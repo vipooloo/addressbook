@@ -1,7 +1,7 @@
 #ifndef ABSTRACTDAO_H
 #define ABSTRACTDAO_H
 
-#include "BaseEntity.h"
+#include "AbstractEntity.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <memory>
 #include <stdint.h>
@@ -11,12 +11,13 @@
 // 1. 错误码枚举（强类型）
 enum class DaoErrCode : uint8_t
 {
-    SUCCESS = 0,    ///< 成功
-    UNSUPPORTED,    ///< 不支持的操作
-    SQLITE_ERROR,   ///< SQLite 错误
-    INVALID_PARAM,  ///< 参数非法
-    NOT_FOUND,      ///< 数据未找到
-    UNKNOWN,        ///< 未知错误
+    SUCCESS = 0,     ///< 成功
+    UNSUPPORTED,     ///< 不支持的操作
+    SQLITE_ERROR,    ///< SQLite 错误
+    INVALID_PARAM,   ///< 参数非法
+    NOT_FOUND,       ///< 数据未找到
+    INTERNAL_ERROR,  ///< 内部错误
+    UNKNOWN,         ///< 未知错误
 };
 
 struct ConditionNode
@@ -64,17 +65,25 @@ class SQLiteConn
 class AbstractDao
 {
   public:
-    explicit AbstractDao(const std::shared_ptr<SQLiteConn>& conn)
-      : m_conn_sptr{conn}
+    AbstractDao(const std::string& tbl_name, const std::shared_ptr<SQLiteConn>& db_sptr)
+      : m_table_name{tbl_name}
+      , m_conn_sptr{db_sptr}
     {}
     virtual ~AbstractDao() = default;
 
+    virtual bool Init()
+    {
+        return true;
+    }
+
+    uint32_t GetCount() const;
+
     // ========== 基础 CRUD 纯虚接口 ==========
-    virtual DaoErrCode Insert(const BaseEntity& entity)
+    virtual DaoErrCode Insert(const AbstractEntity& entity)
     {
         return DaoErrCode::UNSUPPORTED;
     }
-    virtual DaoErrCode Update(const BaseEntity& entity)
+    virtual DaoErrCode Update(const AbstractEntity& entity)
     {
         return DaoErrCode::UNSUPPORTED;
     }
@@ -82,18 +91,24 @@ class AbstractDao
     {
         return DaoErrCode::UNSUPPORTED;
     }
-    virtual std::pair<DaoErrCode, std::shared_ptr<BaseEntity>> FindById(uint32_t rid)
+    virtual std::pair<DaoErrCode, std::shared_ptr<AbstractEntity>> FindById(uint32_t rid)
     {
         return {DaoErrCode::UNSUPPORTED, nullptr};
     }
-    virtual std::pair<DaoErrCode, std::vector<std::shared_ptr<BaseEntity>>> FindAll()
+    virtual std::pair<DaoErrCode, std::vector<std::shared_ptr<AbstractEntity>>> FindAll()
     {
         return {DaoErrCode::UNSUPPORTED, {}};
     }
 
     // ========== 通用查询/删除接口 ==========
-    virtual std::pair<DaoErrCode, PageResult<std::shared_ptr<BaseEntity>>> FindByPage(const QueryParams& params) = 0;
-    virtual DaoErrCode RemoveByConditions(const std::vector<ConditionNode>& conditions) = 0;
+    virtual std::pair<DaoErrCode, PageResult<std::shared_ptr<AbstractEntity>>> FindByPage(const QueryParams& params)
+    {
+        return {DaoErrCode::UNSUPPORTED, {}};
+    }
+    virtual DaoErrCode RemoveByConditions(const std::vector<ConditionNode>& conditions)
+    {
+        return DaoErrCode::UNSUPPORTED;
+    }
 
   protected:
     SQLite::Database& GetDb() const
@@ -111,6 +126,7 @@ class AbstractDao
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
 
   protected:
+    std::string m_table_name;
     std::shared_ptr<SQLiteConn> m_conn_sptr;
 };
 

@@ -1,5 +1,7 @@
 #include "AbstractDao.h"
+#include <sqlite3.h>
 
+static constexpr const char* SQL_ROW_COUNT = "SELECT COUNT(*) FROM ";
 // 计算分页偏移量
 uint32_t AbstractDao::CalcPageOffset(const QueryParams& params) const
 {
@@ -37,4 +39,16 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
         stmt.bind(param_idx++, cond.value);
     }
     return where;
+}
+
+uint32_t AbstractDao::GetCount() const
+{
+    uint32_t ret = 0;
+    SQLite::Statement query(GetDb(), SQL_ROW_COUNT + m_table_name + ";");
+    int32_t code = query.tryExecuteStep();
+    if (SQLITE_ROW == code)
+    {
+        ret = query.getColumn(0).getUInt();
+    }
+    return ret;
 }

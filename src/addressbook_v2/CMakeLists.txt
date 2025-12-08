@@ -22,6 +22,8 @@ foreach(dir ${MY_INCLUDE_DIRS})
     endif()
 endforeach()
 
+target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third_party/SQLiteCpp/sqlite3)
+
 # 如果需要额外链接选项
 target_compile_options(${MODULE_NAME} PRIVATE ${MYAPP_STRICT_COMPILE_FLAGS})
 
