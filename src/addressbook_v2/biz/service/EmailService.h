@@ -3,21 +3,20 @@
 
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
-
-class EmailRepository;
+#include "EmailRepository.h"
 
 class EmailService
 {
   public:
-    explicit EmailService(const std::shared_ptr<EmailRepository>& repo_sptr)
-      : m_repo_sptr{repo_sptr}
+    EmailService()
+      : m_repo{}
     {}
     ~EmailService() = default;
 
     ErrorCode AddEmail(const EmailDto& dto);
 
   private:
-    std::shared_ptr<EmailRepository> m_repo_sptr;
+    EmailRepository m_repo;
 };
 
 #endif  // EMAILSERVICE_H

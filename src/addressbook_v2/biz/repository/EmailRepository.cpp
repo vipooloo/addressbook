@@ -1,8 +1,14 @@
+#include "AddrCenter.h"
+#include "EmailDao.h"
 #include "EmailRepository.h"
 
 EmailRepository::EmailRepository()
-  : m_mail_dao_sptr{nullptr}
+  : m_mail_dao_sptr{std::make_shared<EmailDao>()}
 {
+    if (m_mail_dao_sptr)
+    {
+        m_mail_dao_sptr->Init();
+    }
 }
 
 ErrorCode EmailRepository::AddEmail(const EmailEntity& entity)

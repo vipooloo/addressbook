@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+static constexpr const char* DB_NAME = "addressbook.db";
+
 // 1. 错误码枚举（强类型）
 enum class DaoErrCode : uint8_t
 {
@@ -65,9 +67,8 @@ class SQLiteConn
 class AbstractDao
 {
   public:
-    AbstractDao(const std::string& tbl_name, const std::shared_ptr<SQLiteConn>& db_sptr)
+    explicit AbstractDao(const std::string& tbl_name)
       : m_table_name{tbl_name}
-      , m_conn_sptr{db_sptr}
     {}
     virtual ~AbstractDao() = default;
 
@@ -113,13 +114,8 @@ class AbstractDao
   protected:
     SQLite::Database& GetDb() const
     {
-        static SQLite::Database s_db = SQLite::Database("");
-        SQLite::Database* db_ptr = &s_db;
-        if (m_conn_sptr)
-        {
-            db_ptr = &(m_conn_sptr->GetDb());
-        }
-        return *db_ptr;
+        static SQLiteConn db(DB_NAME);
+        return db.GetDb();
     }
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
@@ -127,7 +123,6 @@ class AbstractDao
 
   protected:
     std::string m_table_name;
-    std::shared_ptr<SQLiteConn> m_conn_sptr;
 };
 
 #endif  // ABSTRACTDAO_H

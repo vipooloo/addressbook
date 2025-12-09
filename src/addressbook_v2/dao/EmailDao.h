@@ -7,7 +7,7 @@
 class EmailDao : public AbstractDao
 {
   public:
-    explicit EmailDao(const std::shared_ptr<SQLiteConn>& db_sptr);
+    EmailDao();
     bool Init() override;
     DaoErrCode Insert(const AbstractEntity& entity) override;
 };

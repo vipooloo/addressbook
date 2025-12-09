@@ -20,6 +20,23 @@ option(ENABLE_COVERAGE "Enable coverage" ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" ON)
 option(ENABLE_GTEST "Enable GTest" OFF)
 
+if(ENABLE_COVERAGE)
+    message(STATUS "Building with coverage flags")
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+endif()
+
+if(ENABLE_ASAN)
+    message(STATUS "Building with AddressSanitizer")
+    set(ASAN_FLAGS "-fsanitize=address,undefined")
+    set(ASAN_FLAGS "-fno-sanitize=signed-integer-overflow")
+    set(ASAN_FLAGS "-fno-sanitize-recover=all")
+    set(ASAN_FLAGS "-fno-omit-frame-pointer")
+    set(ASAN_FLAGS "-fsanitize=address,undefined")
+    add_compile_options(${ASAN_FLAGS})
+    add_link_options(${ASAN_FLAGS})
+endif()
+
 # 依赖通用库
 set(BASE_DEPENDENCIES ${CMAKE_DL_LIBS} pthread ssl crypto)
 

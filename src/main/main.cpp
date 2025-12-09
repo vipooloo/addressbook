@@ -1,5 +1,5 @@
-#include "Api.h"
 #include "Log.h"
+#include "api.h"
 #include <cstring>
 #include <limits.h>
 #include <string>
@@ -48,6 +48,7 @@ int main(int argc, char** argv)
     LOG_INIT();
 
     change_workpath();
+
     Add();
     return 0;
 }

@@ -5,8 +5,8 @@ static constexpr const char* SQL_TABLE_NAME = "email";
 static constexpr const char* SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS email (rid INTEGER PRIMARY KEY AUTOINCREMENT, email_address TEXT, email_name TEXT);";
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
 
-EmailDao::EmailDao(const std::shared_ptr<SQLiteConn>& db_sptr)
-  : AbstractDao(SQL_TABLE_NAME, db_sptr)
+EmailDao::EmailDao()
+  : AbstractDao(SQL_TABLE_NAME)
 {
 }
 
