@@ -11,6 +11,11 @@ ErrorCode EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
+        if (m_repo.GetEmailCount() >= 100)
+        {
+            ret = ErrorCode::kExceedMaxCount;
+            break;
+        }
         EmailEntity entity;
         entity.SetEmailName(dto.GetName());
         entity.SetEmailAddress(dto.GetAddress());

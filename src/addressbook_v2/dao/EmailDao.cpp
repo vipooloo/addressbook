@@ -12,14 +12,14 @@ EmailDao::EmailDao()
 
 bool EmailDao::Init()
 {
-    SQLite::Statement stmt(GetDb(), SQL_CREATE_TABLE);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_CREATE_TABLE);
     return (SQLITE_DONE == stmt.tryExecuteStep());
 }
 
 DaoErrCode EmailDao::Insert(const AbstractEntity& entity)
 {
     const EmailEntity& email_entity = static_cast<const EmailEntity&>(entity);
-    SQLite::Statement stmt(GetDb(), SQL_INSERT);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
     stmt.bind(1, email_entity.GetEmailAddress());
     stmt.bind(2, email_entity.GetEmailName());
 

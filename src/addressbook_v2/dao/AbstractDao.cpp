@@ -44,7 +44,7 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
 uint32_t AbstractDao::GetCount() const
 {
     uint32_t ret = 0;
-    SQLite::Statement query(GetDb(), SQL_ROW_COUNT + m_table_name + ";");
+    SQLite::Statement query(AbstractDao::GetDb(), SQL_ROW_COUNT + m_table_name + ";");
     int32_t code = query.tryExecuteStep();
     if (SQLITE_ROW == code)
     {

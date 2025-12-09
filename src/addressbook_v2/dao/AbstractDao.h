@@ -71,7 +71,11 @@ class AbstractDao
       : m_table_name{tbl_name}
     {}
     virtual ~AbstractDao() = default;
-
+    static SQLite::Database& GetDb()
+    {
+        static SQLiteConn db(DB_NAME);
+        return db.GetDb();
+    }
     virtual bool Init()
     {
         return true;
@@ -112,17 +116,33 @@ class AbstractDao
     }
 
   protected:
-    SQLite::Database& GetDb() const
-    {
-        static SQLiteConn db(DB_NAME);
-        return db.GetDb();
-    }
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
 
   protected:
     std::string m_table_name;
+};
+
+class TransactionGuard
+{
+  public:
+    TransactionGuard()
+      : m_transaction{AbstractDao::GetDb()}
+    {
+    }
+    ~TransactionGuard()
+    {
+        m_transaction.commit();
+    }
+
+    TransactionGuard(const TransactionGuard&) = delete;
+    TransactionGuard& operator=(const TransactionGuard&) = delete;
+    TransactionGuard(TransactionGuard&&) = delete;
+    TransactionGuard& operator=(TransactionGuard&&) = delete;
+
+  private:
+    SQLite::Transaction m_transaction;
 };
 
 #endif  // ABSTRACTDAO_H

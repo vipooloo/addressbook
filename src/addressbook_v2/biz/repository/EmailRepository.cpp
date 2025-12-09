@@ -16,6 +16,7 @@ ErrorCode EmailRepository::AddEmail(const EmailEntity& entity)
     ErrorCode result = ErrorCode::kDbError;
     if (m_mail_dao_sptr)
     {
+        TransactionGuard db_trans_guard;
         DaoErrCode dao_result = m_mail_dao_sptr->Insert(entity);
         switch (dao_result)
         {
