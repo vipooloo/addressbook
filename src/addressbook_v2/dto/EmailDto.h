@@ -3,14 +3,16 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 class EmailDto
 {
   public:
-    EmailDto(const std::string& address, const std::string& name)
+    EmailDto(const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids)
       : m_rid{0}
       , m_address{address}
       , m_name{name}
+      , m_group_rids{group_rids}
     {
     }
     ~EmailDto() = default;
@@ -46,6 +48,7 @@ class EmailDto
     uint32_t m_rid;
     std::string m_address;
     std::string m_name;
+    std::vector<uint32_t> m_group_rids;
 };
 
 #endif  // EMAILDTO_H

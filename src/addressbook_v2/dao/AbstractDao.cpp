@@ -41,10 +41,16 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
     return where;
 }
 
-uint32_t AbstractDao::GetCount() const
+bool AbstractDao::OnCreteTable(const std::string& create_table_sql)
+{
+    SQLite::Statement stmt(GetDb(), create_table_sql);
+    return (SQLITE_DONE == stmt.tryExecuteStep());
+}
+
+size_t AbstractDao::OnGetCount(const std::string& table_name) const
 {
     uint32_t ret = 0;
-    SQLite::Statement query(AbstractDao::GetDb(), SQL_ROW_COUNT + m_table_name + ";");
+    SQLite::Statement query(GetDb(), table_name);
     int32_t code = query.tryExecuteStep();
     if (SQLITE_ROW == code)
     {

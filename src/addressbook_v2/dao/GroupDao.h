@@ -1,16 +1,16 @@
-#ifndef EMAILDAO_H
-#define EMAILDAO_H
+#ifndef GROUPDAO_H
+#define GROUPDAO_H
 
 #include "AbstractDao.h"
 
-class EmailDao : public AbstractDao
+class GroupDao : public AbstractDao
 {
   public:
-    EmailDao();
-    ~EmailDao() override = default;
+    GroupDao();
+    ~GroupDao() override = default;
     bool Init() override;
     size_t GetCount() const override;
     DaoErrCode Insert(const AbstractEntity& entity) override;
 };
 
-#endif  // EMAILDAO_H
+#endif  // GROUPDAO_H

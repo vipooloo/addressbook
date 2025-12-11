@@ -1,19 +1,25 @@
 #include "EmailDao.h"
+#include "EmailEntity.h"
 #include <sqlite3.h>
 
 static constexpr const char* SQL_TABLE_NAME = "email";
 static constexpr const char* SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS email (rid INTEGER PRIMARY KEY AUTOINCREMENT, email_address TEXT, email_name TEXT);";
+static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM email;";
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
 
 EmailDao::EmailDao()
-  : AbstractDao(SQL_TABLE_NAME)
+  : AbstractDao()
 {
 }
 
 bool EmailDao::Init()
 {
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_CREATE_TABLE);
-    return (SQLITE_DONE == stmt.tryExecuteStep());
+    return AbstractDao::OnCreteTable(SQL_CREATE_TABLE);
+}
+
+size_t EmailDao::GetCount() const
+{
+    return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
 DaoErrCode EmailDao::Insert(const AbstractEntity& entity)

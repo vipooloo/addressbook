@@ -4,6 +4,8 @@
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
 #include "EmailRepository.h"
+#include "GroupDto.h"
+#include "GroupRepository.h"
 
 class EmailService
 {
@@ -14,6 +16,7 @@ class EmailService
     ~EmailService() = default;
 
     ErrorCode AddEmail(const EmailDto& dto);
+    ErrorCode AddGroup(const GroupDto& dto);
 
   private:
     EmailRepository m_repo;

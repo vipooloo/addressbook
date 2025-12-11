@@ -67,8 +67,7 @@ class SQLiteConn
 class AbstractDao
 {
   public:
-    explicit AbstractDao(const std::string& tbl_name)
-      : m_table_name{tbl_name}
+    AbstractDao()
     {}
     virtual ~AbstractDao() = default;
     static SQLite::Database& GetDb()
@@ -81,7 +80,10 @@ class AbstractDao
         return true;
     }
 
-    uint32_t GetCount() const;
+    virtual size_t GetCount() const
+    {
+        return 0;
+    }
 
     // ========== 基础 CRUD 纯虚接口 ==========
     virtual DaoErrCode Insert(const AbstractEntity& entity)
@@ -116,12 +118,11 @@ class AbstractDao
     }
 
   protected:
+    bool OnCreteTable(const std::string& create_table_sql);
+    size_t OnGetCount(const std::string& table_name) const;
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
-
-  protected:
-    std::string m_table_name;
 };
 
 class TransactionGuard

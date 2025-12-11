@@ -17,8 +17,8 @@ class EmailEntity : public AbstractEntity
 
     EmailEntity(uint32_t rid, const std::string& email_address, const std::string& email_name)
       : AbstractEntity(rid)
-      , m_email_address(email_address)
-      , m_email_name(email_name)
+      , m_email_address{email_address}
+      , m_email_name{email_name}
     {
     }
 
