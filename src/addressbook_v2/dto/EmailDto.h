@@ -44,6 +44,15 @@ class EmailDto
         m_name = name;
     }
 
+    std::vector<uint32_t> GetGroupRids() const
+    {
+        return m_group_rids;
+    }
+    void SetGroupRids(const std::vector<uint32_t>& group_rids)
+    {
+        m_group_rids = group_rids;
+    }
+
   private:
     uint32_t m_rid;
     std::string m_address;

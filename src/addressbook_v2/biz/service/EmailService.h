@@ -11,7 +11,8 @@ class EmailService
 {
   public:
     EmailService()
-      : m_repo{}
+      : m_mail_rep{}
+      , m_group_repo{}
     {}
     ~EmailService() = default;
 
@@ -19,7 +20,8 @@ class EmailService
     ErrorCode AddGroup(const GroupDto& dto);
 
   private:
-    EmailRepository m_repo;
+    EmailRepository m_mail_rep;
+    GroupRepository m_group_repo;
 };
 
 #endif  // EMAILSERVICE_H

@@ -14,6 +14,7 @@ class GroupRepository
     GroupRepository();
     ~GroupRepository() = default;
     ErrorCode AddGroup(const GroupEntity& entity);
+    bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
     size_t GetGroupCount() const;
 
   private:

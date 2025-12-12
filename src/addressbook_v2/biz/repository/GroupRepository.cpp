@@ -43,3 +43,13 @@ size_t GroupRepository::GetGroupCount() const
     }
     return count;
 }
+
+bool GroupRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
+{
+    bool result = false;
+    if (m_group_dao_sptr)
+    {
+        result = (DaoErrCode::SUCCESS == m_group_dao_sptr->IsExist(group_ids));
+    }
+    return result;
+}

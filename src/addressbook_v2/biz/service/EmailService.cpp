@@ -11,7 +11,14 @@ ErrorCode EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
-        if (m_repo.GetEmailCount() >= 100)
+        std::vector<uint32_t> group_rids = dto.GetGroupRids();
+        bool group_exist = m_group_repo.IsGroupExist(group_rids);
+        if (!group_exist)
+        {
+            ret = ErrorCode::kNotFound;
+            break;
+        }
+        if (m_mail_rep.GetEmailCount() >= 100)
         {
             ret = ErrorCode::kExceedMaxCount;
             break;
@@ -19,7 +26,7 @@ ErrorCode EmailService::AddEmail(const EmailDto& dto)
         EmailEntity entity;
         entity.SetEmailName(dto.GetName());
         entity.SetEmailAddress(dto.GetAddress());
-        ret = m_repo.AddEmail(entity);
+        ret = m_mail_rep.AddEmail(entity);
     } while (false);
     return ret;
 }

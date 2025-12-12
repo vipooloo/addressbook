@@ -90,6 +90,10 @@ class AbstractDao
     {
         return DaoErrCode::UNSUPPORTED;
     }
+    virtual DaoErrCode IsExist(const std::vector<uint32_t>& rids)
+    {
+        return DaoErrCode::UNSUPPORTED;
+    }
     virtual DaoErrCode Update(const AbstractEntity& entity)
     {
         return DaoErrCode::UNSUPPORTED;
