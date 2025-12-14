@@ -22,6 +22,58 @@ enum class DaoErrCode : uint8_t
     UNKNOWN,         ///< 未知错误
 };
 
+// 邮件组映射表查询条件（通用）
+class MailGroupMappingQueryCond
+{
+  public:
+    MailGroupMappingQueryCond()
+      : MailGroupMappingQueryCond(0, 0, 0)
+    {}
+    MailGroupMappingQueryCond(uint32_t rid, uint32_t mail_rid, uint32_t group_rid)
+      : m_rid{rid}
+      , m_mail_rid{mail_rid}
+      , m_group_rid{group_rid}
+    {}
+    ~MailGroupMappingQueryCond() = default;
+
+    void SetRid(uint32_t rid)
+    {
+        m_rid = rid;
+    }
+    uint32_t GetRid() const
+    {
+        return m_rid;
+    }
+
+    void SetMailRid(uint32_t mail_rid)
+    {
+        m_mail_rid = mail_rid;
+    }
+    uint32_t GetMailRid() const
+    {
+        return m_mail_rid;
+    }
+
+    void SetGroupRid(uint32_t group_rid)
+    {
+        m_group_rid = group_rid;
+    }
+    uint32_t GetGroupRid() const
+    {
+        return m_group_rid;
+    }
+
+    bool InValid() const
+    {
+        return 0 == m_rid && 0 == m_mail_rid && 0 == m_group_rid;
+    }
+
+  private:
+    uint32_t m_rid;
+    uint32_t m_mail_rid;
+    uint32_t m_group_rid;
+};
+
 struct ConditionNode
 {
     std::string field;  // 字段名
@@ -84,9 +136,13 @@ class AbstractDao
     {
         return 0;
     }
+    virtual size_t CountByCond(const MailGroupMappingQueryCond& cond) const
+    {
+        return 0;
+    }
 
     // ========== 基础 CRUD 纯虚接口 ==========
-    virtual DaoErrCode Insert(const AbstractEntity& entity)
+    virtual DaoErrCode Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
         return DaoErrCode::UNSUPPORTED;
     }
@@ -127,27 +183,6 @@ class AbstractDao
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
-};
-
-class TransactionGuard
-{
-  public:
-    TransactionGuard()
-      : m_transaction{AbstractDao::GetDb()}
-    {
-    }
-    ~TransactionGuard()
-    {
-        m_transaction.commit();
-    }
-
-    TransactionGuard(const TransactionGuard&) = delete;
-    TransactionGuard& operator=(const TransactionGuard&) = delete;
-    TransactionGuard(TransactionGuard&&) = delete;
-    TransactionGuard& operator=(TransactionGuard&&) = delete;
-
-  private:
-    SQLite::Transaction m_transaction;
 };
 
 #endif  // ABSTRACTDAO_H

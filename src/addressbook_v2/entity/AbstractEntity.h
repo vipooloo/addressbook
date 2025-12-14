@@ -15,6 +15,10 @@ class AbstractEntity
     {
         return m_rid;
     }
+    void SetRid(uint32_t rid)
+    {
+        m_rid = rid;
+    }
 
   private:
     uint32_t m_rid;

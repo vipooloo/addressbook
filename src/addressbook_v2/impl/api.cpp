@@ -3,5 +3,5 @@
 
 void Add()
 {
-    AddrCenter::GetInstance().GetEmailService().AddEmail(EmailDto{"123", "Test Email", {}});
+    AddrCenter::GetInstance().GetEmailService().AddEmail(EmailDto{"123", "Test Email", {1,2}});
 }

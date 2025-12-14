@@ -3,6 +3,8 @@
 
 #include "AddressResultCodeDefs.h"
 #include "EmailEntity.h"
+#include "GroupEntity.h"
+#include "MailGroupRelation.h"
 #include <memory>
 #include <stdint.h>
 
@@ -13,11 +15,20 @@ class EmailRepository
   public:
     EmailRepository();
     ~EmailRepository() = default;
-    ErrorCode AddEmail(const EmailEntity& entity);
+    bool AddEmail(const EmailEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr);
     uint32_t GetEmailCount() const;
+
+    ErrorCode AddGroup(const GroupEntity& entity);
+    bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
+    size_t GetGroupCount() const;
+    bool IsGroupCanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t add_count);
+
+    bool AddEmailToGroupRelation(const MailGroupRelation& entity);
 
   private:
     std::shared_ptr<AbstractDao> m_mail_dao_sptr;
+    std::shared_ptr<AbstractDao> m_group_dao_sptr;
+    std::shared_ptr<AbstractDao> m_mail_group_dao_sptr;
 };
 
 #endif  // EMAILREPOSITORY_H

@@ -22,7 +22,7 @@ size_t EmailDao::GetCount() const
     return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
-DaoErrCode EmailDao::Insert(const AbstractEntity& entity)
+DaoErrCode EmailDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     const EmailEntity& email_entity = static_cast<const EmailEntity&>(entity);
     SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
@@ -32,7 +32,15 @@ DaoErrCode EmailDao::Insert(const AbstractEntity& entity)
     DaoErrCode ret = DaoErrCode::INTERNAL_ERROR;
     if (SQLITE_DONE == stmt.tryExecuteStep())
     {
-        ret = DaoErrCode::SUCCESS;
+        std::shared_ptr<EmailEntity> new_entity = std::static_pointer_cast<EmailEntity>(out_entity_sptr);
+        if (new_entity)
+        {
+            new_entity->SetEmailAddress(email_entity.GetEmailAddress());
+            new_entity->SetEmailName(email_entity.GetEmailName());
+            int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+            new_entity->SetRid(rid);
+            ret = DaoErrCode::SUCCESS;
+        }
     }
     return ret;
 }
