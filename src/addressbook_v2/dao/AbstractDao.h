@@ -142,9 +142,9 @@ class AbstractDao
     }
 
     // ========== 基础 CRUD 纯虚接口 ==========
-    virtual DaoErrCode Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+    virtual bool Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
-        return DaoErrCode::UNSUPPORTED;
+        return false;
     }
     virtual DaoErrCode IsExist(const std::vector<uint32_t>& rids)
     {

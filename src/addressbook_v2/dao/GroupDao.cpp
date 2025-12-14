@@ -22,16 +22,16 @@ size_t GroupDao::GetCount() const
     return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
-DaoErrCode GroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool GroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     const GroupEntity& group_entity = static_cast<const GroupEntity&>(entity);
     SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
     stmt.bind(1, group_entity.GetGroupName());
 
-    DaoErrCode ret = DaoErrCode::INTERNAL_ERROR;
+    bool ret = false;
     if (SQLITE_DONE == stmt.tryExecuteStep())
     {
-        ret = DaoErrCode::SUCCESS;
+        ret = true;
     }
     return ret;
 }

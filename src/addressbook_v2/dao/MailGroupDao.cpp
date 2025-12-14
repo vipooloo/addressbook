@@ -1,5 +1,5 @@
-#include "EmailEntity.h"
 #include "MailGroupDao.h"
+#include "MailGroupRelation.h"
 #include <sqlite3.h>
 
 static constexpr const char* SQL_TABLE_NAME = "GROUPMAPPING";
@@ -44,4 +44,15 @@ size_t MailGroupDao::CountByCond(const MailGroupMappingQueryCond& cond) const
         // TODO
     }
     return ret_count;
+}
+
+bool MailGroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+{
+    (void)out_entity_sptr;
+
+    const MailGroupRelation& relation_entity = static_cast<const MailGroupRelation&>(entity);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+    stmt.bind(1, relation_entity.GetMailRid());
+    stmt.bind(2, relation_entity.GetGroupRid());
+    return SQLITE_DONE == stmt.tryExecuteStep();
 }

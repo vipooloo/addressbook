@@ -10,7 +10,7 @@ class GroupDao : public AbstractDao
     ~GroupDao() override = default;
     bool Init() override;
     size_t GetCount() const override;
-    DaoErrCode Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
+    bool Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
 };
 
 #endif  // GROUPDAO_H

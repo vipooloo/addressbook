@@ -18,7 +18,7 @@ class EmailRepository
     bool AddEmail(const EmailEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr);
     uint32_t GetEmailCount() const;
 
-    ErrorCode AddGroup(const GroupEntity& entity);
+    bool AddGroup(const GroupEntity& entity);
     bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
     size_t GetGroupCount() const;
     bool IsGroupCanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t add_count);

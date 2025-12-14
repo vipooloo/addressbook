@@ -53,17 +53,24 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             break;
         }
         // 添加邮件到组的映射关系
-        MailGroupRelation relation;
-        relation.SetGroupRid(out_entity_sptr->GetRid());
-        bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relation);
-        if (!add_relation_res)
+        for (uint32_t gid : group_rids)
         {
-            AB_LOG_E("Failed to add email-group relation to database");
-            ret = ErrorCode::kDbError;
-            break;
+            MailGroupRelation relation;
+            relation.SetMailRid(out_entity_sptr->GetRid());
+            relation.SetGroupRid(gid);
+            bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relation);
+            if (!add_relation_res)
+            {
+                AB_LOG_E("Failed to add email-group relation to database");
+                ret = ErrorCode::kDbError;
+                break;
+            }
         }
-        result.second.SetRid(out_entity_sptr->GetRid());
-        trans_guard.SetError(false);
+        if (ErrorCode::kSuccess == ret)
+        {
+            result.second.SetRid(out_entity_sptr->GetRid());
+            trans_guard.SetError(false);
+        }
     } while (false);
     return result;
 }

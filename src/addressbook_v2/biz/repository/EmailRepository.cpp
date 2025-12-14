@@ -28,7 +28,7 @@ bool EmailRepository::AddEmail(const EmailEntity& entity, std::shared_ptr<Abstra
     bool result = false;
     if (m_mail_dao_sptr)
     {
-        result = DaoErrCode::SUCCESS == m_mail_dao_sptr->Insert(entity, out_entity_sptr);
+        result = m_mail_dao_sptr->Insert(entity, out_entity_sptr);
     }
     return result;
 }
@@ -43,25 +43,13 @@ uint32_t EmailRepository::GetEmailCount() const
     return count;
 }
 
-ErrorCode EmailRepository::AddGroup(const GroupEntity& entity)
+bool EmailRepository::AddGroup(const GroupEntity& entity)
 {
-    ErrorCode result = ErrorCode::kDbError;
+    bool result = false;
     if (m_group_dao_sptr)
     {
         auto s = std::shared_ptr<AbstractEntity>();
-        DaoErrCode dao_result = m_group_dao_sptr->Insert(entity, s);
-        switch (dao_result)
-        {
-            case DaoErrCode::SUCCESS:
-                result = ErrorCode::kSuccess;
-                break;
-            case DaoErrCode::INVALID_PARAM:
-                result = ErrorCode::kInvalidParam;
-                break;
-            default:
-                result = ErrorCode::kDbError;
-                break;
-        }
+        result = m_group_dao_sptr->Insert(entity, s);
     }
     return result;
 }
@@ -122,7 +110,7 @@ bool EmailRepository::AddEmailToGroupRelation(const MailGroupRelation& entity)
     if (m_mail_dao_sptr)
     {
         std::shared_ptr<AbstractEntity> out_entity_sptr = nullptr;
-        result = DaoErrCode::SUCCESS == m_mail_group_dao_sptr->Insert(entity, out_entity_sptr);
+        result = m_mail_group_dao_sptr->Insert(entity, out_entity_sptr);
     }
     return result;
 }
