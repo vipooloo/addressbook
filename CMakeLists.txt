@@ -5,16 +5,10 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#--------------------------------------------------------------
-# 如果没有指定构建类型，则默认为 Debug
-# 仅在非多配置生成器下生效（如 Makefile/Ninja）
-#--------------------------------------------------------------
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "No build type specified. Defaulting to Debug.")
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
-endif()
 
 message(STATUS "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+
+add_compile_options(-O0 -g)
 
 option(ENABLE_COVERAGE "Enable coverage" ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" ON)
@@ -22,17 +16,17 @@ option(ENABLE_GTEST "Enable GTest" OFF)
 
 if(ENABLE_COVERAGE)
     message(STATUS "Building with coverage flags")
-    add_compile_options(--coverage -O0 -g)
+    add_compile_options(--coverage)
     add_link_options(--coverage)
 endif()
 
 if(ENABLE_ASAN)
     message(STATUS "Building with AddressSanitizer")
-    set(ASAN_FLAGS "-fsanitize=address,undefined")
-    set(ASAN_FLAGS "-fno-sanitize=signed-integer-overflow")
-    set(ASAN_FLAGS "-fno-sanitize-recover=all")
-    set(ASAN_FLAGS "-fno-omit-frame-pointer")
-    set(ASAN_FLAGS "-fsanitize=address,undefined")
+    set(ASAN_FLAGS ${ASAN_FLAGS} "-fsanitize=address,undefined")
+    set(ASAN_FLAGS ${ASAN_FLAGS} "-fno-sanitize=signed-integer-overflow")
+    set(ASAN_FLAGS ${ASAN_FLAGS} "-fno-sanitize-recover=all")
+    set(ASAN_FLAGS ${ASAN_FLAGS} "-fno-omit-frame-pointer")
+    set(ASAN_FLAGS ${ASAN_FLAGS} "-fsanitize=address,undefined")
     add_compile_options(${ASAN_FLAGS})
     add_link_options(${ASAN_FLAGS})
 endif()

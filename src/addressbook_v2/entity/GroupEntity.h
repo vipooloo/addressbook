@@ -18,7 +18,7 @@ class GroupEntity : public AbstractEntity
 
     explicit GroupEntity(uint32_t rid, const std::string& group_name)
       : AbstractEntity(rid)
-      , m_group_name{m_group_name}
+      , m_group_name{group_name}
     {
     }
 

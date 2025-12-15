@@ -14,8 +14,8 @@ class EmailService
     {}
     ~EmailService() = default;
 
-    std::pair<ErrorCode,EmailDto> AddEmail(const EmailDto& dto);
-    ErrorCode AddGroup(const GroupDto& dto);
+    std::pair<ErrorCode, EmailDto> AddEmail(const EmailDto& dto);
+    std::pair<ErrorCode, GroupDto> AddGroup(const GroupDto& dto);
 
   private:
     EmailRepository m_mail_rep;

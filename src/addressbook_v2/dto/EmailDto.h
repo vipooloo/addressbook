@@ -52,12 +52,6 @@ class EmailDto
     {
         m_group_rids = group_rids;
     }
-    EmailDto GetObj() const
-    {
-        EmailDto Dto{m_address, m_name, m_group_rids};
-        Dto.SetRid(m_rid);
-        return Dto;
-    }
 
   private:
     uint32_t m_rid;

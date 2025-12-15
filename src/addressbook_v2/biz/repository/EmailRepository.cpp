@@ -33,23 +33,12 @@ bool EmailRepository::AddEmail(const EmailEntity& entity, std::shared_ptr<Abstra
     return result;
 }
 
-uint32_t EmailRepository::GetEmailCount() const
-{
-    uint32_t count = 0;
-    if (m_mail_dao_sptr)
-    {
-        count = m_mail_dao_sptr->GetCount();
-    }
-    return count;
-}
-
-bool EmailRepository::AddGroup(const GroupEntity& entity)
+bool EmailRepository::AddGroup(const GroupEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     bool result = false;
     if (m_group_dao_sptr)
     {
-        auto s = std::shared_ptr<AbstractEntity>();
-        result = m_group_dao_sptr->Insert(entity, s);
+        result = m_group_dao_sptr->Insert(entity, out_entity_sptr);
     }
     return result;
 }
@@ -64,24 +53,17 @@ size_t EmailRepository::GetGroupCount() const
     return count;
 }
 
-bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
+uint32_t EmailRepository::GetEmailCount() const
 {
-    bool result = false;
-    if (group_ids.empty())
+    uint32_t count = 0;
+    if (m_mail_dao_sptr)
     {
-        result = true;
+        count = m_mail_dao_sptr->GetCount();
     }
-    else
-    {
-        if (m_group_dao_sptr)
-        {
-            result = (DaoErrCode::SUCCESS == m_group_dao_sptr->IsExist(group_ids));
-        }
-    }
-    return result;
+    return count;
 }
 
-bool EmailRepository::IsGroupCanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t add_count)
+bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t add_count)
 {
     bool result = true;
     if (m_mail_group_dao_sptr)
@@ -104,6 +86,29 @@ bool EmailRepository::IsGroupCanAddEmail(const std::vector<uint32_t>& group_ids,
     return result;
 }
 
+bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t add_count)
+{
+    bool result = true;
+    if (m_mail_group_dao_sptr)
+    {
+        for (uint32_t mail_rid : mail_ids)
+        {
+            MailGroupMappingQueryCond cond;
+            cond.SetMailRid(mail_rid);
+            size_t count = m_mail_group_dao_sptr->CountByCond(cond);
+            if (count >= add_count)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        result = false;
+    }
+    return result;
+}
+
 bool EmailRepository::AddEmailToGroupRelation(const MailGroupRelation& entity)
 {
     bool result = false;
@@ -111,6 +116,40 @@ bool EmailRepository::AddEmailToGroupRelation(const MailGroupRelation& entity)
     {
         std::shared_ptr<AbstractEntity> out_entity_sptr = nullptr;
         result = m_mail_group_dao_sptr->Insert(entity, out_entity_sptr);
+    }
+    return result;
+}
+
+bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
+{
+    bool result = false;
+    if (group_ids.empty())
+    {
+        result = true;
+    }
+    else
+    {
+        if (m_group_dao_sptr)
+        {
+            result = (DaoErrCode::SUCCESS == m_group_dao_sptr->IsExist(group_ids));
+        }
+    }
+    return result;
+}
+
+bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
+{
+    bool result = false;
+    if (mail_ids.empty())
+    {
+        result = true;
+    }
+    else
+    {
+        if (m_mail_dao_sptr)
+        {
+            result = (DaoErrCode::SUCCESS == m_mail_dao_sptr->IsExist(mail_ids));
+        }
     }
     return result;
 }
