@@ -109,13 +109,12 @@ bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_
     return result;
 }
 
-bool EmailRepository::AddEmailToGroupRelation(const MailGroupRelation& entity)
+bool EmailRepository::AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items)
 {
     bool result = false;
     if (m_mail_dao_sptr)
     {
-        std::shared_ptr<AbstractEntity> out_entity_sptr = nullptr;
-        result = m_mail_group_dao_sptr->Insert(entity, out_entity_sptr);
+        result = m_mail_group_dao_sptr->InsertBatch(items);
     }
     return result;
 }
@@ -131,7 +130,7 @@ bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
     {
         if (m_group_dao_sptr)
         {
-            result = (DaoErrCode::SUCCESS == m_group_dao_sptr->IsExist(group_ids));
+            result = m_group_dao_sptr->IsExist(group_ids);
         }
     }
     return result;
@@ -148,7 +147,7 @@ bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
     {
         if (m_mail_dao_sptr)
         {
-            result = (DaoErrCode::SUCCESS == m_mail_dao_sptr->IsExist(mail_ids));
+            result = m_mail_dao_sptr->IsExist(mail_ids);
         }
     }
     return result;

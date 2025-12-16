@@ -12,6 +12,7 @@ class MailGroupDao : public AbstractDao
     size_t GetCount() const override;
     size_t CountByCond(const MailGroupMappingQueryCond& cond) const override;
     bool Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
+    bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items) override;
 };
 
 #endif  // MAILGROUPDAO_H

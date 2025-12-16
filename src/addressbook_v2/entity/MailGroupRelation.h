@@ -8,9 +8,15 @@ class MailGroupRelation : public AbstractEntity
 {
   public:
     MailGroupRelation()
+      : MailGroupRelation(0, 0)
+    {}
+
+    MailGroupRelation(uint32_t mail_rid, uint32_t group_rid)
       : AbstractEntity(0)
-      , m_mail_rid{0}
-      , m_group_rid{0} {};
+      , m_mail_rid{mail_rid}
+      , m_group_rid{group_rid}
+    {}
+
     ~MailGroupRelation() = default;
 
     uint32_t GetMailRid() const

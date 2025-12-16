@@ -1,6 +1,8 @@
 #include "EmailDao.h"
 #include "EmailEntity.h"
+#include <iostream>
 #include <sqlite3.h>
+#include <sstream>
 
 static constexpr const char* SQL_TABLE_NAME = "email";
 static constexpr const char* SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS email (rid INTEGER PRIMARY KEY AUTOINCREMENT, email_address TEXT, email_name TEXT);";
@@ -40,6 +42,34 @@ bool EmailDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEnti
             int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
             new_entity->SetRid(rid);
             ret = true;
+        }
+    }
+    return ret;
+}
+
+bool EmailDao::IsExist(const std::vector<uint32_t>& rids)
+{
+    bool ret = false;
+    if (!rids.empty())
+    {
+        std::ostringstream sql;
+        sql << "SELECT COUNT(DISTINCT rid) = " << rids.size()
+            << " FROM email WHERE rid IN (";
+
+        for (size_t i = 0; i < rids.size(); ++i)
+        {
+            if (i > 0)
+            {
+                sql << ",";
+            }
+            sql << rids[i];
+        }
+        sql << ");";
+
+        SQLite::Statement stmt(AbstractDao::GetDb(), sql.str());
+        if (SQLITE_ROW == stmt.tryExecuteStep())
+        {
+            ret = stmt.getColumn(0).getInt() == 1;
         }
     }
     return ret;

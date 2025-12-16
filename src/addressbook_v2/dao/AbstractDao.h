@@ -146,9 +146,13 @@ class AbstractDao
     {
         return false;
     }
-    virtual DaoErrCode IsExist(const std::vector<uint32_t>& rids)
+    virtual bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
     {
-        return DaoErrCode::UNSUPPORTED;
+        return false;
+    }
+    virtual bool IsExist(const std::vector<uint32_t>& rids)
+    {
+        return false;
     }
     virtual DaoErrCode Update(const AbstractEntity& entity)
     {

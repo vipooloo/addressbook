@@ -54,18 +54,17 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             break;
         }
         // 添加邮件到组的映射关系
-        for (uint32_t gid : group_rids)
+        std::vector<std::shared_ptr<AbstractEntity>> relations;
+        for (uint32_t group_rid : group_rids)
         {
-            MailGroupRelation relation;
-            relation.SetMailRid(out_entity_sptr->GetRid());
-            relation.SetGroupRid(gid);
-            bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relation);
-            if (!add_relation_res)
-            {
-                AB_LOG_E("Failed to add email-group relation to database");
-                ret = ErrorCode::kDbError;
-                break;
-            }
+            relations.emplace_back(std::make_shared<MailGroupRelation>(out_entity_sptr->GetRid(), group_rid));
+        }
+        bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relations);
+        if (!add_relation_res)
+        {
+            AB_LOG_E("Failed to add email-group relation to database");
+            ret = ErrorCode::kDbError;
+            break;
         }
         if (ErrorCode::kSuccess == ret)
         {
@@ -130,13 +129,18 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             MailGroupRelation relation;
             relation.SetGroupRid(out_entity_sptr->GetRid());
             relation.SetMailRid(mail_rid);
-            bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relation);
-            if (!add_relation_res)
-            {
-                AB_LOG_E("Failed to add email-group relation to database");
-                ret = ErrorCode::kDbError;
-                break;
-            }
+        }
+        std::vector<std::shared_ptr<AbstractEntity>> relations;
+        for (uint32_t mail_rid : mail_rids)
+        {
+            relations.emplace_back(std::make_shared<MailGroupRelation>(out_entity_sptr->GetRid(), mail_rid));
+        }
+        bool add_relation_res = m_mail_rep.AddEmailToGroupRelation(relations);
+        if (!add_relation_res)
+        {
+            AB_LOG_E("Failed to add email-group relation to database");
+            ret = ErrorCode::kDbError;
+            break;
         }
         if (ErrorCode::kSuccess == ret)
         {

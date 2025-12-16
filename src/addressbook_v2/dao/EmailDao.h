@@ -11,6 +11,7 @@ class EmailDao : public AbstractDao
     bool Init() override;
     size_t GetCount() const override;
     bool Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
+    bool IsExist(const std::vector<uint32_t>& rids) override;
 };
 
 #endif  // EMAILDAO_H

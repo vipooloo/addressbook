@@ -31,7 +31,14 @@ bool GroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEnti
     bool ret = false;
     if (SQLITE_DONE == stmt.tryExecuteStep())
     {
-        ret = true;
+        std::shared_ptr<GroupEntity> new_entity = std::static_pointer_cast<GroupEntity>(out_entity_sptr);
+        if (new_entity)
+        {
+            new_entity->SetGroupName(group_entity.GetGroupName());
+            int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+            new_entity->SetRid(rid);
+            ret = true;
+        }
     }
     return ret;
 }

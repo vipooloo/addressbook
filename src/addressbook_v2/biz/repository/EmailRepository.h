@@ -25,7 +25,7 @@ class EmailRepository
     size_t GetGroupCount() const;
     bool CanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t add_count);
 
-    bool AddEmailToGroupRelation(const MailGroupRelation& entity);
+    bool AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items);
 
   private:
     std::shared_ptr<AbstractDao> m_mail_dao_sptr;
