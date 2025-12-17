@@ -12,13 +12,12 @@ class GroupDto
       : GroupDto(0, {}, {})
     {}
 
-    explicit GroupDto(uint32_t rid)
-      : GroupDto(rid, {}, {})
-    {}
     explicit GroupDto(const std::string& group_name)
       : GroupDto(0, group_name, {})
     {}
-
+    GroupDto(const std::string& group_name, const std::vector<uint32_t>& mail_rids)
+      : GroupDto(0, group_name, mail_rids)
+    {}
     GroupDto(uint32_t rid, const std::string& group_name, const std::vector<uint32_t>& mail_rids)
       : m_rid{rid}
       , m_group_name{group_name}

@@ -15,6 +15,10 @@ class EmailEntity : public AbstractEntity
       : EmailEntity(rid, {}, {})
     {}
 
+    EmailEntity(const std::string& email_address, const std::string& email_name)
+      : EmailEntity(0, email_address, email_name)
+    {}
+
     EmailEntity(const EmailEntity& other)
       : EmailEntity(other.GetRid(), other.m_email_address, other.m_email_name)
     {

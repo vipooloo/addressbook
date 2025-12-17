@@ -16,6 +16,10 @@ class GroupEntity : public AbstractEntity
       : GroupEntity(rid, {})
     {}
 
+    explicit GroupEntity(const std::string& group_name)
+      : GroupEntity(0, group_name)
+    {}
+
     explicit GroupEntity(uint32_t rid, const std::string& group_name)
       : AbstractEntity(rid)
       , m_group_name{group_name}

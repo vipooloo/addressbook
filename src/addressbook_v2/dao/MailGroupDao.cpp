@@ -1,3 +1,4 @@
+#include "AddrCenterLog.h"
 #include "MailGroupDao.h"
 #include "MailGroupRelation.h"
 #include <sqlite3.h>
@@ -9,7 +10,7 @@ CREATE TABLE IF NOT EXISTS GROUPMAPPING (
     m_rid INTEGER,  
     g_rid INTEGER,  
     FOREIGN KEY (g_rid) REFERENCES MAILGROUP (rid) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY (m_rid) REFERENCES MAIL (rid) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (m_rid) REFERENCES MAIL      (rid) ON DELETE SET NULL ON UPDATE CASCADE,
     UNIQUE (m_rid, g_rid)
 );
 )";
@@ -48,7 +49,15 @@ bool MailGroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr,
         SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
         stmt.bind(1, relation_entity_sptr->GetMailRid());
         stmt.bind(2, relation_entity_sptr->GetGroupRid());
-        ret = SQLITE_DONE == stmt.tryExecuteStep();
+        int32_t code = stmt.tryExecuteStep();
+        if (SQLITE_DONE == code)
+        {
+            ret = true;
+        }
+        else
+        {
+            AB_LOG_E("Insert failed, code:%d", code);
+        }
     }
     return ret;
 }
@@ -64,8 +73,10 @@ bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>
         {
             stmt.bind(1, entity_sptr->GetMailRid());
             stmt.bind(2, entity_sptr->GetGroupRid());
-            if (SQLITE_DONE != stmt.tryExecuteStep())
+            int32_t code = stmt.tryExecuteStep();
+            if (SQLITE_DONE != code)
             {
+                AB_LOG_E("InsertBatch failed, ret_code:%d", code);
                 ret = false;
                 break;
             }

@@ -15,6 +15,7 @@ class EmailRepository
   public:
     EmailRepository();
     ~EmailRepository() = default;
+
     bool AddEmail(const std::shared_ptr<EmailEntity>& entity_sptr, std::shared_ptr<AbstractEntity>& out_entity_sptr);
     bool IsMailExist(const std::vector<uint32_t>& mail_ids) const;
     uint32_t GetEmailCount() const;

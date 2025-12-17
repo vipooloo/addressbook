@@ -1,4 +1,5 @@
 #include "AbstractDao.h"
+#include "AddrCenterLog.h"
 #include <sqlite3.h>
 
 static constexpr const char* SQL_ROW_COUNT = "SELECT COUNT(*) FROM ";
@@ -43,8 +44,18 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
 
 bool AbstractDao::OnCreteTable(const std::string& create_table_sql)
 {
+    bool ret = false;
     SQLite::Statement stmt(GetDb(), create_table_sql);
-    return (SQLITE_DONE == stmt.tryExecuteStep());
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_DONE == code)
+    {
+        ret = true;
+    }
+    else
+    {
+        AB_LOG_E("Failed to create table, code: {}", code);
+    }
+    return ret;
 }
 
 size_t AbstractDao::OnGetCount(const std::string& table_name) const

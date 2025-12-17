@@ -1,3 +1,4 @@
+#include "AddrCenterLog.h"
 #include "EmailDao.h"
 #include "EmailEntity.h"
 #include <iostream>
@@ -33,7 +34,8 @@ bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
         SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
         stmt.bind(1, email_entity_sptr->GetEmailAddress());
         stmt.bind(2, email_entity_sptr->GetEmailName());
-        if (SQLITE_DONE == stmt.tryExecuteStep())
+        int32_t code = stmt.tryExecuteStep();
+        if (SQLITE_DONE == code)
         {
             std::shared_ptr<EmailEntity> new_entity_sptr = std::static_pointer_cast<EmailEntity>(out_entity_sptr);
             if (new_entity_sptr)
@@ -44,6 +46,10 @@ bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
                 new_entity_sptr->SetRid(rid);
                 ret = true;
             }
+        }
+        else
+        {
+            AB_LOG_E("Insert email failed, code: %d", code);
         }
     }
     return ret;
@@ -56,7 +62,7 @@ bool EmailDao::IsExist(const std::vector<uint32_t>& rids)
     {
         std::ostringstream sql;
         sql << "SELECT COUNT(DISTINCT rid) = " << rids.size()
-            << " FROM email WHERE rid IN (";
+            << " FROM " << SQL_TABLE_NAME << " WHERE rid IN (";
 
         for (size_t i = 0; i < rids.size(); ++i)
         {
@@ -69,9 +75,14 @@ bool EmailDao::IsExist(const std::vector<uint32_t>& rids)
         sql << ");";
 
         SQLite::Statement stmt(AbstractDao::GetDb(), sql.str());
-        if (SQLITE_ROW == stmt.tryExecuteStep())
+        int32_t code = stmt.tryExecuteStep();
+        if (SQLITE_ROW == code)
         {
             ret = stmt.getColumn(0).getInt() == 1;
+        }
+        else
+        {
+            AB_LOG_E("IsExist failed, code: %d", code);
         }
     }
     return ret;
