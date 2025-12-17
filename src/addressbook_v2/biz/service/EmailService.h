@@ -3,22 +3,21 @@
 
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
-#include "EmailRepository.h"
 #include "GroupDto.h"
+#include <memory>
 
+class EmailRepository;
 class EmailService
 {
   public:
-    EmailService()
-      : m_mail_rep{}
-    {}
+    EmailService();
     ~EmailService() = default;
 
     std::pair<ErrorCode, EmailDto> AddEmail(const EmailDto& dto);
     std::pair<ErrorCode, GroupDto> AddGroup(const GroupDto& dto);
 
   private:
-    EmailRepository m_mail_rep;
+    std::shared_ptr<EmailRepository> m_mail_rep_sptr;
 };
 
 #endif  // EMAILSERVICE_H

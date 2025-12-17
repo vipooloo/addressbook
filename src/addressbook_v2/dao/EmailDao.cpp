@@ -24,24 +24,26 @@ size_t EmailDao::GetCount() const
     return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
-bool EmailDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
-    const EmailEntity& email_entity = static_cast<const EmailEntity&>(entity);
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-    stmt.bind(1, email_entity.GetEmailAddress());
-    stmt.bind(2, email_entity.GetEmailName());
-
     bool ret = false;
-    if (SQLITE_DONE == stmt.tryExecuteStep())
+    std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(in_entity_sptr);
+    if (email_entity_sptr)
     {
-        std::shared_ptr<EmailEntity> new_entity = std::static_pointer_cast<EmailEntity>(out_entity_sptr);
-        if (new_entity)
+        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+        stmt.bind(1, email_entity_sptr->GetEmailAddress());
+        stmt.bind(2, email_entity_sptr->GetEmailName());
+        if (SQLITE_DONE == stmt.tryExecuteStep())
         {
-            new_entity->SetEmailAddress(email_entity.GetEmailAddress());
-            new_entity->SetEmailName(email_entity.GetEmailName());
-            int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
-            new_entity->SetRid(rid);
-            ret = true;
+            std::shared_ptr<EmailEntity> new_entity_sptr = std::static_pointer_cast<EmailEntity>(out_entity_sptr);
+            if (new_entity_sptr)
+            {
+                new_entity_sptr->SetEmailAddress(email_entity_sptr->GetEmailAddress());
+                new_entity_sptr->SetEmailName(email_entity_sptr->GetEmailName());
+                int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+                new_entity_sptr->SetRid(rid);
+                ret = true;
+            }
         }
     }
     return ret;

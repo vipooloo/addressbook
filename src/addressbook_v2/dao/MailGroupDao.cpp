@@ -38,15 +38,19 @@ size_t MailGroupDao::CountByCond(const MailGroupMappingQueryCond& cond) const
     return cond.InValid() ? GetCount() : 0;
 }
 
-bool MailGroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool MailGroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     (void)out_entity_sptr;
-
-    const MailGroupRelation& relation_entity = static_cast<const MailGroupRelation&>(entity);
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-    stmt.bind(1, relation_entity.GetMailRid());
-    stmt.bind(2, relation_entity.GetGroupRid());
-    return SQLITE_DONE == stmt.tryExecuteStep();
+    bool ret = false;
+    std::shared_ptr<MailGroupRelation> relation_entity_sptr = std::static_pointer_cast<MailGroupRelation>(in_entity_sptr);
+    if (relation_entity_sptr)
+    {
+        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+        stmt.bind(1, relation_entity_sptr->GetMailRid());
+        stmt.bind(2, relation_entity_sptr->GetGroupRid());
+        ret = SQLITE_DONE == stmt.tryExecuteStep();
+    }
+    return ret;
 }
 
 bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)

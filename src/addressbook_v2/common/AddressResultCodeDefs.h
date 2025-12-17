@@ -10,6 +10,7 @@ enum class ErrorCode
     kDbError = 4,         // 数据库错误
     kGroupNotEmpty = 5,   // 邮件组非空（删除失败）
     kExceedMaxCount = 6,  // 超出最大数量限制（新增）
+    kNotable = 7,         // 不可用
 };
 
 #endif  // ADDRESSRESULTCODEDEFS_H

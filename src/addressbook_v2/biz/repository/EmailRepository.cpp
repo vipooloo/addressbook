@@ -23,22 +23,22 @@ EmailRepository::EmailRepository()
     }
 }
 
-bool EmailRepository::AddEmail(const EmailEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool EmailRepository::AddEmail(const std::shared_ptr<EmailEntity>& entity_sptr, std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     bool result = false;
-    if (m_mail_dao_sptr)
+    if (m_mail_dao_sptr && entity_sptr)
     {
-        result = m_mail_dao_sptr->Insert(entity, out_entity_sptr);
+        result = m_mail_dao_sptr->Insert(entity_sptr, out_entity_sptr);
     }
     return result;
 }
 
-bool EmailRepository::AddGroup(const GroupEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool EmailRepository::AddGroup(const std::shared_ptr<GroupEntity>& entity_sptr, std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     bool result = false;
-    if (m_group_dao_sptr)
+    if (m_group_dao_sptr && entity_sptr)
     {
-        result = m_group_dao_sptr->Insert(entity, out_entity_sptr);
+        result = m_group_dao_sptr->Insert(entity_sptr, out_entity_sptr);
     }
     return result;
 }

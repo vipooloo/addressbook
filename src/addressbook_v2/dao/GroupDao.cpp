@@ -22,22 +22,24 @@ size_t GroupDao::GetCount() const
     return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
-bool GroupDao::Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+bool GroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
-    const GroupEntity& group_entity = static_cast<const GroupEntity&>(entity);
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-    stmt.bind(1, group_entity.GetGroupName());
-
     bool ret = false;
-    if (SQLITE_DONE == stmt.tryExecuteStep())
+    std::shared_ptr<GroupEntity> group_entity_sptr = std::static_pointer_cast<GroupEntity>(in_entity_sptr);
+    if (group_entity_sptr)
     {
-        std::shared_ptr<GroupEntity> new_entity = std::static_pointer_cast<GroupEntity>(out_entity_sptr);
-        if (new_entity)
+        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+        stmt.bind(1, group_entity_sptr->GetGroupName());
+        if (SQLITE_DONE == stmt.tryExecuteStep())
         {
-            new_entity->SetGroupName(group_entity.GetGroupName());
-            int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
-            new_entity->SetRid(rid);
-            ret = true;
+            std::shared_ptr<GroupEntity> new_entity_sptr = std::static_pointer_cast<GroupEntity>(out_entity_sptr);
+            if (new_entity_sptr)
+            {
+                new_entity_sptr->SetGroupName(group_entity_sptr->GetGroupName());
+                int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+                new_entity_sptr->SetRid(rid);
+                ret = true;
+            }
         }
     }
     return ret;

@@ -142,7 +142,7 @@ class AbstractDao
     }
 
     // ========== 基础 CRUD 纯虚接口 ==========
-    virtual bool Insert(const AbstractEntity& entity, std::shared_ptr<AbstractEntity>& out_entity_sptr)
+    virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
         return false;
     }
