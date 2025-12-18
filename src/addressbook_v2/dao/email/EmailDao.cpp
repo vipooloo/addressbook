@@ -6,7 +6,13 @@
 #include <sstream>
 
 static constexpr const char* SQL_TABLE_NAME = "email";
-static constexpr const char* SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS email (rid INTEGER PRIMARY KEY AUTOINCREMENT, email_address TEXT, email_name TEXT);";
+static constexpr const char* SQL_CREATE_TABLE = R"(
+CREATE TABLE IF NOT EXISTS email (
+    rid INTEGER PRIMARY KEY AUTOINCREMENT, 
+    email_address TEXT, 
+    email_name TEXT
+    );
+)";
 static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM email;";
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
 

@@ -5,7 +5,12 @@
 #include <sstream>
 
 static constexpr const char* SQL_TABLE_NAME = "mail_group";
-static constexpr const char* SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS mail_group (rid INTEGER PRIMARY KEY AUTOINCREMENT, group_name TEXT);";
+static constexpr const char* SQL_CREATE_TABLE = R"(
+CREATE TABLE IF NOT EXISTS mail_group (
+    rid INTEGER PRIMARY KEY AUTOINCREMENT, 
+    group_name TEXT
+    );
+)";
 static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM mail_group;";
 static constexpr const char* SQL_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
