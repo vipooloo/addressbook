@@ -15,17 +15,7 @@ class TransactionGuard
       , m_has_error{has_error}
     {
     }
-    ~TransactionGuard()
-    {
-        if (m_has_error)
-        {
-            m_transaction.rollback();
-        }
-        else
-        {
-            m_transaction.commit();
-        }
-    }
+    ~TransactionGuard();
     void SetError(bool has_error)
     {
         m_has_error = has_error;

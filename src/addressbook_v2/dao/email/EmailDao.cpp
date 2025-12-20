@@ -1,6 +1,7 @@
 #include "AddrCenterLog.h"
 #include "EmailDao.h"
 #include "EmailEntity.h"
+#include <algorithm>
 #include <iostream>
 #include <sqlite3.h>
 #include <sstream>
@@ -15,6 +16,9 @@ CREATE TABLE IF NOT EXISTS email (
 )";
 static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM email;";
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
+static constexpr const char* SQL_DELETE_BY_RID = "DELETE FROM email WHERE rid = ?";
+static constexpr const char* SQL_DELETE_ALL = "DELETE FROM email";
+static constexpr const char* SQL_IS_EXIST = "SELECT COUNT(rid) FROM email WHERE rid IN (?);";
 
 EmailDao::EmailDao()
   : AbstractDao()
@@ -23,7 +27,7 @@ EmailDao::EmailDao()
 
 bool EmailDao::Init()
 {
-    return AbstractDao::OnCreteTable(SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
 size_t EmailDao::GetCount() const
@@ -66,21 +70,15 @@ bool EmailDao::IsExist(const std::vector<uint32_t>& rids)
     bool ret = false;
     if (!rids.empty())
     {
-        std::ostringstream sql;
-        sql << "SELECT COUNT(DISTINCT rid) = " << rids.size()
-            << " FROM " << SQL_TABLE_NAME << " WHERE rid IN (";
+        // 去掉重复的
+        std::vector<uint32_t> unique_rids = rids;
+        std::sort(unique_rids.begin(), unique_rids.end());
+        std::vector<uint32_t>::iterator last = std::unique(unique_rids.begin(), unique_rids.end());
+        unique_rids.erase(last, unique_rids.end());
 
-        for (size_t i = 0; i < rids.size(); ++i)
-        {
-            if (i > 0)
-            {
-                sql << ",";
-            }
-            sql << rids[i];
-        }
-        sql << ");";
+        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_IS_EXIST);
+        stmt.bind(1, AbstractDao::JoinIds(unique_rids));
 
-        SQLite::Statement stmt(AbstractDao::GetDb(), sql.str());
         int32_t code = stmt.tryExecuteStep();
         if (SQLITE_ROW == code)
         {
@@ -92,4 +90,29 @@ bool EmailDao::IsExist(const std::vector<uint32_t>& rids)
         }
     }
     return ret;
+}
+
+bool EmailDao::Remove(const std::vector<uint32_t>& rids)
+{
+    bool ret = true;
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_DELETE_BY_RID);
+    for (uint32_t rid : rids)
+    {
+        stmt.bind(1, rid);
+        int32_t code = stmt.tryExecuteStep();
+        if (SQLITE_DONE != code)
+        {
+            AB_LOG_E("Remove email failed, code: %d", code);
+            ret = false;
+            break;
+        }
+        stmt.reset();
+        stmt.clearBindings();
+    }
+    return ret;
+}
+
+bool EmailDao::RemoveAll()
+{
+    return AbstractDao::OnExecuteSql(SQL_DELETE_ALL);
 }

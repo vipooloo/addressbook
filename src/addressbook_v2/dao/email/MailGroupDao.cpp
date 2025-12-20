@@ -25,7 +25,7 @@ MailGroupDao::MailGroupDao()
 
 bool MailGroupDao::Init()
 {
-    return AbstractDao::OnCreteTable(SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
 size_t MailGroupDao::GetCount() const
@@ -81,6 +81,7 @@ bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>
                 break;
             }
             stmt.reset();
+            stmt.clearBindings();
         }
         else
         {

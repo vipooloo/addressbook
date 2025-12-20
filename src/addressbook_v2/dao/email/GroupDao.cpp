@@ -21,7 +21,7 @@ GroupDao::GroupDao()
 
 bool GroupDao::Init()
 {
-    return AbstractDao::OnCreteTable(SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
 size_t GroupDao::GetCount() const

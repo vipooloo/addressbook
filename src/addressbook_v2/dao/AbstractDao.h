@@ -154,11 +154,16 @@ class AbstractDao
     {
         return false;
     }
-    virtual DaoErrCode Update(const AbstractEntity& entity)
+    virtual bool Remove(const std::vector<uint32_t>& rids)
     {
-        return DaoErrCode::UNSUPPORTED;
+        return false;
     }
-    virtual DaoErrCode Remove(uint32_t rid)
+    virtual bool RemoveAll()
+    {
+        return false;
+    }
+    /*---------------------*/
+    virtual DaoErrCode Update(const AbstractEntity& entity)
     {
         return DaoErrCode::UNSUPPORTED;
     }
@@ -182,11 +187,12 @@ class AbstractDao
     }
 
   protected:
-    bool OnCreteTable(const std::string& create_table_sql);
+    bool OnExecuteSql(const std::string& sql);
     size_t OnGetCount(const std::string& table_name) const;
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
+    static std::string JoinIds(const std::vector<uint32_t>& rids);
 };
 
 #endif  // ABSTRACTDAO_H

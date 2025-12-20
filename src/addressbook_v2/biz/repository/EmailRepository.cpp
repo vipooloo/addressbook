@@ -152,3 +152,20 @@ bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
     }
     return result;
 }
+
+bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
+{
+    bool result = false;
+    if (mail_ids.empty())
+    {
+        result = true;
+    }
+    else
+    {
+        if (m_mail_dao_sptr)
+        {
+            result = m_mail_dao_sptr->Remove(mail_ids);
+        }
+    }
+    return result;
+}

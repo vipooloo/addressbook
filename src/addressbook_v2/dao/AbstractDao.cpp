@@ -42,10 +42,10 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
     return where;
 }
 
-bool AbstractDao::OnCreteTable(const std::string& create_table_sql)
+bool AbstractDao::OnExecuteSql(const std::string& sql)
 {
     bool ret = false;
-    SQLite::Statement stmt(GetDb(), create_table_sql);
+    SQLite::Statement stmt(GetDb(), sql);
     int32_t code = stmt.tryExecuteStep();
     if (SQLITE_DONE == code)
     {
@@ -68,4 +68,24 @@ size_t AbstractDao::OnGetCount(const std::string& table_name) const
         ret = query.getColumn(0).getUInt();
     }
     return ret;
+}
+
+std::string AbstractDao::JoinIds(const std::vector<uint32_t>& rids)
+{
+    if (rids.empty())
+    {
+        return "";
+    }
+
+    std::string result;
+    // 预估大小，避免多次内存分配
+    result.reserve(rids.size() * 10);
+
+    result += std::to_string(rids[0]);
+    for (size_t i = 1; i < rids.size(); ++i)
+    {
+        result += ",";
+        result += std::to_string(rids[i]);
+    }
+    return result;
 }

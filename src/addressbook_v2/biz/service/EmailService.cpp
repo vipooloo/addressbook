@@ -80,11 +80,8 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kDbError;
             break;
         }
-        if (ErrorCode::kSuccess == ret)
-        {
-            result.second.SetRid(out_entity_sptr->GetRid());
-            trans_guard.SetError(false);
-        }
+        result.second.SetRid(out_entity_sptr->GetRid());
+        trans_guard.SetError(false);
     } while (false);
     return result;
 }
@@ -158,11 +155,38 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             ret = ErrorCode::kDbError;
             break;
         }
-        if (ErrorCode::kSuccess == ret)
-        {
-            result.second.SetRid(out_entity_sptr->GetRid());
-            trans_guard.SetError(false);
-        }
+        result.second.SetRid(out_entity_sptr->GetRid());
+        trans_guard.SetError(false);
     } while (false);
+    return result;
+}
+
+ErrorCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
+{
+    ErrorCode result = ErrorCode::kSuccess;
+    do
+    {
+        if (rids.empty())
+        {
+            AB_LOG_E("Email rids is empty");
+            result = ErrorCode::kInvalidParam;
+            break;
+        }
+        if (!m_mail_rep_sptr)
+        {
+            AB_LOG_E("Email repository is null");
+            result = ErrorCode::kNotable;
+            break;
+        }
+        TransactionGuard trans_guard(true);
+        if (!m_mail_rep_sptr->RemoveEmail(rids))
+        {
+            AB_LOG_E("Failed to remove email from database");
+            result = ErrorCode::kDbError;
+            break;
+        }
+        trans_guard.SetError(false);
+    } while (false);
+
     return result;
 }
