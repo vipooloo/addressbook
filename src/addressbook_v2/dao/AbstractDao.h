@@ -98,7 +98,6 @@ struct PageResult
     int page_size = 10;
     int total_pages = 0;
 };
-
 class SQLiteConn
 {
   public:
@@ -119,8 +118,8 @@ class SQLiteConn
 class AbstractDao
 {
   public:
-    AbstractDao()
-    {}
+    explicit AbstractDao(const std::string& table_name);
+
     virtual ~AbstractDao() = default;
     static SQLite::Database& GetDb()
     {
@@ -131,17 +130,6 @@ class AbstractDao
     {
         return true;
     }
-
-    virtual size_t GetCount() const
-    {
-        return 0;
-    }
-    virtual size_t CountByCond(const MailGroupMappingQueryCond& cond) const
-    {
-        return 0;
-    }
-
-    // ========== 基础 CRUD 纯虚接口 ==========
     virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
         return false;
@@ -150,18 +138,18 @@ class AbstractDao
     {
         return false;
     }
-    virtual bool IsExist(const std::vector<uint32_t>& rids)
+    virtual bool IsExist(const std::vector<uint32_t>& rids);
+    virtual bool Remove(const std::vector<uint32_t>& rids);
+    virtual bool RemoveAll();
+
+    virtual size_t GetCount() const;
+    virtual size_t CountByCond(const MailGroupMappingQueryCond& cond) const
     {
-        return false;
+        return 0;
     }
-    virtual bool Remove(const std::vector<uint32_t>& rids)
-    {
-        return false;
-    }
-    virtual bool RemoveAll()
-    {
-        return false;
-    }
+
+    // ========== 基础 CRUD 纯虚接口 ==========
+
     /*---------------------*/
     virtual DaoErrCode Update(const AbstractEntity& entity)
     {
@@ -187,12 +175,17 @@ class AbstractDao
     }
 
   protected:
-    bool OnExecuteSql(const std::string& sql);
-    size_t OnGetCount(const std::string& table_name) const;
+    bool OnExecuteSql(const std::string& sql) const;
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
     static std::string JoinIds(const std::vector<uint32_t>& rids);
+
+  private:
+    std::string m_table_name;
+    std::string m_count;
+    std::string m_delete_by_rid;
+    std::string m_delete_all;
 };
 
 #endif  // ABSTRACTDAO_H

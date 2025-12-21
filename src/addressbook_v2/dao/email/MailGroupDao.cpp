@@ -15,22 +15,16 @@ CREATE TABLE IF NOT EXISTS GROUPMAPPING (
     );
 )";
 
-static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM GROUPMAPPING;";
 static constexpr const char* SQL_INSERT = "INSERT INTO GROUPMAPPING (m_rid, g_rid) VALUES (?, ?);";
 
 MailGroupDao::MailGroupDao()
-  : AbstractDao()
+  : AbstractDao(SQL_TABLE_NAME)
 {
 }
 
 bool MailGroupDao::Init()
 {
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
-}
-
-size_t MailGroupDao::GetCount() const
-{
-    return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
 size_t MailGroupDao::CountByCond(const MailGroupMappingQueryCond& cond) const

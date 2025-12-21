@@ -29,6 +29,7 @@ class EmailRepository
     bool AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items);
     /*------------------------------------*/
     bool RemoveEmail(const std::vector<uint32_t>& mail_ids);
+    bool RemoveGroup(const std::vector<uint32_t>& group_ids);
 
   private:
     std::shared_ptr<AbstractDao> m_mail_dao_sptr;

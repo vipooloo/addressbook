@@ -169,3 +169,20 @@ bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
     }
     return result;
 }
+
+bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
+{
+    bool result = false;
+    if (group_ids.empty())
+    {
+        result = true;
+    }
+    else
+    {
+        if (m_group_dao_sptr)
+        {
+            result = m_group_dao_sptr->Remove(group_ids);
+        }
+    }
+    return result;
+}

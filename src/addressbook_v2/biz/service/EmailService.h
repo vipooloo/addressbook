@@ -19,6 +19,7 @@ class EmailService
     std::pair<ErrorCode, GroupDto> AddGroup(const GroupDto& dto);
 
     ErrorCode RemoveEmail(const std::vector<uint32_t>& rids);
+    ErrorCode RemoveGroup(const std::vector<uint32_t>& rids);
 
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;

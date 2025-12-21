@@ -190,3 +190,33 @@ ErrorCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
 
     return result;
 }
+
+ErrorCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
+{
+    ErrorCode result = ErrorCode::kSuccess;
+    do
+    {
+        if (rids.empty())
+        {
+            AB_LOG_E("Group rids is empty");
+            result = ErrorCode::kInvalidParam;
+            break;
+        }
+        if (!m_mail_rep_sptr)
+        {
+            AB_LOG_E("Group repository is null");
+            result = ErrorCode::kNotable;
+            break;
+        }
+        TransactionGuard trans_guard(true);
+        if (!m_mail_rep_sptr->RemoveGroup(rids))
+        {
+            AB_LOG_E("Failed to remove group from database");
+            result = ErrorCode::kDbError;
+            break;
+        }
+        trans_guard.SetError(false);
+    } while (false);
+
+    return result;
+}

@@ -11,22 +11,16 @@ CREATE TABLE IF NOT EXISTS mail_group (
     group_name TEXT
     );
 )";
-static constexpr const char* SQL_COUNT = "SELECT COUNT(*) FROM mail_group;";
 static constexpr const char* SQL_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
 GroupDao::GroupDao()
-  : AbstractDao()
+  : AbstractDao(SQL_TABLE_NAME)
 {
 }
 
 bool GroupDao::Init()
 {
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
-}
-
-size_t GroupDao::GetCount() const
-{
-    return AbstractDao::OnGetCount(SQL_COUNT);
 }
 
 bool GroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
@@ -52,39 +46,6 @@ bool GroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
         else
         {
             AB_LOG_E("Insert group failed, code: %d", code);
-        }
-    }
-    return ret;
-}
-
-bool GroupDao::IsExist(const std::vector<uint32_t>& rids)
-{
-    bool ret = false;
-    if (!rids.empty())
-    {
-        std::ostringstream sql;
-        sql << "SELECT COUNT(DISTINCT rid) = " << rids.size()
-            << " FROM " << SQL_TABLE_NAME << " WHERE rid IN (";
-
-        for (size_t i = 0; i < rids.size(); ++i)
-        {
-            if (i > 0)
-            {
-                sql << ",";
-            }
-            sql << rids[i];
-        }
-        sql << ");";
-
-        SQLite::Statement stmt(AbstractDao::GetDb(), sql.str());
-        int32_t code = stmt.tryExecuteStep();
-        if (SQLITE_ROW == code)
-        {
-            ret = stmt.getColumn(0).getInt() == 1;
-        }
-        else
-        {
-            AB_LOG_E("IsExist group failed, code: %d", code);
         }
     }
     return ret;
