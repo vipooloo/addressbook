@@ -1,7 +1,8 @@
 #ifndef EMAILDTO_H
 #define EMAILDTO_H
 
-#include <stdint.h>
+#include "AddressCenterUtilities.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -12,7 +13,7 @@ class EmailDto
       : m_rid{0}
       , m_address{address}
       , m_name{name}
-      , m_group_rids{group_rids}
+      , m_group_rids{AddressCenterUtilities::GetSortedUniqueRids(group_rids)}
     {
     }
     ~EmailDto() = default;
@@ -50,7 +51,7 @@ class EmailDto
     }
     void SetGroupRids(const std::vector<uint32_t>& group_rids)
     {
-        m_group_rids = group_rids;
+        m_group_rids = AddressCenterUtilities::GetSortedUniqueRids(group_rids);
     }
 
   private:

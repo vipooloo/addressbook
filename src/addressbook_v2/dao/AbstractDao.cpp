@@ -27,26 +27,20 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
     bool ret = false;
     if (!rids.empty())
     {
-        // 去掉重复的
-        std::vector<uint32_t> unique_rids = rids;
-        std::sort(unique_rids.begin(), unique_rids.end());
-        std::vector<uint32_t>::iterator last = std::unique(unique_rids.begin(), unique_rids.end());
-        unique_rids.erase(last, unique_rids.end());
-
-        std::string ids = JoinIds(unique_rids);
+        std::string ids = JoinIds(rids);
         std::string sql = "SELECT COUNT(rid) FROM " + m_table_name + " WHERE rid IN (" + ids + ");";
         SQLite::Statement stmt(GetDb(), sql);
         int32_t code = stmt.tryExecuteStep();
         if (SQLITE_ROW == code)
         {
-            size_t count = static_cast<size_t>(stmt.getColumn(0).getUInt());
-            if (count == unique_rids.size())
+            uint32_t count = static_cast<uint32_t>(stmt.getColumn(0).getUInt());
+            if (count == static_cast<uint32_t>(rids.size()))
             {
                 ret = true;
             }
             else
             {
-                AB_LOG_E("IsExist failed %u %u %s", count, unique_rids.size(), ids.c_str());
+                AB_LOG_E("IsExist failed %u %u %s", count, rids.size(), ids.c_str());
             }
         }
         else

@@ -21,6 +21,9 @@ class EmailService
     ErrorCode RemoveEmail(const std::vector<uint32_t>& rids);
     ErrorCode RemoveGroup(const std::vector<uint32_t>& rids);
 
+    ErrorCode UpdateEmail(const EmailDto& dto);
+    ErrorCode UpdateGroup(const GroupDto& dto);
+
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;
 };

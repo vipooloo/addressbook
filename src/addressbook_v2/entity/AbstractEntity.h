@@ -1,7 +1,7 @@
 #ifndef ABSTRACTENTITY_H
 #define ABSTRACTENTITY_H
 
-#include <stdint.h>
+#include <cstdint>
 
 class AbstractEntity
 {

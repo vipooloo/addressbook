@@ -1,7 +1,7 @@
 #ifndef ADDRESSBOOKCONFIGDEFS_H
 #define ADDRESSBOOKCONFIGDEFS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 static constexpr uint32_t kMaxMailCount = 100;        ///< 最多支持多少个邮件
 static constexpr uint32_t kMaxGroupCount = 100;       ///< 最多支持多少个邮件组

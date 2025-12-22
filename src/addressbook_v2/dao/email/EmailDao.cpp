@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS email (
     );
 )";
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
+static constexpr const char* SQL_UPDATE = "UPDATE email SET email_address = ?, email_name = ? WHERE rid = ?;";
 
 EmailDao::EmailDao()
   : AbstractDao(SQL_TABLE_NAME)
@@ -56,3 +57,20 @@ bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
     return ret;
 }
 
+bool EmailDao::Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
+{
+    bool ret = false;
+    std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(entity_sptr);
+    if (email_entity_sptr)
+    {
+        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_UPDATE);
+        stmt.bind(1, email_entity_sptr->GetEmailAddress());
+        stmt.bind(2, email_entity_sptr->GetEmailName());
+        int32_t code = stmt.tryExecuteStep();
+        if (SQLITE_DONE != code)
+        {
+            AB_LOG_E("Update email failed, code: %d %s %s", code, email_entity_sptr->GetEmailAddress(), email_entity_sptr->GetEmailName());
+        }
+    }
+    return ret;
+}

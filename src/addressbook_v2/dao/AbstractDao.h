@@ -4,7 +4,7 @@
 #include "AbstractEntity.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <memory>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -132,10 +132,13 @@ class AbstractDao
     }
     virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
+        (void)in_entity_sptr;
+        (void)out_entity_sptr;
         return false;
     }
     virtual bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
     {
+        (void)items;
         return false;
     }
     virtual bool IsExist(const std::vector<uint32_t>& rids);
@@ -143,18 +146,20 @@ class AbstractDao
     virtual bool RemoveAll();
 
     virtual size_t GetCount() const;
+    virtual bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
+    {
+        return false;
+    }
     virtual size_t CountByCond(const MailGroupMappingQueryCond& cond) const
     {
+        (void)cond;
         return 0;
     }
 
     // ========== 基础 CRUD 纯虚接口 ==========
 
     /*---------------------*/
-    virtual DaoErrCode Update(const AbstractEntity& entity)
-    {
-        return DaoErrCode::UNSUPPORTED;
-    }
+
     virtual std::pair<DaoErrCode, std::shared_ptr<AbstractEntity>> FindById(uint32_t rid)
     {
         return {DaoErrCode::UNSUPPORTED, nullptr};

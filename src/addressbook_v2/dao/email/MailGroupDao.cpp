@@ -1,6 +1,7 @@
 #include "AddrCenterLog.h"
 #include "MailGroupDao.h"
 #include "MailGroupRelation.h"
+#include <algorithm>
 #include <sqlite3.h>
 
 static constexpr const char* SQL_TABLE_NAME = "GROUPMAPPING";
@@ -84,4 +85,29 @@ bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>
         }
     }
     return ret;
+}
+
+std::map<uint32_t, uint32_t> MailGroupDao::GetGroupEmailCounts(const std::vector<uint32_t>& rids, bool is_mail) const
+{
+    std::map<uint32_t, uint32_t> ret_count;
+    // 默认值
+    std::for_each(rids.cbegin(), rids.cend(), [&ret_count](uint32_t group_id) {
+        ret_count[group_id] = 0;
+    });
+    std::string str_ids = AbstractDao::JoinIds(rids);
+    std::string sql = "SELECT g_rid, COUNT(*) FROM " + std::string(SQL_TABLE_NAME) + " WHERE g_rid IN (" + str_ids + ") GROUP BY g_rid;";
+    if (is_mail)
+    {
+        sql = "SELECT m_rid, COUNT(*) FROM " + std::string(SQL_TABLE_NAME) + " WHERE m_rid IN (" + str_ids + ") GROUP BY m_rid;";
+    }
+    SQLite::Statement stmt(GetDb(), sql);
+    int32_t code = stmt.tryExecuteStep();
+    while (SQLITE_ROW == code)
+    {
+        uint32_t g_rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());
+        uint32_t count = static_cast<uint32_t>(stmt.getColumn(1).getUInt());
+        ret_count[g_rid] = count;
+        code = stmt.tryExecuteStep();
+    }
+    return ret_count;
 }

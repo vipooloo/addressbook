@@ -3,6 +3,7 @@
 #include "EmailRepository.h"
 #include "GroupDao.h"
 #include "MailGroupDao.h"
+#include <algorithm>
 
 EmailRepository::EmailRepository()
   : m_mail_dao_sptr{std::make_shared<EmailDao>()}
@@ -63,48 +64,28 @@ uint32_t EmailRepository::GetEmailCount() const
     return count;
 }
 
-bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t add_count)
+bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
-    bool result = true;
+    bool result = false;
     if (m_mail_group_dao_sptr)
     {
-        for (uint32_t group_id : group_ids)
-        {
-            MailGroupMappingQueryCond cond;
-            cond.SetGroupRid(group_id);
-            size_t count = m_mail_group_dao_sptr->CountByCond(cond);
-            if (count >= add_count)
-            {
-                break;
-            }
-        }
-    }
-    else
-    {
-        result = false;
+        std::map<uint32_t, uint32_t> mail_counts = m_mail_group_dao_sptr->GetGroupEmailCounts(group_ids, false);
+        result = std::all_of(mail_counts.cbegin(), mail_counts.cend(), [count_limit](const std::pair<uint32_t, uint32_t>& item) {
+            return item.second < count_limit;
+        });
     }
     return result;
 }
 
-bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t add_count)
+bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t count_limit)
 {
-    bool result = true;
+    bool result = false;
     if (m_mail_group_dao_sptr)
     {
-        for (uint32_t mail_rid : mail_ids)
-        {
-            MailGroupMappingQueryCond cond;
-            cond.SetMailRid(mail_rid);
-            size_t count = m_mail_group_dao_sptr->CountByCond(cond);
-            if (count >= add_count)
-            {
-                break;
-            }
-        }
-    }
-    else
-    {
-        result = false;
+        std::map<uint32_t, uint32_t> mail_counts = m_mail_group_dao_sptr->GetGroupEmailCounts(mail_ids, true);
+        result = std::all_of(mail_counts.cbegin(), mail_counts.cend(), [count_limit](const std::pair<uint32_t, uint32_t>& item) {
+            return item.second < count_limit;
+        });
     }
     return result;
 }
@@ -185,4 +166,19 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
         }
     }
     return result;
+}
+
+bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr)
+{
+    bool result = false;
+    if (m_mail_dao_sptr && entity_sptr)
+    {
+        result = m_mail_dao_sptr->Update(entity_sptr);
+    }
+    return result;
+}
+
+bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr)
+{
+    return false;
 }

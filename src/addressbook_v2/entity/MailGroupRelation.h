@@ -2,7 +2,7 @@
 #define MAILGROUPRELATION_H
 
 #include "AbstractEntity.h"
-#include <stdint.h>
+#include <cstdint>
 
 class MailGroupRelation : public AbstractEntity
 {
