@@ -111,3 +111,32 @@ std::map<uint32_t, uint32_t> MailGroupDao::GetGroupEmailCounts(const std::vector
     }
     return ret_count;
 }
+
+std::vector<uint32_t> MailGroupDao::GetEmailGroupsByEmailId(uint32_t email_id) const
+{
+    std::string sql = "SELECT g_rid FROM GROUPMAPPING WHERE rid = ?;";
+    SQLite::Statement stmt(AbstractDao::GetDb(), sql);
+    stmt.bind(1, email_id);
+    std::vector<uint32_t> ret_group_ids;
+    int32_t code = stmt.tryExecuteStep();
+    while (SQLITE_ROW == code)
+    {
+        ret_group_ids.push_back(static_cast<uint32_t>(stmt.getColumn(0).getUInt()));
+        code = stmt.tryExecuteStep();
+    }
+    return ret_group_ids;
+}
+std::vector<uint32_t> MailGroupDao::GetEmailIdsByGroupId(uint32_t group_id) const
+{
+    std::string sql = "SELECT m_rid FROM GROUPMAPPING WHERE rid = ?;";
+    SQLite::Statement stmt(AbstractDao::GetDb(), sql);
+    stmt.bind(1, group_id);
+    std::vector<uint32_t> ret_email_ids;
+    int32_t code = stmt.tryExecuteStep();
+    while (SQLITE_ROW == code)
+    {
+        ret_email_ids.push_back(static_cast<uint32_t>(stmt.getColumn(0).getUInt()));
+        code = stmt.tryExecuteStep();
+    }
+    return ret_email_ids;
+}

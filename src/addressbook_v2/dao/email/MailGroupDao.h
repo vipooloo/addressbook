@@ -14,6 +14,8 @@ class MailGroupDao : public AbstractDao
     bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items) override;
     size_t CountByCond(const MailGroupMappingQueryCond& cond) const override;
     std::map<uint32_t, uint32_t> GetGroupEmailCounts(const std::vector<uint32_t>& rids, bool is_mail) const;
+    std::vector<uint32_t> GetEmailGroupsByEmailId(uint32_t email_id) const;
+    std::vector<uint32_t> GetEmailIdsByGroupId(uint32_t group_id) const;
 };
 
 #endif  // MAILGROUPDAO_H
