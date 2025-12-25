@@ -57,4 +57,4 @@ class GroupDto
     std::vector<uint32_t> m_mail_rids;
 };
 
-#endif  // GROUPDTO_H
+#endif  // GROUPDTO_H~

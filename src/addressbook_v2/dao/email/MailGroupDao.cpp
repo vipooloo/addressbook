@@ -2,8 +2,10 @@
 #include "MailGroupDao.h"
 #include "MailGroupRelation.h"
 #include <algorithm>
+#include <array>
 #include <sqlite3.h>
 
+static constexpr uint32_t SQL_BUFFER_SIZE = 512;
 static constexpr const char* SQL_TABLE_NAME = "GROUPMAPPING";
 static constexpr const char* SQL_CREATE_TABLE = R"(
 CREATE TABLE IF NOT EXISTS GROUPMAPPING (
@@ -17,6 +19,24 @@ CREATE TABLE IF NOT EXISTS GROUPMAPPING (
 )";
 
 static constexpr const char* SQL_INSERT = "INSERT INTO GROUPMAPPING (m_rid, g_rid) VALUES (?, ?);";
+static constexpr const char* SQL_QUERY_GRID_BY_RID = "SELECT g_rid FROM GROUPMAPPING WHERE rid = ?;";
+static constexpr const char* SQL_QUERY_MAIL_BY_RID = "SELECT m_rid FROM GROUPMAPPING WHERE rid = ?;";
+static constexpr const char* SQL_CHECK_OVER_GROUP_LIMIT = R"(
+    SELECT 1
+    FROM GROUPMAPPING
+    WHERE g_rid IN (%s)
+    GROUP BY m_rid
+    HAVING COUNT(g_rid) > ?
+    LIMIT 1;
+)";
+static constexpr const char* SQL_CHECK_OVER_EMAIL_LIMIT = R"(
+    SELECT 1
+    FROM GROUPMAPPING
+    WHERE m_rid IN (%s)
+    GROUP BY g_rid
+    HAVING COUNT(m_rid) > ?
+    LIMIT 1;
+)";
 
 MailGroupDao::MailGroupDao()
   : AbstractDao(SQL_TABLE_NAME)
@@ -87,35 +107,9 @@ bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>
     return ret;
 }
 
-std::map<uint32_t, uint32_t> MailGroupDao::GetGroupEmailCounts(const std::vector<uint32_t>& rids, bool is_mail) const
-{
-    std::map<uint32_t, uint32_t> ret_count;
-    // 默认值
-    std::for_each(rids.cbegin(), rids.cend(), [&ret_count](uint32_t group_id) {
-        ret_count[group_id] = 0;
-    });
-    std::string str_ids = AbstractDao::JoinIds(rids);
-    std::string sql = "SELECT g_rid, COUNT(*) FROM " + std::string(SQL_TABLE_NAME) + " WHERE g_rid IN (" + str_ids + ") GROUP BY g_rid;";
-    if (is_mail)
-    {
-        sql = "SELECT m_rid, COUNT(*) FROM " + std::string(SQL_TABLE_NAME) + " WHERE m_rid IN (" + str_ids + ") GROUP BY m_rid;";
-    }
-    SQLite::Statement stmt(GetDb(), sql);
-    int32_t code = stmt.tryExecuteStep();
-    while (SQLITE_ROW == code)
-    {
-        uint32_t g_rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());
-        uint32_t count = static_cast<uint32_t>(stmt.getColumn(1).getUInt());
-        ret_count[g_rid] = count;
-        code = stmt.tryExecuteStep();
-    }
-    return ret_count;
-}
-
 std::vector<uint32_t> MailGroupDao::GetEmailGroupsByEmailId(uint32_t email_id) const
 {
-    std::string sql = "SELECT g_rid FROM GROUPMAPPING WHERE rid = ?;";
-    SQLite::Statement stmt(AbstractDao::GetDb(), sql);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_QUERY_GRID_BY_RID);
     stmt.bind(1, email_id);
     std::vector<uint32_t> ret_group_ids;
     int32_t code = stmt.tryExecuteStep();
@@ -128,8 +122,7 @@ std::vector<uint32_t> MailGroupDao::GetEmailGroupsByEmailId(uint32_t email_id) c
 }
 std::vector<uint32_t> MailGroupDao::GetEmailIdsByGroupId(uint32_t group_id) const
 {
-    std::string sql = "SELECT m_rid FROM GROUPMAPPING WHERE rid = ?;";
-    SQLite::Statement stmt(AbstractDao::GetDb(), sql);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_QUERY_MAIL_BY_RID);
     stmt.bind(1, group_id);
     std::vector<uint32_t> ret_email_ids;
     int32_t code = stmt.tryExecuteStep();
@@ -139,4 +132,32 @@ std::vector<uint32_t> MailGroupDao::GetEmailIdsByGroupId(uint32_t group_id) cons
         code = stmt.tryExecuteStep();
     }
     return ret_email_ids;
+}
+
+bool MailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
+{
+    return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
+}
+
+bool MailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
+{
+    return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
+}
+
+bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
+{
+    std::string str_ids = AbstractDao::JoinIds(ids);
+    std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
+    snprintf(sql_buffer.data(), sql_buffer.size(), content.c_str(), str_ids.c_str());
+
+    bool ret = true;
+    SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer.data());
+    stmt.bind(1, limit);
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_ROW == code)
+    {
+        AB_LOG_E("HasMemberOverGroupLimit failed, code:%d %s", code, str_ids.c_str());
+        ret = false;
+    }
+    return ret;
 }

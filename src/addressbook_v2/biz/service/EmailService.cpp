@@ -63,31 +63,14 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         }
         // 添加邮件
         std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetName(), dto.GetAddress());
-        std::shared_ptr<AbstractEntity> out_entity_sptr = std::make_shared<EmailEntity>();
-        bool add_mail_res = m_mail_rep_sptr->AddEmail(mail_entity_sptr, out_entity_sptr);
-        if (!out_entity_sptr || !add_mail_res)
+        uint32_t rid = m_mail_rep_sptr->AddEmail(mail_entity_sptr, group_rids);
+        if (0 == rid)
         {
             AB_LOG_E("Failed to add email to database");
             ret = ErrorCode::kDbError;
             break;
         }
-        // 添加邮件到组的映射关系
-        std::vector<std::shared_ptr<AbstractEntity>> relations;
-        relations.reserve(group_rids.size());
-        std::transform(
-            group_rids.cbegin(),
-            group_rids.cend(),
-            std::back_inserter(relations),
-            [out_entity_sptr](uint32_t group_rid) {
-                return std::make_shared<MailGroupRelation>(out_entity_sptr->GetRid(), group_rid);
-            });
-        if (!m_mail_rep_sptr->AddEmailToGroupRelation(relations))
-        {
-            AB_LOG_E("Failed to add email-group relation to database");
-            ret = ErrorCode::kDbError;
-            break;
-        }
-        result.second.SetRid(out_entity_sptr->GetRid());
+        result.second.SetRid(rid);
         trans_guard.SetError(false);
     } while (false);
     return result;
@@ -145,31 +128,14 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         }
         // 添加邮件组
         std::shared_ptr<GroupEntity> group_entity_sptr = std::make_shared<GroupEntity>(dto.GetGroupName());
-        std::shared_ptr<AbstractEntity> out_entity_sptr = std::make_shared<GroupEntity>();
-        bool add_mail_res = m_mail_rep_sptr->AddGroup(group_entity_sptr, out_entity_sptr);
-        if (!out_entity_sptr || !add_mail_res)
+        uint32_t group_rid = m_mail_rep_sptr->AddGroup(group_entity_sptr, mail_rids);
+        if (0 == group_rid)
         {
             AB_LOG_E("Failed to add email to database");
             ret = ErrorCode::kDbError;
             break;
         }
-        // 添加邮件到组的映射关系
-        std::vector<std::shared_ptr<AbstractEntity>> relations;
-        relations.reserve(mail_rids.size());
-        std::transform(
-            mail_rids.cbegin(),
-            mail_rids.cend(),
-            std::back_inserter(relations),
-            [out_entity_sptr](uint32_t mail_rid) {
-                return std::make_shared<MailGroupRelation>(mail_rid, out_entity_sptr->GetRid());
-            });
-        if (!m_mail_rep_sptr->AddEmailToGroupRelation(relations))
-        {
-            AB_LOG_E("Failed to add email-group relation to database");
-            ret = ErrorCode::kDbError;
-            break;
-        }
-        result.second.SetRid(out_entity_sptr->GetRid());
+        result.second.SetRid(group_rid);
         trans_guard.SetError(false);
     } while (false);
     return result;
