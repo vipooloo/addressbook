@@ -214,3 +214,28 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
 {
     return false;
 }
+
+std::pair<std::vector<uint32_t>, std::vector<uint32_t>> EmailRepository::GetChangedGroup(const std::vector<uint32_t>& group_rids, uint32_t mail_rid)
+{
+    std::vector<uint32_t> to_add;     // 需要新增的 ID
+    std::vector<uint32_t> to_delete;  // 需要删除的 ID
+    if (m_mail_group_dao_sptr)
+    {
+        std::vector<uint32_t> old_group_ids = m_mail_group_dao_sptr->GetEmailGroupsByEmailId(mail_rid);
+        // 计算需删除部分: Old - New
+        std::set_difference(
+            old_group_ids.begin(),
+            old_group_ids.end(),
+            group_rids.begin(),
+            group_rids.end(),
+            std::back_inserter(to_delete));
+        // 计算需新增部分: New - Old
+        std::set_difference(
+            group_rids.begin(),
+            group_rids.end(),
+            old_group_ids.begin(),
+            old_group_ids.end(),
+            std::back_inserter(to_add));
+    }
+    return std::make_pair<>(to_add, to_delete);
+}

@@ -28,13 +28,17 @@ class EmailRepository
     size_t GetGroupCount() const;
     bool CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t count_limit);
 
-    bool AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items);
-
     bool RemoveEmail(const std::vector<uint32_t>& mail_ids);
     bool RemoveGroup(const std::vector<uint32_t>& group_ids);
 
     bool UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr);
     bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
+
+    std::pair<std::vector<uint32_t>, std::vector<uint32_t>> GetChangedGroup(const std::vector<uint32_t>& group_rids, uint32_t mail_rid);
+
+  private:
+    bool
+    AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items);
 
   private:
     std::shared_ptr<EmailDao> m_mail_dao_sptr;

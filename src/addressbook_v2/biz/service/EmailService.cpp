@@ -30,19 +30,19 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
-        TransactionGuard trans_guard(true);
-        // 检查邮件是否超过最大数量限制
-        if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
-        {
-            AB_LOG_E("Exceed max email count");
-            ret = ErrorCode::kExceedMaxCount;
-            break;
-        }
         // 检查邮件组数量是否超了规格上限
         std::vector<uint32_t> group_rids = dto.GetGroupRids();
         if (group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
+            ret = ErrorCode::kExceedMaxCount;
+            break;
+        }
+        TransactionGuard trans_guard(true);
+        // 检查邮件是否超过最大数量限制
+        if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
+        {
+            AB_LOG_E("Exceed max email count");
             ret = ErrorCode::kExceedMaxCount;
             break;
         }
@@ -95,19 +95,19 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
-        TransactionGuard trans_guard(true);
-        // 检查邮件组是否超过最大数量限制
-        if (m_mail_rep_sptr->GetGroupCount() >= kMaxGroupCount)
-        {
-            AB_LOG_E("Exceed max group count");
-            ret = ErrorCode::kExceedMaxCount;
-            break;
-        }
         // 检查邮件数量是否超了规格上限
         std::vector<uint32_t> mail_rids = dto.GetMailRids();
         if (mail_rids.size() > kMaxEmailsPerGroup)
         {
             AB_LOG_E("Exceed max email count");
+            ret = ErrorCode::kExceedMaxCount;
+            break;
+        }
+        TransactionGuard trans_guard(true);
+        // 检查邮件组是否超过最大数量限制
+        if (m_mail_rep_sptr->GetGroupCount() >= kMaxGroupCount)
+        {
+            AB_LOG_E("Exceed max group count");
             ret = ErrorCode::kExceedMaxCount;
             break;
         }
@@ -203,9 +203,58 @@ ErrorCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
 
 ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
 {
-    ErrorCode ret = ErrorCode::kSuccess;
-
-    return ret;
+    ErrorCode result = ErrorCode::kSuccess;
+    do
+    {
+        if (!m_mail_rep_sptr)
+        {
+            AB_LOG_E("Email repository is null");
+            result = ErrorCode::kNotable;
+            break;
+        }
+        // 输入合法验证
+        if (dto.GetName().empty() || dto.GetAddress().empty())
+        {
+            AB_LOG_E("Invalid email name or address");
+            result = ErrorCode::kInvalidParam;
+            break;
+        }
+        // 检查邮件组数量是否超了规格上限
+        std::vector<uint32_t> group_rids = dto.GetGroupRids();
+        if (group_rids.size() > kMaxGroupsPerEmail)
+        {
+            AB_LOG_E("Exceed max group count");
+            result = ErrorCode::kExceedMaxCount;
+            break;
+        }
+        TransactionGuard trans_guard(true);
+        std::pair<std::vector<uint32_t>, std::vector<uint32_t>> changed_rids = m_mail_rep_sptr->GetChangedGroup(group_rids, dto.GetRid());
+        // 检查邮件组是否存在
+        bool group_exist = m_mail_rep_sptr->IsGroupExist(changed_rids.first);
+        if (!group_exist)
+        {
+            AB_LOG_E("Some groups do not exist");
+            result = ErrorCode::kInvalidParam;
+            break;
+        }
+        // 检查邮件组中是否还能关联邮件
+        if (!m_mail_rep_sptr->CanAddEmail(changed_rids.first, kMaxGroupsPerEmail))
+        {
+            AB_LOG_E("Some groups exceed max email count");
+            result = ErrorCode::kExceedMaxCount;
+            break;
+        }
+        // 添加邮件
+        std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetRid(), dto.GetName(), dto.GetAddress());
+        if (m_mail_rep_sptr->UpdateEmail(mail_entity_sptr))
+        {
+            AB_LOG_E("Failed to update email to database");
+            result = ErrorCode::kDbError;
+            break;
+        }
+        trans_guard.SetError(false);
+    } while (false);
+    return result;
 }
 
 ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
