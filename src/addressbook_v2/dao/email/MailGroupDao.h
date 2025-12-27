@@ -17,8 +17,6 @@ class MailGroupDao : public AbstractDao
 
     bool RemoveByEmailRid(uint32_t email_rid);
 
-    size_t CountByCond(const MailGroupMappingQueryCond& cond) const override;
-
   private:
     bool HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const;
 };

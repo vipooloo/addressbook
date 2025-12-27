@@ -49,12 +49,6 @@ bool MailGroupDao::Init()
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
-size_t MailGroupDao::CountByCond(const MailGroupMappingQueryCond& cond) const
-{
-    //TBD
-    return cond.InValid() ? GetCount() : 0;
-}
-
 bool MailGroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
 {
     (void)out_entity_sptr;
@@ -62,50 +56,32 @@ bool MailGroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr,
     std::shared_ptr<MailGroupRelation> relation_entity_sptr = std::static_pointer_cast<MailGroupRelation>(in_entity_sptr);
     if (relation_entity_sptr)
     {
-        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-        stmt.bind(1, relation_entity_sptr->GetMailRid());
-        stmt.bind(2, relation_entity_sptr->GetGroupRid());
-        int32_t code = stmt.tryExecuteStep();
-        if (SQLITE_DONE == code)
-        {
-            ret = true;
-        }
-        else
-        {
-            AB_LOG_E("Insert failed, code:%d", code);
-        }
+        std::vector<StmtParam> stmt_params;
+        stmt_params.emplace_back(relation_entity_sptr->GetMailRid());
+        stmt_params.emplace_back(relation_entity_sptr->GetGroupRid());
+        ret = AbstractDao::OnExecuteSql(SQL_INSERT, stmt_params);
     }
     return ret;
 }
 
 bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
 {
-    bool ret = true;
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-    for (const std::shared_ptr<AbstractEntity>& item : items)
-    {
-        std::shared_ptr<MailGroupRelation> entity_sptr = std::static_pointer_cast<MailGroupRelation>(item);
-        if (entity_sptr)
-        {
-            stmt.bind(1, entity_sptr->GetMailRid());
-            stmt.bind(2, entity_sptr->GetGroupRid());
-            int32_t code = stmt.tryExecuteStep();
-            if (SQLITE_DONE != code)
+    std::vector<std::vector<StmtParam>> stmt_paramss;
+    std::transform(
+        items.cbegin(),
+        items.cend(),
+        std::back_inserter(stmt_paramss),
+        [](const std::shared_ptr<AbstractEntity>& item) {
+            std::shared_ptr<MailGroupRelation> entity_sptr = std::static_pointer_cast<MailGroupRelation>(item);
+            std::vector<StmtParam> stmt_params;
+            if (entity_sptr)
             {
-                AB_LOG_E("InsertBatch failed, ret_code:%d", code);
-                ret = false;
-                break;
+                stmt_params.emplace_back(entity_sptr->GetMailRid());
+                stmt_params.emplace_back(entity_sptr->GetGroupRid());
             }
-            stmt.reset();
-            stmt.clearBindings();
-        }
-        else
-        {
-            ret = false;
-            break;
-        }
-    }
-    return ret;
+            return stmt_params;
+        });
+    return AbstractDao::OnExecuteSql(SQL_INSERT, stmt_paramss);
 }
 
 bool MailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
@@ -138,7 +114,6 @@ bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const st
 
 bool MailGroupDao::RemoveByEmailRid(uint32_t email_rid)
 {
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_REMOVE_BY_EMAIL_RID);
-    stmt.bind(1, email_rid);
-    return AbstractDao::OnExecuteSql(stmt);
+    StmtParam param(email_rid);
+    return AbstractDao::OnExecuteSql(SQL_REMOVE_BY_EMAIL_RID, {param});
 }

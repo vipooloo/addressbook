@@ -2,6 +2,7 @@
 #define ABSTRACTDAO_H
 
 #include "AbstractEntity.h"
+#include "StmtParam.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <cstdint>
 #include <memory>
@@ -180,8 +181,13 @@ class AbstractDao
     }
 
   protected:
-    bool OnExecuteSql(const std::string& sql) const;
-    bool OnExecuteSql(SQLite::Statement& stmt) const;
+    bool OnExecuteSql(const std::string& sql) const
+    {
+        std::vector<StmtParam> stmt_params;
+        return OnExecuteSql(sql, stmt_params);
+    }
+    bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
+    bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;

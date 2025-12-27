@@ -73,7 +73,7 @@ bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
 
 bool AbstractDao::RemoveAll()
 {
-    return OnExecuteSql(m_delete_all);
+    return OnExecuteSql(m_delete_all, std::vector<StmtParam>{});
 }
 
 /*-----------------------------------*/
@@ -117,33 +117,91 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
     return where;
 }
 
-bool AbstractDao::OnExecuteSql(const std::string& sql) const
+bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const
 {
-    bool ret = false;
+    bool ret = true;
     SQLite::Statement stmt(GetDb(), sql);
-    int32_t code = stmt.tryExecuteStep();
-    if (SQLITE_DONE == code)
+    for (uint32_t i = 0; i < stmt_params.size(); ++i)
     {
-        ret = true;
+        const StmtParam& stmt_param = stmt_params[i];
+        StmtParamType type = stmt_param.GetType();
+        if (StmtParamType::INT32 == type)
+        {
+            stmt.bind(i + 1, stmt_param.GetInt32Value());
+        }
+        else if (StmtParamType::UINT32 == type)
+        {
+            stmt.bind(i + 1, stmt_param.GetUInt32Value());
+        }
+        else if (StmtParamType::STRING == type)
+        {
+            stmt.bind(i + 1, stmt_param.GetStringValue());
+        }
+        else
+        {
+            AB_LOG_E("invalid stmt param type:%d", static_cast<int32_t>(type));
+            ret = false;
+            break;
+        }
     }
-    else
+    if (ret)
     {
-        AB_LOG_E("Failed to create table, code: %d", code);
+        int32_t code = stmt.tryExecuteStep();
+        if (code != SQLITE_DONE)
+        {
+            ret = false;
+            AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+        }
     }
     return ret;
 }
 
-bool AbstractDao::OnExecuteSql(SQLite::Statement& stmt) const
+bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const
 {
-    bool ret = false;
-    int32_t code = stmt.tryExecuteStep();
-    if (SQLITE_DONE == code)
+    bool ret = true;
+    SQLite::Statement stmt(GetDb(), sql);
+    for (const std::vector<StmtParam>& stmt_params : stmt_params_vec)
     {
-        ret = true;
-    }
-    else
-    {
-        AB_LOG_E("Failed to create table, code: %d", code);
+        for (uint32_t i = 0; i < stmt_params.size(); ++i)
+        {
+            const StmtParam& stmt_param = stmt_params[i];
+            StmtParamType type = stmt_param.GetType();
+            if (StmtParamType::INT32 == type)
+            {
+                stmt.bind(i + 1, stmt_param.GetInt32Value());
+            }
+            else if (StmtParamType::UINT32 == type)
+            {
+                stmt.bind(i + 1, stmt_param.GetUInt32Value());
+            }
+            else if (StmtParamType::STRING == type)
+            {
+                stmt.bind(i + 1, stmt_param.GetStringValue());
+            }
+            else
+            {
+                AB_LOG_E("invalid stmt param type:%d", static_cast<int32_t>(type));
+                ret = false;
+                break;
+            }
+        }
+        if (ret)
+        {
+            int32_t code = stmt.tryExecuteStep();
+            if (code != SQLITE_DONE)
+            {
+                ret = false;
+                AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+            }
+            stmt.tryReset();
+            stmt.clearBindings();
+        }
+        else
+        {
+            ret = false;
+            AB_LOG_E("failed to execute sql, sql:%s", sql.c_str());
+            break;
+        }
     }
     return ret;
 }
