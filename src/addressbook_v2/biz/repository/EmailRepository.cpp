@@ -112,12 +112,12 @@ bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32
     return result;
 }
 
-bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t count_limit)
+bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
     bool result = false;
     if (m_mail_group_dao_sptr)
     {
-        result = m_mail_group_dao_sptr->HasMemberOverEMailLimit(mail_ids, count_limit);
+        result = m_mail_group_dao_sptr->HasMemberOverEMailLimit(group_ids, count_limit);
     }
     return result;
 }
@@ -200,7 +200,7 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
     return result;
 }
 
-bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr)
+bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& add_group_ids, const std::vector<uint32_t>& remove_group_ids)
 {
     bool result = false;
     if (m_mail_dao_sptr && entity_sptr)
@@ -215,27 +215,12 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
     return false;
 }
 
-std::pair<std::vector<uint32_t>, std::vector<uint32_t>> EmailRepository::GetChangedGroup(const std::vector<uint32_t>& group_rids, uint32_t mail_rid)
+std::vector<uint32_t> EmailRepository::GetGroupRidsByMailRid(uint32_t mail_rid)
 {
-    std::vector<uint32_t> to_add;     // 需要新增的 ID
-    std::vector<uint32_t> to_delete;  // 需要删除的 ID
+    std::vector<uint32_t> ret;
     if (m_mail_group_dao_sptr)
     {
-        std::vector<uint32_t> old_group_ids = m_mail_group_dao_sptr->GetEmailGroupsByEmailId(mail_rid);
-        // 计算需删除部分: Old - New
-        std::set_difference(
-            old_group_ids.begin(),
-            old_group_ids.end(),
-            group_rids.begin(),
-            group_rids.end(),
-            std::back_inserter(to_delete));
-        // 计算需新增部分: New - Old
-        std::set_difference(
-            group_rids.begin(),
-            group_rids.end(),
-            old_group_ids.begin(),
-            old_group_ids.end(),
-            std::back_inserter(to_add));
+        ret = m_mail_group_dao_sptr->GetEmailGroupsByEmailId(mail_rid);
     }
-    return std::make_pair<>(to_add, to_delete);
+    return ret;
 }

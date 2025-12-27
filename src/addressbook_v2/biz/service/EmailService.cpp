@@ -220,17 +220,21 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         // 检查邮件组数量是否超了规格上限
-        std::vector<uint32_t> group_rids = dto.GetGroupRids();
-        if (group_rids.size() > kMaxGroupsPerEmail)
+        std::vector<uint32_t> new_group_rids = dto.GetGroupRids();
+        if (new_group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
             result = ErrorCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard(true);
-        std::pair<std::vector<uint32_t>, std::vector<uint32_t>> changed_rids = m_mail_rep_sptr->GetChangedGroup(group_rids, dto.GetRid());
+        // 获取当前邮件组
+        std::vector<uint32_t> old_group_rids = m_mail_rep_sptr->GetGroupRidsByMailRid(dto.GetRid());
+        std::pair<std::vector<uint32_t>, std::vector<uint32_t>> changed_rids = AddressCenterUtilities::CalculateIdDiff(new_group_rids, old_group_rids);
+        const std::vector<uint32_t>& groups_to_add = changed_rids.first;
+        const std::vector<uint32_t>& groups_to_remove = changed_rids.second;
         // 检查邮件组是否存在
-        bool group_exist = m_mail_rep_sptr->IsGroupExist(changed_rids.first);
+        bool group_exist = m_mail_rep_sptr->IsGroupExist(groups_to_add);
         if (!group_exist)
         {
             AB_LOG_E("Some groups do not exist");
@@ -238,15 +242,15 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         // 检查邮件组中是否还能关联邮件
-        if (!m_mail_rep_sptr->CanAddEmail(changed_rids.first, kMaxGroupsPerEmail))
+        if (!m_mail_rep_sptr->CanAddEmail(groups_to_add, kMaxGroupsPerEmail))
         {
             AB_LOG_E("Some groups exceed max email count");
             result = ErrorCode::kExceedMaxCount;
             break;
         }
-        // 添加邮件
+        // 更新邮件
         std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetRid(), dto.GetName(), dto.GetAddress());
-        if (m_mail_rep_sptr->UpdateEmail(mail_entity_sptr))
+        if (!m_mail_rep_sptr->UpdateEmail(mail_entity_sptr, groups_to_add, groups_to_remove))
         {
             AB_LOG_E("Failed to update email to database");
             result = ErrorCode::kDbError;

@@ -21,7 +21,8 @@ class EmailRepository
     uint32_t AddEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& rids);
     bool IsMailExist(const std::vector<uint32_t>& mail_ids) const;
     uint32_t GetEmailCount() const;
-    bool CanAddGroup(const std::vector<uint32_t>& mail_ids, uint32_t count_limit);
+    bool CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit);
+    std::vector<uint32_t> GetGroupRidsByMailRid(uint32_t mail_rid);
 
     uint32_t AddGroup(const std::shared_ptr<GroupEntity>& entity_sptr, const std::vector<uint32_t>& rids);
     bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
@@ -31,10 +32,8 @@ class EmailRepository
     bool RemoveEmail(const std::vector<uint32_t>& mail_ids);
     bool RemoveGroup(const std::vector<uint32_t>& group_ids);
 
-    bool UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr);
+    bool UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& add_group_ids, const std::vector<uint32_t>& remove_group_ids);
     bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
-
-    std::pair<std::vector<uint32_t>, std::vector<uint32_t>> GetChangedGroup(const std::vector<uint32_t>& group_rids, uint32_t mail_rid);
 
   private:
     bool
