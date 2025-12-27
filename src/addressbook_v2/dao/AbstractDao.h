@@ -3,8 +3,8 @@
 
 #include "AbstractEntity.h"
 #include <SQLiteCpp/SQLiteCpp.h>
-#include <memory>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -181,6 +181,7 @@ class AbstractDao
 
   protected:
     bool OnExecuteSql(const std::string& sql) const;
+    bool OnExecuteSql(SQLite::Statement& stmt) const;
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;

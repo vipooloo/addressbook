@@ -200,12 +200,32 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
     return result;
 }
 
-bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& add_group_ids, const std::vector<uint32_t>& remove_group_ids)
+bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& new_group_rids)
 {
-    bool result = false;
+    bool result = true;
     if (m_mail_dao_sptr && entity_sptr)
     {
+        // 更新邮件表信息
         result = m_mail_dao_sptr->Update(entity_sptr);
+        if (result && !new_group_rids.empty())
+        {
+            // 映射表中增加信息
+            uint32_t email_rid = entity_sptr->GetRid();
+            // 添加邮件到组的映射关系
+            std::vector<std::shared_ptr<AbstractEntity>> relations;
+            relations.reserve(new_group_rids.size());
+            std::transform(
+                new_group_rids.cbegin(),
+                new_group_rids.cend(),
+                std::back_inserter(relations),
+                [email_rid](uint32_t group_rid) {
+                    return std::make_shared<MailGroupRelation>(email_rid, group_rid);
+                });
+            if (!AddEmailToGroupRelation(relations))
+            {
+                result = false;
+            }
+        }
     }
     return result;
 }
@@ -215,12 +235,12 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
     return false;
 }
 
-std::vector<uint32_t> EmailRepository::GetGroupRidsByMailRid(uint32_t mail_rid)
+bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
 {
-    std::vector<uint32_t> ret;
-    if (m_mail_group_dao_sptr)
+    bool ret = false;
+    if (m_mail_group_dao_sptr && mail_rid != 0)
     {
-        ret = m_mail_group_dao_sptr->GetEmailGroupsByEmailId(mail_rid);
+        ret = m_mail_group_dao_sptr->RemoveByEmailRid(mail_rid);
     }
     return ret;
 }

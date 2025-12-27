@@ -37,6 +37,7 @@ static constexpr const char* SQL_CHECK_OVER_EMAIL_LIMIT = R"(
     HAVING COUNT(m_rid) > ?
     LIMIT 1;
 )";
+static constexpr const char* SQL_REMOVE_BY_EMAIL_RID = R"(DELETE FROM GROUPMAPPING WHERE m_rid = ?;)";
 
 MailGroupDao::MailGroupDao()
   : AbstractDao(SQL_TABLE_NAME)
@@ -107,33 +108,6 @@ bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>
     return ret;
 }
 
-std::vector<uint32_t> MailGroupDao::GetEmailGroupsByEmailId(uint32_t email_id) const
-{
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_QUERY_GRID_BY_RID);
-    stmt.bind(1, email_id);
-    std::vector<uint32_t> ret_group_ids;
-    int32_t code = stmt.tryExecuteStep();
-    while (SQLITE_ROW == code)
-    {
-        ret_group_ids.push_back(static_cast<uint32_t>(stmt.getColumn(0).getUInt()));
-        code = stmt.tryExecuteStep();
-    }
-    return ret_group_ids;
-}
-std::vector<uint32_t> MailGroupDao::GetEmailIdsByGroupId(uint32_t group_id) const
-{
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_QUERY_MAIL_BY_RID);
-    stmt.bind(1, group_id);
-    std::vector<uint32_t> ret_email_ids;
-    int32_t code = stmt.tryExecuteStep();
-    while (SQLITE_ROW == code)
-    {
-        ret_email_ids.push_back(static_cast<uint32_t>(stmt.getColumn(0).getUInt()));
-        code = stmt.tryExecuteStep();
-    }
-    return ret_email_ids;
-}
-
 bool MailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
 {
     return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
@@ -160,4 +134,11 @@ bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const st
         ret = false;
     }
     return ret;
+}
+
+bool MailGroupDao::RemoveByEmailRid(uint32_t email_rid)
+{
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_REMOVE_BY_EMAIL_RID);
+    stmt.bind(1, email_rid);
+    return AbstractDao::OnExecuteSql(stmt);
 }

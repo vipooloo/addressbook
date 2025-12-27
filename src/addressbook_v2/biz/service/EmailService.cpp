@@ -228,13 +228,15 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         TransactionGuard trans_guard(true);
-        // 获取当前邮件组
-        std::vector<uint32_t> old_group_rids = m_mail_rep_sptr->GetGroupRidsByMailRid(dto.GetRid());
-        std::pair<std::vector<uint32_t>, std::vector<uint32_t>> changed_rids = AddressCenterUtilities::CalculateIdDiff(new_group_rids, old_group_rids);
-        const std::vector<uint32_t>& groups_to_add = changed_rids.first;
-        const std::vector<uint32_t>& groups_to_remove = changed_rids.second;
+        // 删除旧关系
+        if (!m_mail_rep_sptr->RemoveGroupByMailRid(dto.GetRid()))
+        {
+            AB_LOG_E("Failed to remove group from database");
+            result = ErrorCode::kDbError;
+            break;
+        }
         // 检查邮件组是否存在
-        bool group_exist = m_mail_rep_sptr->IsGroupExist(groups_to_add);
+        bool group_exist = m_mail_rep_sptr->IsGroupExist(new_group_rids);
         if (!group_exist)
         {
             AB_LOG_E("Some groups do not exist");
@@ -242,7 +244,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         // 检查邮件组中是否还能关联邮件
-        if (!m_mail_rep_sptr->CanAddEmail(groups_to_add, kMaxGroupsPerEmail))
+        if (!m_mail_rep_sptr->CanAddEmail(new_group_rids, kMaxGroupsPerEmail))
         {
             AB_LOG_E("Some groups exceed max email count");
             result = ErrorCode::kExceedMaxCount;
@@ -250,7 +252,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
         }
         // 更新邮件
         std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetRid(), dto.GetName(), dto.GetAddress());
-        if (!m_mail_rep_sptr->UpdateEmail(mail_entity_sptr, groups_to_add, groups_to_remove))
+        if (!m_mail_rep_sptr->UpdateEmail(mail_entity_sptr, new_group_rids))
         {
             AB_LOG_E("Failed to update email to database");
             result = ErrorCode::kDbError;

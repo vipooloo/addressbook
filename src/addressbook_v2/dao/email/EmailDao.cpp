@@ -59,16 +59,18 @@ bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
 
 bool EmailDao::Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
 {
-    bool ret = false;
+    bool ret = true;
     std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(entity_sptr);
     if (email_entity_sptr)
     {
         SQLite::Statement stmt(AbstractDao::GetDb(), SQL_UPDATE);
         stmt.bind(1, email_entity_sptr->GetEmailAddress());
         stmt.bind(2, email_entity_sptr->GetEmailName());
+        stmt.bind(3, email_entity_sptr->GetRid());
         int32_t code = stmt.tryExecuteStep();
         if (SQLITE_DONE != code)
         {
+            ret = false;
             AB_LOG_E("Update email failed, code: %d %s %s", code, email_entity_sptr->GetEmailAddress(), email_entity_sptr->GetEmailName());
         }
     }

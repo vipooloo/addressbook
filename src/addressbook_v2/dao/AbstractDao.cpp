@@ -122,7 +122,22 @@ bool AbstractDao::OnExecuteSql(const std::string& sql) const
     bool ret = false;
     SQLite::Statement stmt(GetDb(), sql);
     int32_t code = stmt.tryExecuteStep();
-    if (SQLITE_DONE == code || SQLITE_ROW == code)
+    if (SQLITE_DONE == code)
+    {
+        ret = true;
+    }
+    else
+    {
+        AB_LOG_E("Failed to create table, code: %d", code);
+    }
+    return ret;
+}
+
+bool AbstractDao::OnExecuteSql(SQLite::Statement& stmt) const
+{
+    bool ret = false;
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_DONE == code)
     {
         ret = true;
     }
