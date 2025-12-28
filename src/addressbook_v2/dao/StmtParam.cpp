@@ -5,12 +5,14 @@ StmtParam::StmtParam(uint32_t val)
   : m_type{StmtParamType::UINT32}
   , m_data{0, 0, 0, 0}
 {
+  std::memcpy(m_data.data(), &val, sizeof(val));
 }
 
 StmtParam::StmtParam(int32_t val)
   : m_type{StmtParamType::INT32}
   , m_data{0, 0, 0, 0}
 {
+  std::memcpy(m_data.data(), &val, sizeof(val));
 }
 
 StmtParam::StmtParam(const std::string& val)
