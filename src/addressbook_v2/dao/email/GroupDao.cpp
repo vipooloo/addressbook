@@ -1,8 +1,8 @@
 #include "AddrCenterLog.h"
 #include "GroupDao.h"
 #include "GroupEntity.h"
+#include <array>
 #include <sqlite3.h>
-#include <sstream>
 
 static constexpr const char* SQL_TABLE_NAME = "mail_group";
 static constexpr const char* SQL_CREATE_TABLE = R"(

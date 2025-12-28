@@ -5,6 +5,8 @@
 #include <sqlite3.h>
 
 static constexpr uint32_t SQL_BUFFER_SIZE = 512;
+static constexpr const char* SQL_QUERY_COUNT = "SELECT COUNT(*) FROM %s %s ;";
+static constexpr const char* SQL_QUERY = "SELECT * FROM %s %s ORDER BY rid %s LIMIT ? OFFSET ?;";
 
 AbstractDao::AbstractDao(const std::string& table_name)
   : m_table_name{table_name}
@@ -13,14 +15,18 @@ AbstractDao::AbstractDao(const std::string& table_name)
   , m_sql_delete_all{"DELETE FROM " + table_name + ";"}
 {}
 
-size_t AbstractDao::GetCount() const
+uint32_t AbstractDao::GetCount() const
 {
     size_t ret = 0;
     SQLite::Statement query(GetDb(), m_sql_count);
     int32_t code = query.tryExecuteStep();
     if (SQLITE_ROW == code)
     {
-        ret = static_cast<size_t>(query.getColumn(0).getUInt());
+        ret = static_cast<uint32_t>(query.getColumn(0).getUInt());
+    }
+    else
+    {
+        AB_LOG_E("GetCount failed, code: %d %s", code, m_sql_count.c_str());
     }
     return ret;
 }
@@ -79,25 +85,31 @@ bool AbstractDao::ValidatePageParams(const QueryParams& params) const
     return result;
 }
 
-// 拼接 WHERE 子句（参数化，避免 SQL 注入）
-std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const
+std::string AbstractDao::GenWhereSql(const std::vector<ConditionNode>& conditions) const
 {
-    std::string where;
-    if (conditions.empty())
+    std::string sql;
+    if (!conditions.empty())
     {
-        where = " WHERE ";
+        sql = " WHERE ";
         for (size_t i = 0; i < conditions.size(); ++i)
         {
             const ConditionNode& cond = conditions[i];
-            where += cond.GetField() + " " + cond.GetOp() + " ?";
+            sql += cond.GetField() + " " + cond.GetOp() + " ?";
             if (i != conditions.size() - 1)
             {
-                where += " AND ";
+                sql += " AND ";
             }
-            stmt.bind(++param_idx, cond.GetValue());
         }
     }
-    return where;
+    return sql;
+}
+
+void AbstractDao::BindWhereParams(SQLite::Statement& stmt, const std::vector<ConditionNode>& conditions, uint32_t start_idx) const
+{
+    for (const ConditionNode& cond : conditions)
+    {
+        stmt.bind(start_idx++, cond.GetValue());
+    }
 }
 
 bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const
@@ -171,4 +183,68 @@ bool AbstractDao::BindStmtParams(SQLite::Statement& stmt, const std::vector<Stmt
         }
     }
     return ret;
+}
+
+PageResult AbstractDao::FindByPage(const QueryParams& params)
+{
+    PageResult page_result(params.GetPage(), params.GetPageSize());
+    const std::vector<ConditionNode>& conditions = params.GetConditions();
+    std::string where_sql = GenWhereSql(conditions);
+    uint32_t total_records = QueryCount(where_sql, conditions);
+    if (total_records != 0)
+    {
+        std::vector<std::shared_ptr<AbstractEntity>> records = QueryRecords(where_sql, params);
+        page_result.SetRecords(records);
+        page_result.SetTotalRecords(total_records);
+    }
+    return page_result;
+}
+
+uint32_t AbstractDao::QueryCount(const std::string& where_sql, const std::vector<ConditionNode>& conditions)
+{
+    uint32_t total = 0;
+    std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
+    snprintf(sql_buffer.data(), sql_buffer.size(), SQL_QUERY_COUNT, m_table_name.c_str(), where_sql.c_str());
+    // 创建 Statement (此时 SQL 已经是完整的了)
+    SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer.data());
+    // 绑定参数 绑定 WHERE 部分的参数 (从索引 1 开始)
+    BindWhereParams(stmt, conditions, 1);
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_ROW == code)
+    {
+        total = static_cast<uint32_t>(stmt.getColumn(0).getUInt());
+    }
+    else
+    {
+        AB_LOG_E("GetCount failed, code: %d %s", code, sql_buffer.data());
+    }
+    return total;
+}
+
+std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& where_sql, const QueryParams& params)
+{
+    const std::vector<ConditionNode>& conditions = params.GetConditions();
+    std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
+    snprintf(sql_buffer.data(), sql_buffer.size(), SQL_QUERY, m_table_name.c_str(), where_sql.c_str(), OrderType::ASC == params.GetOrderBy() ? "ASC" : "DESC");
+    SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer.data());
+    // 第三步：绑定参数
+    // 绑定 WHERE 部分的参数 (从索引 1 开始)
+    BindWhereParams(stmt, conditions, 1);
+    // 绑定分页参数 (索引接在 where 参数后面)
+    uint32_t limit_idx = conditions.size() + 1;
+    stmt.bind(limit_idx, params.GetPageSize());
+    stmt.bind(limit_idx + 1, CalcPageOffset(params));
+    std::vector<std::shared_ptr<AbstractEntity>> records;
+    int32_t code = stmt.tryExecuteStep();
+    while (SQLITE_ROW == code)
+    {
+        std::shared_ptr<AbstractEntity> entity = OnCreateEntity(stmt);
+        records.emplace_back(entity);
+        code = stmt.tryExecuteStep();
+    }
+    if (code != SQLITE_DONE)
+    {
+        AB_LOG_E("Query email failed, code: %d %s", code, sql_buffer.data());
+    }
+    return records;
 }

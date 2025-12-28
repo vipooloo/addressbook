@@ -1,68 +1,93 @@
 #ifndef PAGERESULT_H
 #define PAGERESULT_H
 
-#include "ConditionNode.h"
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
+// 前置声明，减少头文件依赖
 class AbstractEntity;
 
 class PageResult
 {
   public:
     PageResult()
-      : m_total{0}
-      , m_page{1}
-      , m_page_size{10}
-      , m_total_pages{0}
-      , m_data{}
+      : PageResult(1, 10)
     {}
+    PageResult(uint32_t current_page, uint32_t page_size)
+      : m_total_records{0}
+      , m_current_page{current_page}
+      , m_page_size{page_size}
+      , m_records{}
+    {}
+
     ~PageResult() = default;
-    uint32_t GetTotal() const
+
+    uint32_t GetTotalRecords() const
     {
-        return m_total;
+        return m_total_records;
     }
-    uint32_t GetPage() const
+
+    uint32_t GetCurrentPage() const
     {
-        return m_page;
+        return m_current_page;
     }
+
     uint32_t GetPageSize() const
     {
         return m_page_size;
     }
+
     uint32_t GetTotalPages() const
     {
-        return m_total_pages;
+        uint32_t total_pages = 0;
+        if (m_page_size != 0)
+        {
+            total_pages = (m_total_records + m_page_size - 1) / m_page_size;
+        }
+        return total_pages;
     }
-    std::vector<std::shared_ptr<AbstractEntity>> GetData() const
+
+    const std::vector<std::shared_ptr<AbstractEntity>>& GetRecords() const
     {
-        return m_data;
+        return m_records;
     }
-    void SetTotal(uint32_t total)
+
+    std::vector<std::shared_ptr<AbstractEntity>>& GetMutableRecords()
     {
-        m_total = total;
+        return m_records;
     }
-    void SetPage(uint32_t page)
+
+    void SetTotalRecords(uint32_t total_records)
     {
-        m_page = page;
+        m_total_records = total_records;
     }
+
+    void SetCurrentPage(uint32_t current_page)
+    {
+        m_current_page = current_page;
+    }
+
     void SetPageSize(uint32_t page_size)
     {
         m_page_size = page_size;
     }
-    void SetTotalPages(uint32_t total_pages)
+
+    void SetRecords(std::vector<std::shared_ptr<AbstractEntity>> records)
     {
-        m_total_pages = total_pages;
+        m_records = std::move(records);
+    }
+
+    void AddRecord(const std::shared_ptr<AbstractEntity>& record)
+    {
+        m_records.push_back(record);
     }
 
   private:
-    uint32_t m_total;                                     ///< 一共多少条
-    uint32_t m_page;                                      ///< 当前第几页
-    uint32_t m_page_size;                                 ///< 一页多少条
-    uint32_t m_total_pages;                               ///< 一共多少页
-    std::vector<std::shared_ptr<AbstractEntity>> m_data;  ///< 当前页的具体数据
+    uint32_t m_total_records;                                ///< 总记录条数 (Total number of records)
+    uint32_t m_current_page;                                 ///< 当前页码 (Current page number, 1-based)
+    uint32_t m_page_size;                                    ///< 每页容量 (Items per page)
+    std::vector<std::shared_ptr<AbstractEntity>> m_records;  ///< 当前页的具体数据列表 (List of records)
 };
 
 #endif  // PAGERESULT_H

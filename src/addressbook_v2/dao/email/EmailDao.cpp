@@ -2,10 +2,11 @@
 #include "EmailDao.h"
 #include "EmailEntity.h"
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <sqlite3.h>
-#include <sstream>
 
+static constexpr uint32_t SQL_BUFFER_SIZE = 512;
 static constexpr const char* SQL_TABLE_NAME = "email";
 static constexpr const char* SQL_CREATE_TABLE = R"(
 CREATE TABLE IF NOT EXISTS email (
@@ -72,7 +73,10 @@ bool EmailDao::Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
     return ret;
 }
 
-std::pair<bool, PageResult> EmailDao::FindByPage(const QueryParams& params)
+std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement& stmt)
 {
-    return {};
+    uint32_t rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());  // rid
+    std::string email_address = stmt.getColumn(1).getString();          // email_address
+    std::string email_name = stmt.getColumn(2).getString();             // email_name
+    return std::make_shared<EmailEntity>(rid, email_address, email_name);
 }

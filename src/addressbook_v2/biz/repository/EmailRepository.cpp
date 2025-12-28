@@ -244,3 +244,16 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
     }
     return ret;
 }
+
+PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword)
+{
+    PageResult result;
+    QueryParams params;
+    std::vector<ConditionNode> conditions;
+    params.SetConditions(conditions);
+    if (m_mail_group_dao_sptr)
+    {
+        result = m_mail_group_dao_sptr->FindByPage(params);
+    }
+    return result;
+}

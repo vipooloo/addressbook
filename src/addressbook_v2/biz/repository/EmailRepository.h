@@ -5,6 +5,7 @@
 #include "EmailEntity.h"
 #include "GroupEntity.h"
 #include "MailGroupRelation.h"
+#include "PageResult.h"
 #include <cstdint>
 #include <memory>
 
@@ -35,6 +36,8 @@ class EmailRepository
 
     bool UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& new_group_rids);
     bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
+
+    PageResult GetEmailsByKeyword(const std::string& keyword);
 
   private:
     bool

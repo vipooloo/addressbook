@@ -40,6 +40,22 @@ class QueryParams
     {
         return m_conditions;
     }
+    void SetPage(uint32_t page)
+    {
+        m_page = page;
+    }
+    void SetPageSize(uint32_t page_size)
+    {
+        m_page_size = page_size;
+    }
+    void SetOrderBy(OrderType order_by)
+    {
+        m_order_by = order_by;
+    }
+    void SetConditions(std::vector<ConditionNode> conditions)
+    {
+        m_conditions = conditions;
+    }
 
   private:
     uint32_t m_page;

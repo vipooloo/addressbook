@@ -45,7 +45,7 @@ class AbstractDao
     {
         return true;
     }
-    virtual size_t GetCount() const;
+    virtual uint32_t GetCount() const;
     virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
         (void)in_entity_sptr;
@@ -69,15 +69,12 @@ class AbstractDao
         return false;
     }
 
-    virtual std::pair<bool, PageResult> FindAll()
+    virtual PageResult FindAll()
     {
-        return {false, {}};
+        return {};
     }
 
-    virtual std::pair<bool, PageResult> FindByPage(const QueryParams& params)
-    {
-        return {false, {}};
-    }
+    virtual PageResult FindByPage(const QueryParams& params);
 
   protected:
     bool OnExecuteSql(const std::string& sql) const
@@ -90,10 +87,19 @@ class AbstractDao
 
     uint32_t CalcPageOffset(const QueryParams& params) const;
     bool ValidatePageParams(const QueryParams& params) const;
-    std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
+    // 返回值示例: " WHERE name LIKE ? AND age > ?"
+    std::string GenWhereSql(const std::vector<ConditionNode>& conditions) const;
+    // start_idx: 参数绑定的起始索引（因为前面可能有 UPDATE/INSERT 的参数）
+    void BindWhereParams(SQLite::Statement& stmt, const std::vector<ConditionNode>& conditions, uint32_t start_idx) const;
+    virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
+    {
+        return nullptr;
+    }
 
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);
+    uint32_t QueryCount(const std::string& where_sql, const std::vector<ConditionNode>& conditions);
+    std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& where_sql, const QueryParams& params);
 
   private:
     std::string m_table_name;
