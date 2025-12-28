@@ -1,5 +1,6 @@
 #include "AbstractDao.h"
 #include "AddrCenterLog.h"
+#include "AddressCenterUtilities.h"
 #include <algorithm>
 #include <sqlite3.h>
 
@@ -27,7 +28,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
     bool ret = false;
     if (!rids.empty())
     {
-        std::string ids = JoinIds(rids);
+        std::string ids = AddressCenterUtilities::JoinIds(rids);
         std::string sql = "SELECT COUNT(rid) FROM " + m_table_name + " WHERE rid IN (" + ids + ");";
         SQLite::Statement stmt(GetDb(), sql);
         int32_t code = stmt.tryExecuteStep();
@@ -119,8 +120,51 @@ std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& cond
 
 bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const
 {
+    SQLite::Statement stmt(GetDb(), sql);
+    bool ret = BindStmtParams(stmt, stmt_params);
+    if (ret)
+    {
+        int32_t code = stmt.tryExecuteStep();
+        if (code != SQLITE_DONE)
+        {
+            ret = false;
+            AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+        }
+    }
+    return ret;
+}
+
+bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const
+{
     bool ret = true;
     SQLite::Statement stmt(GetDb(), sql);
+    for (const std::vector<StmtParam>& stmt_params : stmt_params_vec)
+    {
+        ret = BindStmtParams(stmt, stmt_params);
+        if (ret)
+        {
+            int32_t code = stmt.tryExecuteStep();
+            if (code != SQLITE_DONE)
+            {
+                ret = false;
+                AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+            }
+            stmt.tryReset();
+            stmt.clearBindings();
+        }
+        else
+        {
+            ret = false;
+            AB_LOG_E("failed to execute sql, sql:%s", sql.c_str());
+            break;
+        }
+    }
+    return ret;
+}
+
+bool AbstractDao::BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params) const
+{
+    bool ret = true;
     for (uint32_t i = 0; i < stmt_params.size(); ++i)
     {
         const StmtParam& stmt_param = stmt_params[i];
@@ -144,84 +188,5 @@ bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtPar
             break;
         }
     }
-    if (ret)
-    {
-        int32_t code = stmt.tryExecuteStep();
-        if (code != SQLITE_DONE)
-        {
-            ret = false;
-            AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
-        }
-    }
     return ret;
-}
-
-bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const
-{
-    bool ret = true;
-    SQLite::Statement stmt(GetDb(), sql);
-    for (const std::vector<StmtParam>& stmt_params : stmt_params_vec)
-    {
-        for (uint32_t i = 0; i < stmt_params.size(); ++i)
-        {
-            const StmtParam& stmt_param = stmt_params[i];
-            StmtParamType type = stmt_param.GetType();
-            if (StmtParamType::INT32 == type)
-            {
-                stmt.bind(i + 1, stmt_param.GetInt32Value());
-            }
-            else if (StmtParamType::UINT32 == type)
-            {
-                stmt.bind(i + 1, stmt_param.GetUInt32Value());
-            }
-            else if (StmtParamType::STRING == type)
-            {
-                stmt.bind(i + 1, stmt_param.GetStringValue());
-            }
-            else
-            {
-                AB_LOG_E("invalid stmt param type:%d", static_cast<int32_t>(type));
-                ret = false;
-                break;
-            }
-        }
-        if (ret)
-        {
-            int32_t code = stmt.tryExecuteStep();
-            if (code != SQLITE_DONE)
-            {
-                ret = false;
-                AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
-            }
-            stmt.tryReset();
-            stmt.clearBindings();
-        }
-        else
-        {
-            ret = false;
-            AB_LOG_E("failed to execute sql, sql:%s", sql.c_str());
-            break;
-        }
-    }
-    return ret;
-}
-
-std::string AbstractDao::JoinIds(const std::vector<uint32_t>& rids)
-{
-    if (rids.empty())
-    {
-        return "";
-    }
-
-    std::string result;
-    // 预估大小，避免多次内存分配
-    result.reserve(rids.size() * 10);
-
-    result += std::to_string(rids[0]);
-    for (size_t i = 1; i < rids.size(); ++i)
-    {
-        result += ",";
-        result += std::to_string(rids[i]);
-    }
-    return result;
 }

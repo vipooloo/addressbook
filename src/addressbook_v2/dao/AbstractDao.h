@@ -191,7 +191,10 @@ class AbstractDao
     uint32_t CalcPageOffset(const QueryParams& params) const;
     DaoErrCode ValidatePageParams(const QueryParams& params) const;
     std::string BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const;
-    static std::string JoinIds(const std::vector<uint32_t>& rids);
+    
+
+  private:
+    bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params) const;
 
   private:
     std::string m_table_name;
