@@ -1,7 +1,7 @@
 #ifndef QUERYPARAMS_H
 #define QUERYPARAMS_H
 
-#include "ConditionNode.h"
+#include "CustomWhere.h"
 #include <cstdint>
 #include <vector>
 
@@ -15,9 +15,9 @@ class QueryParams
 {
   public:
     QueryParams()
-      : QueryParams(1, 10, OrderType::ASC, {})
+      : QueryParams(1, 10, OrderType::ASC, CustomWhere{""})
     {}
-    QueryParams(uint32_t page, uint32_t page_size, OrderType order_by, std::vector<ConditionNode> conditions)
+    QueryParams(uint32_t page, uint32_t page_size, OrderType order_by, const CustomWhere& conditions)
       : m_page{page}
       , m_page_size{page_size}
       , m_order_by{order_by}
@@ -36,7 +36,7 @@ class QueryParams
     {
         return m_order_by;
     }
-    std::vector<ConditionNode> GetConditions() const
+    CustomWhere GetConditions() const
     {
         return m_conditions;
     }
@@ -52,7 +52,7 @@ class QueryParams
     {
         m_order_by = order_by;
     }
-    void SetConditions(std::vector<ConditionNode> conditions)
+    void SetConditions(const CustomWhere& conditions)
     {
         m_conditions = conditions;
     }
@@ -61,7 +61,7 @@ class QueryParams
     uint32_t m_page;
     uint32_t m_page_size;
     OrderType m_order_by;
-    std::vector<ConditionNode> m_conditions;
+    CustomWhere m_conditions;
 };
 
 #endif  // QUERYPARAMS_H

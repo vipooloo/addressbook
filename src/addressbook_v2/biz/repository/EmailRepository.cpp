@@ -249,7 +249,7 @@ PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword)
 {
     PageResult result;
     QueryParams params;
-    std::vector<ConditionNode> conditions;
+    CustomWhere conditions("");
     params.SetConditions(conditions);
     if (m_mail_group_dao_sptr)
     {

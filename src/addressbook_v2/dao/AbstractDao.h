@@ -3,7 +3,7 @@
 
 #include "AbstractEntity.h"
 #include "AddressBookConfigDefs.h"
-#include "ConditionNode.h"
+#include "CustomWhere.h"
 #include "PageResult.h"
 #include "QueryParams.h"
 #include "StmtParam.h"
@@ -87,10 +87,8 @@ class AbstractDao
 
     uint32_t CalcPageOffset(const QueryParams& params) const;
     bool ValidatePageParams(const QueryParams& params) const;
-    // 返回值示例: " WHERE name LIKE ? AND age > ?"
-    std::string GenWhereSql(const std::vector<ConditionNode>& conditions) const;
     // start_idx: 参数绑定的起始索引（因为前面可能有 UPDATE/INSERT 的参数）
-    void BindWhereParams(SQLite::Statement& stmt, const std::vector<ConditionNode>& conditions, uint32_t start_idx) const;
+    void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const;
     virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
     {
         return nullptr;
@@ -98,7 +96,7 @@ class AbstractDao
 
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);
-    uint32_t QueryCount(const std::string& where_sql, const std::vector<ConditionNode>& conditions);
+    uint32_t QueryCount(const std::string& where_sql, const CustomWhere& conditions);
     std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& where_sql, const QueryParams& params);
 
   private:
