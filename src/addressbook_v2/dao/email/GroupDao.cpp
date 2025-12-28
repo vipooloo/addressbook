@@ -18,7 +18,7 @@ GroupDao::GroupDao()
 {
 }
 
-bool GroupDao::Init()
+bool GroupDao::Create()
 {
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }

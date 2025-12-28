@@ -45,7 +45,7 @@ MailGroupDao::MailGroupDao()
 {
 }
 
-bool MailGroupDao::Init()
+bool MailGroupDao::Create()
 {
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }

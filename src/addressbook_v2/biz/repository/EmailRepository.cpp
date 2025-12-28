@@ -12,15 +12,15 @@ EmailRepository::EmailRepository()
 {
     if (m_mail_dao_sptr)
     {
-        m_mail_dao_sptr->Init();
+        m_mail_dao_sptr->Create();
     }
     if (m_group_dao_sptr)
     {
-        m_group_dao_sptr->Init();
+        m_group_dao_sptr->Create();
     }
     if (m_mail_group_dao_sptr)
     {
-        m_mail_group_dao_sptr->Init();
+        m_mail_group_dao_sptr->Create();
     }
 }
 

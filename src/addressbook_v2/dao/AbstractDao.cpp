@@ -4,17 +4,19 @@
 #include <algorithm>
 #include <sqlite3.h>
 
+static constexpr uint32_t SQL_BUFFER_SIZE = 512;
+
 AbstractDao::AbstractDao(const std::string& table_name)
   : m_table_name{table_name}
-  , m_count{"SELECT COUNT(*) FROM " + table_name + ";"}
-  , m_delete_by_rid{"DELETE FROM " + table_name + " WHERE rid = ?;"}
-  , m_delete_all{"DELETE FROM " + table_name + ";"}
+  , m_sql_count{"SELECT COUNT(*) FROM " + table_name + ";"}
+  , m_sql_delete_by_rid{"DELETE FROM " + table_name + " WHERE rid  IN (%s);"}
+  , m_sql_delete_all{"DELETE FROM " + table_name + ";"}
 {}
 
 size_t AbstractDao::GetCount() const
 {
     size_t ret = 0;
-    SQLite::Statement query(GetDb(), m_count);
+    SQLite::Statement query(GetDb(), m_sql_count);
     int32_t code = query.tryExecuteStep();
     if (SQLITE_ROW == code)
     {
@@ -54,44 +56,25 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
 
 bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
 {
-    bool ret = true;
-    SQLite::Statement stmt(GetDb(), m_delete_by_rid);
-    for (uint32_t rid : rids)
-    {
-        stmt.bind(1, rid);
-        int32_t code = stmt.tryExecuteStep();
-        if (SQLITE_DONE != code)
-        {
-            AB_LOG_E("Remove email failed, code: %d", code);
-            ret = false;
-            break;
-        }
-        stmt.reset();
-        stmt.clearBindings();
-    }
-    return ret;
+    std::string str_ids = AddressCenterUtilities::JoinIds(rids);
+    std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
+    snprintf(sql_buffer.data(), sql_buffer.size(), m_sql_delete_by_rid.c_str(), str_ids.c_str());
+    return OnExecuteSql(sql_buffer.data());
 }
-
-bool AbstractDao::RemoveAll()
-{
-    return OnExecuteSql(m_delete_all, std::vector<StmtParam>{});
-}
-
-/*-----------------------------------*/
 
 // 计算分页偏移量
 uint32_t AbstractDao::CalcPageOffset(const QueryParams& params) const
 {
-    return (params.page - 1) * params.page_size;
+    return (params.GetPage() - 1) * params.GetPageSize();
 }
 
 // 校验分页参数
-DaoErrCode AbstractDao::ValidatePageParams(const QueryParams& params) const
+bool AbstractDao::ValidatePageParams(const QueryParams& params) const
 {
-    DaoErrCode result = DaoErrCode::SUCCESS;
-    if (params.page < 1 || params.page_size < 1)
+    bool result = true;
+    if (params.GetPage() < 1 || params.GetPageSize() < 1)
     {
-        result = DaoErrCode::INVALID_PARAM;
+        result = false;
     }
     return result;
 }
@@ -99,21 +82,20 @@ DaoErrCode AbstractDao::ValidatePageParams(const QueryParams& params) const
 // 拼接 WHERE 子句（参数化，避免 SQL 注入）
 std::string AbstractDao::BuildWhereClause(const std::vector<ConditionNode>& conditions, SQLite::Statement& stmt, uint32_t& param_idx) const
 {
+    std::string where;
     if (conditions.empty())
-        return "";
-
-    std::string where = " WHERE ";
-    param_idx = 1;  // SQLiteCpp 参数从 1 开始
-    for (size_t i = 0; i < conditions.size(); ++i)
     {
-        const auto& cond = conditions[i];
-        where += cond.field + " " + cond.op + " ?";  // 占位符，避免拼接值
-        if (i != conditions.size() - 1)
+        where = " WHERE ";
+        for (size_t i = 0; i < conditions.size(); ++i)
         {
-            where += " AND ";
+            const ConditionNode& cond = conditions[i];
+            where += cond.GetField() + " " + cond.GetOp() + " ?";
+            if (i != conditions.size() - 1)
+            {
+                where += " AND ";
+            }
+            stmt.bind(++param_idx, cond.GetValue());
         }
-        // 绑定参数（SQLiteCpp 类型安全绑定）
-        stmt.bind(param_idx++, cond.value);
     }
     return where;
 }
@@ -162,7 +144,7 @@ bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::ve
     return ret;
 }
 
-bool AbstractDao::BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params) const
+bool AbstractDao::BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params)
 {
     bool ret = true;
     for (uint32_t i = 0; i < stmt_params.size(); ++i)

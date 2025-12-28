@@ -9,7 +9,7 @@ class MailGroupDao : public AbstractDao
   public:
     MailGroupDao();
     ~MailGroupDao() override = default;
-    bool Init() override;
+    bool Create() override;
     bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
     bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items) override;
     bool HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const;
