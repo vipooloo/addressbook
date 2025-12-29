@@ -5,8 +5,8 @@
 #include <sqlite3.h>
 
 static constexpr uint32_t SQL_BUFFER_SIZE = 512;
-static constexpr const char* SQL_QUERY_COUNT = "SELECT COUNT(*) FROM %s %s ;";
-static constexpr const char* SQL_QUERY = "SELECT * FROM %s %s ORDER BY rid %s LIMIT ? OFFSET ?;";
+static constexpr const char* SQL_QUERY_COUNT = "SELECT COUNT(*) FROM %s WHERE %s;";
+static constexpr const char* SQL_QUERY = "SELECT * FROM %s WHERE %s ORDER BY rid %s LIMIT ? OFFSET ?;";
 
 AbstractDao::AbstractDao(const std::string& table_name)
   : m_table_name{table_name}
@@ -214,9 +214,9 @@ std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std
     const std::vector<std::string>& args = conditions.GetArgs();
     BindWhereParams(stmt, args, 1);
     // 绑定分页参数 (索引接在 where 参数后面)
-    uint32_t limit_idx = args.size() + 1;
-    stmt.bind(limit_idx, params.GetPageSize());
-    stmt.bind(limit_idx + 1, CalcPageOffset(params));
+    uint32_t limit_idx = args.size();
+    stmt.bind(++limit_idx, params.GetPageSize());
+    stmt.bind(++limit_idx, CalcPageOffset(params));
     std::vector<std::shared_ptr<AbstractEntity>> records;
     int32_t code = stmt.tryExecuteStep();
     while (SQLITE_ROW == code)

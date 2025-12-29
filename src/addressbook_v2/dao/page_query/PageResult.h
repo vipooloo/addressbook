@@ -53,11 +53,6 @@ class PageResult
         return m_records;
     }
 
-    std::vector<std::shared_ptr<AbstractEntity>>& GetMutableRecords()
-    {
-        return m_records;
-    }
-
     void SetTotalRecords(uint32_t total_records)
     {
         m_total_records = total_records;
@@ -82,6 +77,30 @@ class PageResult
     {
         m_records.push_back(record);
     }
+    PageResult& operator=(PageResult&& other) noexcept
+    {
+        if (this != &other)
+        {
+            m_total_records = other.m_total_records;
+            m_current_page = other.m_current_page;
+            m_page_size = other.m_page_size;
+            m_records = std::move(other.m_records);
+        }
+        return *this;
+    }
+    PageResult(PageResult&& other) noexcept
+    {
+        // 移动构造函数体
+        if (this != &other)
+        {
+            m_total_records = other.m_total_records;
+            m_current_page = other.m_current_page;
+            m_page_size = other.m_page_size;
+            m_records = std::move(other.m_records);
+        }
+    }
+    PageResult(const PageResult&) = delete;
+    PageResult& operator=(const PageResult&) = delete;
 
   private:
     uint32_t m_total_records;                                ///< 总记录条数 (Total number of records)

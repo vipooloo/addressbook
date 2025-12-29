@@ -245,15 +245,17 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
     return ret;
 }
 
-PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword)
+PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, int32_t page, uint32_t size)
 {
     PageResult result;
-    QueryParams params;
-    CustomWhere conditions("");
-    params.SetConditions(conditions);
+    static constexpr const char* sql = "email_address LIKE ? OR email_name LIKE ?";
+    CustomWhere conditions(sql);
+    conditions.AddArg("%" + keyword + "%");
+    conditions.AddArg("%" + keyword + "%");
+    QueryParams params(page, size, conditions);
     if (m_mail_group_dao_sptr)
     {
-        result = m_mail_group_dao_sptr->FindByPage(params);
+        result = m_mail_dao_sptr->FindByPage(params);
     }
     return result;
 }

@@ -267,3 +267,16 @@ ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
 {
     return {};
 }
+
+PageResult EmailService::SearchEmail(const std::string& keyword, uint32_t page, uint32_t size)
+{
+    if (m_mail_rep_sptr)
+    {
+        return m_mail_rep_sptr->GetEmailsByKeyword(keyword, page, size);
+    }
+    else
+
+    {
+        return {};
+    }
+}
