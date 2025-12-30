@@ -3,6 +3,7 @@
 #include "EmailEntity.h"
 #include "EmailRepository.h"
 #include "EmailService.h"
+#include "PageResult.h"
 #include "TransactionGuard.h"
 #include <algorithm>
 
@@ -268,11 +269,24 @@ ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-PageResult EmailService::SearchEmail(const std::string& keyword, uint32_t page, uint32_t size)
+SearchResult EmailService::SearchEmail(const std::string& keyword, uint32_t page, uint32_t size)
 {
     if (m_mail_rep_sptr)
     {
-        return m_mail_rep_sptr->GetEmailsByKeyword(keyword, page, size);
+        PageResult page_result = m_mail_rep_sptr->GetEmailsByKeyword(keyword, page, size);
+        const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
+        std::vector<EmailDto> dtos;
+        for (const std::shared_ptr<AbstractEntity>& item : items)
+        {
+            std::shared_ptr<EmailEntity> mail_entity_sptr = std::static_pointer_cast<EmailEntity>(item);
+            if (mail_entity_sptr)
+            {
+                dtos.emplace_back(mail_entity_sptr->GetRid(), mail_entity_sptr->GetEmailAddress(), mail_entity_sptr->GetEmailName());
+            }
+        }
+        SearchResult result(page_result.GetTotalRecords(), page_result.GetCurrentPage(), page_result.GetPageSize());
+
+        return result;
     }
     else
 

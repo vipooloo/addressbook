@@ -4,7 +4,7 @@
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
-#include "PageResult.h"
+#include "SearchResult.h"
 #include <memory>
 #include <vector>
 
@@ -25,7 +25,7 @@ class EmailService
     ErrorCode UpdateEmail(const EmailDto& dto);
     ErrorCode UpdateGroup(const GroupDto& dto);
 
-    PageResult SearchEmail(const std::string& keyword, uint32_t page = 1, uint32_t size = 10);
+    SearchResult SearchEmail(const std::string& keyword, uint32_t page = 1, uint32_t size = 10);
 
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;
