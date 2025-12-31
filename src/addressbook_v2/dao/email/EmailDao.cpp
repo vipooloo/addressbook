@@ -78,5 +78,7 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
     uint32_t rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());  // rid
     std::string email_address = stmt.getColumn(1).getString();          // email_address
     std::string email_name = stmt.getColumn(2).getString();             // email_name
-    return std::make_shared<EmailEntity>(rid, email_address, email_name);
+    std::string group_rids = stmt.getColumn(3).getString();             // group_rids
+    std::string group_names = stmt.getColumn(4).getString();            // group_names
+    return std::make_shared<EmailEntity>(rid, email_address, email_name, group_rids, group_names);
 }

@@ -11,20 +11,27 @@ void Add()
     AddrCenter::GetInstance().GetEmailService().AddEmail(EmailDto{"email2", "email12", {1, 2}});
     AddrCenter::GetInstance().GetEmailService().UpdateEmail(EmailDto{1, "XXXXX", "YYY", {3, 4}});
     AddrCenter::GetInstance().GetEmailService().RemoveEmail({12, 333332, 33});
-    PageResult result = AddrCenter::GetInstance().GetEmailService().SearchEmail("ai", 1, 2);
+    SearchResult result = AddrCenter::GetInstance().GetEmailService().SearchEmail("ai", 1, 2);
     std::cout << "总记录条数:" << result.GetTotalRecords() << std::endl;
+    std::cout << "总页码数:" << result.GetTotalPages() << std::endl;
     std::cout << "当前页码:" << result.GetCurrentPage() << std::endl;
     std::cout << "每页容量:" << result.GetPageSize() << std::endl;
 
     auto items = result.GetRecords();
     for (auto& item : items)
     {
-        std::shared_ptr<EmailEntity> email_sptr = std::dynamic_pointer_cast<EmailEntity>(item);
-        if (email_sptr)
+        std::cout << item.GetRid() << "  ";
+        std::cout << item.GetAddress() << "  ";
+        std::cout << item.GetName() << "  ";
+        const std::vector<uint32_t>& group_rids = item.GetGroupRids();
+        const std::vector<std::string>& group_names = item.GetGroupNames();
+        for (size_t i = 0; i < group_rids.size(); ++i)
         {
-            std::cout << email_sptr->GetEmailAddress() << "  ";
-            std::cout << email_sptr->GetEmailName() << "  ";
-            std::cout << std::endl;
+            std::cout << "[ ";
+            std::cout << group_rids[i] << "  ";
+            std::cout << group_names[i] << "  ";
+            std::cout << " ]";
         }
+        std::cout << std::endl;
     }
 }

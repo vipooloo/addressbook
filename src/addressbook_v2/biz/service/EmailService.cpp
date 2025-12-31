@@ -1,5 +1,6 @@
 #include "AddrCenterLog.h"
 #include "AddressBookConfigDefs.h"
+#include "AddressCenterUtilities.h"
 #include "EmailEntity.h"
 #include "EmailRepository.h"
 #include "EmailService.h"
@@ -271,26 +272,28 @@ ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
 
 SearchResult EmailService::SearchEmail(const std::string& keyword, uint32_t page, uint32_t size)
 {
+    SearchResult result(page, size);
     if (m_mail_rep_sptr)
     {
         PageResult page_result = m_mail_rep_sptr->GetEmailsByKeyword(keyword, page, size);
-        const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
         std::vector<EmailDto> dtos;
-        for (const std::shared_ptr<AbstractEntity>& item : items)
-        {
+        const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
+        std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {
             std::shared_ptr<EmailEntity> mail_entity_sptr = std::static_pointer_cast<EmailEntity>(item);
             if (mail_entity_sptr)
             {
-                dtos.emplace_back(mail_entity_sptr->GetRid(), mail_entity_sptr->GetEmailAddress(), mail_entity_sptr->GetEmailName());
+                uint32_t rid = mail_entity_sptr->GetRid();
+                const std::string& email_address = mail_entity_sptr->GetEmailAddress();
+                const std::string& email_name = mail_entity_sptr->GetEmailName();
+                const std::string& group_rids = mail_entity_sptr->GetGroupRids();
+                std::vector<uint32_t> rids = AddressCenterUtilities::ConvertToNumbers(AddressCenterUtilities::Split(group_rids, ","));
+                std::vector<std::string> group_names = AddressCenterUtilities::Split(mail_entity_sptr->GetGroupNames(), "|##|");
+                return EmailDto(rid, email_address, email_name, rids, group_names);
             }
-        }
-        SearchResult result(page_result.GetTotalRecords(), page_result.GetCurrentPage(), page_result.GetPageSize());
-
-        return result;
+            return EmailDto();
+        });
+        result.SetTotalRecords(page_result.GetTotalRecords());
+        result.SetRecords(dtos);
     }
-    else
-
-    {
-        return {};
-    }
+    return result;
 }

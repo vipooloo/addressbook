@@ -9,6 +9,10 @@
 class EmailDto
 {
   public:
+    EmailDto()
+      : EmailDto(0, "", "", {})
+    {
+    }
     EmailDto(const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids)
       : EmailDto(0, address, name, group_rids)
     {
@@ -18,11 +22,14 @@ class EmailDto
     {
     }
     EmailDto(uint32_t rid, const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids)
+      : EmailDto(rid, address, name, group_rids, {})
+    {}
+    EmailDto(uint32_t rid, const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids, const std::vector<std::string>& group_names)
       : m_rid{rid}
       , m_address{address}
       , m_name{name}
       , m_group_rids{AddressCenterUtilities::GetSortedUniqueRids(group_rids)}
-      , m_group_names{}
+      , m_group_names{group_names}
     {
     }
     ~EmailDto() = default;
@@ -54,7 +61,7 @@ class EmailDto
         m_name = name;
     }
 
-    std::vector<uint32_t> GetGroupRids() const
+    const std::vector<uint32_t>& GetGroupRids() const
     {
         return m_group_rids;
     }

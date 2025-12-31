@@ -97,7 +97,7 @@ class AbstractDao
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);
     uint32_t QueryCount(const std::string& where_sql, const CustomWhere& conditions);
-    std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& where_sql, const QueryParams& params);
+    std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParams& params);
 
   private:
     std::string m_table_name;
