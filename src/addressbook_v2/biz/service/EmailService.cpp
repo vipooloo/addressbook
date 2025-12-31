@@ -32,8 +32,17 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
-        // 检查邮件组数量是否超了规格上限
         std::vector<uint32_t> group_rids = dto.GetGroupRids();
+        // 检查其中是否还有rid=0
+        if (std::any_of(group_rids.cbegin(), group_rids.cend(), [](uint32_t rid) {
+                return rid == 0;
+            }))
+        {
+            AB_LOG_E("Invalid group rid");
+            ret = ErrorCode::kInvalidParam;
+            break;
+        }
+        // 检查邮件组数量是否超了规格上限
         if (group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
@@ -97,8 +106,17 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             ret = ErrorCode::kInvalidParam;
             break;
         }
-        // 检查邮件数量是否超了规格上限
         std::vector<uint32_t> mail_rids = dto.GetMailRids();
+        // 检查其中是否还有rid=0
+        if (std::any_of(mail_rids.cbegin(), mail_rids.cend(), [](uint32_t rid) {
+                return rid == 0;
+            }))
+        {
+            AB_LOG_E("Invalid group rid");
+            ret = ErrorCode::kInvalidParam;
+            break;
+        }
+        // 检查邮件数量是否超了规格上限
         if (mail_rids.size() > kMaxEmailsPerGroup)
         {
             AB_LOG_E("Exceed max email count");
