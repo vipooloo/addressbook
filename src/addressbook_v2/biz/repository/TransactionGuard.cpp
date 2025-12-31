@@ -16,6 +16,7 @@ TransactionGuard::~TransactionGuard()
 {
     if (!m_bCommited)
     {
+        AB_LOG_E("TransactionGuard: Transaction rollback");
         Execute(SQL_ROLLBACK_TRANSACTION);
     }
 }

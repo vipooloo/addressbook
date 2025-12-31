@@ -270,12 +270,14 @@ ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-SearchResult EmailService::SearchEmail(const std::string& keyword, uint32_t page, uint32_t size)
+std::pair<ErrorCode, SearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
-    SearchResult result(page, size);
+    std::pair<ErrorCode, SearchResult> ret = std::make_pair(ErrorCode::kSuccess, SearchResult(current_page, page_size));
+    ErrorCode& code = ret.first;
+    SearchResult& result = ret.second;
     if (m_mail_rep_sptr)
     {
-        PageResult page_result = m_mail_rep_sptr->GetEmailsByKeyword(keyword, page, size);
+        PageResult page_result = m_mail_rep_sptr->GetEmailsByKeyword(keyword, current_page, page_size);
         std::vector<EmailDto> dtos;
         const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
         std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {
@@ -295,5 +297,9 @@ SearchResult EmailService::SearchEmail(const std::string& keyword, uint32_t page
         result.SetTotalRecords(page_result.GetTotalRecords());
         result.SetRecords(dtos);
     }
-    return result;
+    else
+    {
+        code = ErrorCode::kDbError;
+    }
+    return ret;
 }

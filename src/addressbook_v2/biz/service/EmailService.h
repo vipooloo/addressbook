@@ -25,7 +25,7 @@ class EmailService
     ErrorCode UpdateEmail(const EmailDto& dto);
     ErrorCode UpdateGroup(const GroupDto& dto);
 
-    SearchResult SearchEmail(const std::string& keyword, uint32_t page = 1, uint32_t size = 10);
+    std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
 
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;
