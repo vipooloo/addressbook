@@ -74,7 +74,10 @@ class AbstractDao
         return {};
     }
 
-    virtual PageResult FindByPage(const QueryParams& params);
+    virtual PageResult FindByPage(const std::string& keyword, int32_t page, uint32_t size)
+    {
+        return {};
+    }
 
   protected:
     bool OnExecuteSql(const std::string& sql) const
@@ -93,6 +96,7 @@ class AbstractDao
     {
         return nullptr;
     }
+    PageResult DoFindByPage(const QueryParams& params);
 
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);

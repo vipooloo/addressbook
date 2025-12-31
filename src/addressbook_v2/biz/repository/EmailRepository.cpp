@@ -247,29 +247,10 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
 
 PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, int32_t page, uint32_t size)
 {
-    PageResult result;
-    static constexpr const char* sql = R"(
-            SELECT 
-                m.rid, 
-                m.email_address, 
-                m.email_name, 
-                GROUP_CONCAT(g.rid, ',') as group_rids, 
-                GROUP_CONCAT(g.group_name, '|##|') as group_names 
-            FROM %s m 
-            LEFT JOIN GROUPMAPPING r ON m.rid = r.m_rid 
-            LEFT JOIN mail_group g ON r.g_rid = g.rid 
-            WHERE %s 
-            GROUP BY m.rid 
-            ORDER BY m.rid %s LIMIT ? OFFSET ?;
-)";
-    static constexpr const char* where_sql = "email_address LIKE ? OR email_name LIKE ?";
-    CustomWhere conditions(sql, where_sql);
-    conditions.AddWhereArg("%" + keyword + "%");
-    conditions.AddWhereArg("%" + keyword + "%");
-    QueryParams params(page, size, conditions);
+    PageResult result(page, size);
     if (m_mail_group_dao_sptr)
     {
-        result = m_mail_dao_sptr->FindByPage(params);
+        result = m_mail_dao_sptr->FindByPage(keyword, page, size);
     }
     return result;
 }

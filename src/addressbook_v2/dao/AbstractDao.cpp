@@ -166,7 +166,7 @@ bool AbstractDao::BindStmtParams(SQLite::Statement& stmt, const std::vector<Stmt
     return ret;
 }
 
-PageResult AbstractDao::FindByPage(const QueryParams& params)
+PageResult AbstractDao::DoFindByPage(const QueryParams& params)
 {
     PageResult page_result(params.GetPage(), params.GetPageSize());
     const CustomWhere& conditions = params.GetConditions();
@@ -203,13 +203,13 @@ uint32_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere
     }
     return total;
 }
-#include <iostream>
+
 std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParams& params)
 {
     const CustomWhere& conditions = params.GetConditions();
     std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
     snprintf(sql_buffer.data(), sql_buffer.size(), sql.c_str(), m_table_name.c_str(), where_sql.c_str(), OrderType::ASC == params.GetOrderBy() ? "ASC" : "DESC");
-    std::cout << sql_buffer.data() << std::endl;
+
     SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer.data());
     // 第三步：绑定参数
     // 绑定 WHERE 部分的参数 (从索引 1 开始)

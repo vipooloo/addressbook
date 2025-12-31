@@ -82,3 +82,27 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
     std::string group_names = stmt.getColumn(4).getString();            // group_names
     return std::make_shared<EmailEntity>(rid, email_address, email_name, group_rids, group_names);
 }
+
+PageResult EmailDao::FindByPage(const std::string& keyword, int32_t page, uint32_t size)
+{
+    static constexpr const char* sql = R"(
+            SELECT 
+                m.rid, 
+                m.email_address, 
+                m.email_name, 
+                GROUP_CONCAT(g.rid, ',') as group_rids, 
+                GROUP_CONCAT(g.group_name, '|##|') as group_names 
+            FROM %s m 
+            LEFT JOIN GROUPMAPPING r ON m.rid = r.m_rid 
+            LEFT JOIN mail_group g ON r.g_rid = g.rid 
+            WHERE %s 
+            GROUP BY m.rid 
+            ORDER BY m.rid %s LIMIT ? OFFSET ?;
+)";
+    static constexpr const char* where_sql = "email_address LIKE ? OR email_name LIKE ?";
+    CustomWhere conditions(sql, where_sql);
+    conditions.AddWhereArg("%" + keyword + "%");
+    conditions.AddWhereArg("%" + keyword + "%");
+    QueryParams params(page, size, conditions);
+    return AbstractDao::DoFindByPage(params);
+}
