@@ -83,7 +83,7 @@ class AbstractDao
     bool OnExecuteSql(const std::string& sql) const
     {
         std::vector<StmtParam> stmt_params;
-        return OnExecuteSql(sql, stmt_params);
+        return OnExecuteSql(sql, std::move(stmt_params));
     }
     bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
     bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;

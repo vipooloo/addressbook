@@ -1,25 +1,12 @@
 #ifndef TRANSACTIONGUARD_H
 #define TRANSACTIONGUARD_H
 
-#include "AbstractDao.h"
-
 class TransactionGuard
 {
   public:
-    TransactionGuard()
-      : TransactionGuard(false)
-    {
-    }
-    explicit TransactionGuard(bool has_error)
-      : m_transaction{AbstractDao::GetDb()}
-      , m_has_error{has_error}
-    {
-    }
+    TransactionGuard();
     ~TransactionGuard();
-    void SetError(bool has_error)
-    {
-        m_has_error = has_error;
-    }
+    bool Commit();
 
     TransactionGuard(const TransactionGuard&) = delete;
     TransactionGuard& operator=(const TransactionGuard&) = delete;
@@ -27,8 +14,10 @@ class TransactionGuard
     TransactionGuard& operator=(TransactionGuard&&) = delete;
 
   private:
-    SQLite::Transaction m_transaction;
-    bool m_has_error;
+    bool Execute(const char* sql);
+
+  private:
+    bool m_bCommited;
 };
 
 #endif  // TRANSACTIONGUARD_H

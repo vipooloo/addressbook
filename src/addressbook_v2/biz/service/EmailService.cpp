@@ -40,7 +40,7 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             ret = ErrorCode::kExceedMaxCount;
             break;
         }
-        TransactionGuard trans_guard(true);
+        TransactionGuard trans_guard;
         // 检查邮件是否超过最大数量限制
         if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
         {
@@ -73,7 +73,7 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             break;
         }
         result.second.SetRid(rid);
-        trans_guard.SetError(false);
+        trans_guard.Commit();
     } while (false);
     return result;
 }
@@ -105,7 +105,7 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             ret = ErrorCode::kExceedMaxCount;
             break;
         }
-        TransactionGuard trans_guard(true);
+        TransactionGuard trans_guard;
         // 检查邮件组是否超过最大数量限制
         if (m_mail_rep_sptr->GetGroupCount() >= kMaxGroupCount)
         {
@@ -138,7 +138,7 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             break;
         }
         result.second.SetRid(group_rid);
-        trans_guard.SetError(false);
+        trans_guard.Commit();
     } while (false);
     return result;
 }
@@ -160,14 +160,14 @@ ErrorCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
             result = ErrorCode::kNotable;
             break;
         }
-        TransactionGuard trans_guard(true);
+        TransactionGuard trans_guard;
         if (!m_mail_rep_sptr->RemoveEmail(rids))
         {
             AB_LOG_E("Failed to remove email from database");
             result = ErrorCode::kDbError;
             break;
         }
-        trans_guard.SetError(false);
+        trans_guard.Commit();
     } while (false);
 
     return result;
@@ -190,14 +190,14 @@ ErrorCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
             result = ErrorCode::kNotable;
             break;
         }
-        TransactionGuard trans_guard(true);
+        TransactionGuard trans_guard;
         if (!m_mail_rep_sptr->RemoveGroup(rids))
         {
             AB_LOG_E("Failed to remove group from database");
             result = ErrorCode::kDbError;
             break;
         }
-        trans_guard.SetError(false);
+        trans_guard.Commit();
     } while (false);
 
     return result;
@@ -229,7 +229,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             result = ErrorCode::kExceedMaxCount;
             break;
         }
-        TransactionGuard trans_guard(true);
+        TransactionGuard trans_guard;
         // 删除旧关系
         if (!m_mail_rep_sptr->RemoveGroupByMailRid(dto.GetRid()))
         {
@@ -260,7 +260,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
             result = ErrorCode::kDbError;
             break;
         }
-        trans_guard.SetError(false);
+        trans_guard.Commit();
     } while (false);
     return result;
 }
