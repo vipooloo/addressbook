@@ -6,7 +6,6 @@
 #include <iostream>
 #include <sqlite3.h>
 
-static constexpr uint32_t SQL_BUFFER_SIZE = 512;
 static constexpr const char* SQL_TABLE_NAME = "email";
 static constexpr const char* SQL_CREATE_TABLE = R"(
 CREATE TABLE IF NOT EXISTS email (
