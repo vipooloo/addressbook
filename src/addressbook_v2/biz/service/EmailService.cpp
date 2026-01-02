@@ -295,6 +295,7 @@ std::pair<ErrorCode, SearchResult> EmailService::SearchEmail(const std::string& 
     SearchResult& result = ret.second;
     if (m_mail_rep_sptr)
     {
+        TransactionGuard trans_guard;
         PageResult page_result = m_mail_rep_sptr->GetEmailsByKeyword(keyword, current_page, page_size);
         std::vector<EmailDto> dtos;
         const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();

@@ -8,9 +8,7 @@ static constexpr const char* SQL_ROLLBACK_TRANSACTION = "ROLLBACK TRANSACTION";
 
 TransactionGuard::TransactionGuard()
   : m_bCommited{false}
-  , m_mutex{}
 {
-    m_mutex.lock();
     Execute(SQL_BEGIN_TRANSACTION);
 }
 
@@ -21,7 +19,6 @@ TransactionGuard::~TransactionGuard()
         AB_LOG_E("TransactionGuard: Transaction rollback");
         Execute(SQL_ROLLBACK_TRANSACTION);
     }
-    m_mutex.unlock();
 }
 
 bool TransactionGuard::Commit()

@@ -1,8 +1,6 @@
 #ifndef TRANSACTIONGUARD_H
 #define TRANSACTIONGUARD_H
 
-#include <mutex>
-
 class TransactionGuard
 {
   public:
@@ -20,7 +18,6 @@ class TransactionGuard
 
   private:
     bool m_bCommited;
-    std::mutex m_mutex;
 };
 
 #endif  // TRANSACTIONGUARD_H
