@@ -112,7 +112,7 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
                 return rid == 0;
             }))
         {
-            AB_LOG_E("Invalid group rid");
+            AB_LOG_E("Invalid mail rid");
             ret = ErrorCode::kInvalidParam;
             break;
         }
