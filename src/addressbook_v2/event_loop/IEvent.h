@@ -1,7 +1,9 @@
 #ifndef IEVENT_H
 #define IEVENT_H
 
+#include "ImportFileType.h"
 #include <cstdint>
+#include <string>
 
 class IEvent
 {
@@ -12,19 +14,18 @@ class IEvent
 
 enum class EventType : uint8_t
 {
-    EMail_Add = 0x00 | 0x00,
-    EMail_Delete,
-    EMail_Update,
-    EMail_Search_By_Name,
+    EMail_Import = 0x00 | 0x00,
+    EMail_Export,
 
-    Group_Add = 0x01 | 0x00,
+    Group_Import = 0x01 | 0x00,
 };
 
 class AbstractEvent : public IEvent
 {
   public:
     explicit AbstractEvent(EventType type)
-      : m_type{type}
+      : IEvent()
+      , m_type{type}
     {}
     ~AbstractEvent() = default;
     EventType GetType() const
@@ -34,5 +35,29 @@ class AbstractEvent : public IEvent
 
   private:
     EventType m_type;
+};
+
+class ImportExportEvent : public AbstractEvent
+{
+  public:
+    ImportExportEvent(EventType type, const std::string& file_path, ImportFileType file_type)
+      : AbstractEvent{type}
+      , m_file_path{file_path}
+      , m_file_type{file_type}
+    {}
+    ~ImportExportEvent() = default;
+
+    const std::string& GetFilePath() const
+    {
+        return m_file_path;
+    }
+    ImportFileType GetFileType() const
+    {
+        return m_file_type;
+    }
+
+  private:
+    std::string m_file_path;
+    ImportFileType m_file_type;
 };
 #endif  // IEVENT_H

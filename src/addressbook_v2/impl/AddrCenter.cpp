@@ -35,3 +35,8 @@ std::pair<ErrorCode, SearchResult> AddrCenter::SearchEmail(const std::string& ke
 {
     return AddrCenterImpl::GetInstance().SearchEmail(keyword, current_page, page_size);
 }
+
+ErrorCode AddrCenter::ImportEmail(const std::string& file_path, ImportFileType type)
+{
+    return AddrCenterImpl::GetInstance().ImportEmail(file_path, type);
+}
