@@ -255,7 +255,6 @@ CsvWriter::CsvWriter(const std::string& file_name, const std::vector<std::string
 
     m_ofs.open(GetFilename().c_str(), mode);
 
-    // 【关键修正】这里之前的逻辑反了
     if (m_ofs.is_open())
     {
         // 如果不是追加模式，则需要写入表头
