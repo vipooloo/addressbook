@@ -58,11 +58,10 @@ void CsvBase::ParseLine(const std::string& line_str, std::vector<std::string>& r
     std::string current_cell = "";
     bool in_quotes = false;
     size_t len = line_str.length();
-    size_t i = 0;
 
     row_out.clear();
 
-    for (i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
         char c = line_str[i];
         if (in_quotes)

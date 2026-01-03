@@ -1,7 +1,7 @@
 #ifndef IEVENT_H
 #define IEVENT_H
 
-#include "ImportFileType.h"
+#include "FileType.h"
 #include <cstdint>
 #include <string>
 
@@ -40,7 +40,7 @@ class AbstractEvent : public IEvent
 class ImportExportEvent : public AbstractEvent
 {
   public:
-    ImportExportEvent(EventType type, const std::string& file_path, ImportFileType file_type)
+    ImportExportEvent(EventType type, const std::string& file_path, FileType file_type)
       : AbstractEvent{type}
       , m_file_path{file_path}
       , m_file_type{file_type}
@@ -51,13 +51,13 @@ class ImportExportEvent : public AbstractEvent
     {
         return m_file_path;
     }
-    ImportFileType GetFileType() const
+    FileType GetFileType() const
     {
         return m_file_type;
     }
 
   private:
     std::string m_file_path;
-    ImportFileType m_file_type;
+    FileType m_file_type;
 };
 #endif  // IEVENT_H

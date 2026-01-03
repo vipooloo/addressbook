@@ -1,18 +1,45 @@
 #include "AddrCenterImpl.h"
+#include "CsvProcessor.h"
 
 AddrCenterImpl::AddrCenterImpl()
   : m_email_srv{}
   , m_evt_loop{std::bind(&AddrCenterImpl::EventHandler, this, std::placeholders::_1)}
   , m_mtx{}
-{}
+{
+    m_evt_loop.Start();
+}
+
+AddrCenterImpl::~AddrCenterImpl()
+{
+    m_evt_loop.Stop();
+}
 
 void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
 {
     std::shared_ptr<ImportExportEvent> event_sptr = std::static_pointer_cast<ImportExportEvent>(evt_sptr);
     if (event_sptr)
     {
-        if (EventType::EMail_Import == event_sptr->GetType())
+        EventType event_type = event_sptr->GetType();
+        if (EventType::EMail_Import == event_type)
         {
+        }
+        else if (EventType::EMail_Export == event_type)
+        {
+            std::pair<ErrorCode, SearchResult> result = m_email_srv.SearchEmail("", 1, 11110);
+            SearchResult& export_res = result.second;
+            const std::vector<EmailDto>& records = export_res.GetRecords();
+            std::vector<std::vector<std::string>> items;
+            for (const EmailDto& dto : records)
+            {
+                std::vector<std::string> item;
+                const std::string& name = dto.GetName();
+                const std::string& email = dto.GetAddress();
+                item.emplace_back(name);
+                item.emplace_back(email);
+                items.emplace_back(item);
+            }
+            CsvWriter csv_writer(event_sptr->GetFilePath(), {"列A", "列B"});
+            csv_writer.WriteBatch(items);
         }
     }
 }
@@ -59,12 +86,22 @@ std::pair<ErrorCode, SearchResult> AddrCenterImpl::SearchEmail(const std::string
     return m_email_srv.SearchEmail(keyword, current_page, page_size);
 }
 
-ErrorCode AddrCenterImpl::ImportEmail(const std::string& file_path, ImportFileType type)
+ErrorCode AddrCenterImpl::ImportEmails(const std::string& file_path, FileType type)
 {
     ErrorCode code = ErrorCode::kInvalidParam;
-    if (ImportFileType::CSV == type)
+    if (FileType::CSV == type)
     {
         m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, type));
+    }
+    return code;
+}
+
+ErrorCode AddrCenterImpl::ExportEmails(const std::string& file_path, FileType type)
+{
+    ErrorCode code = ErrorCode::kInvalidParam;
+    if (FileType::CSV == type)
+    {
+        m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Export, file_path, type));
     }
     return code;
 }

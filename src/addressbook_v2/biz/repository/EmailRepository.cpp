@@ -250,7 +250,14 @@ PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, int32
     PageResult result(page, size);
     if (m_mail_group_dao_sptr)
     {
-        result = m_mail_dao_sptr->FindByPage(keyword, page, size);
+        if (keyword.empty())
+        {
+            result = m_mail_dao_sptr->FindAll(page, size);
+        }
+        else
+        {
+            result = m_mail_dao_sptr->FindByPage(keyword, page, size);
+        }
     }
     return result;
 }

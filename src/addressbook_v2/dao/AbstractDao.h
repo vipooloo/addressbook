@@ -69,7 +69,7 @@ class AbstractDao
         return false;
     }
 
-    virtual PageResult FindAll()
+    virtual PageResult FindAll(int32_t page, uint32_t size)
     {
         return {};
     }

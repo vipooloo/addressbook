@@ -3,8 +3,8 @@
 
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
+#include "FileType.h"
 #include "GroupDto.h"
-#include "ImportFileType.h"
 #include "SearchResult.h"
 
 class AddrCenter
@@ -18,7 +18,8 @@ class AddrCenter
     static ErrorCode UpdateGroup(const GroupDto& dto);
     static std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page = 1, uint32_t page_size = 10);
     /*---------------------------------------------------*/
-    static ErrorCode ImportEmail(const std::string& file_path, ImportFileType type = ImportFileType::CSV);
+    static ErrorCode ImportEmails(const std::string& file_path, FileType type = FileType::CSV);
+    static ErrorCode ExportEmails(const std::string& file_path, FileType type = FileType::CSV);
 
   private:
     AddrCenter() = delete;

@@ -3,7 +3,7 @@
 
 #include "EmailService.h"
 #include "EventLoop.h"
-#include "ImportFileType.h"
+#include "FileType.h"
 #include <mutex>
 
 class AddrCenterImpl
@@ -22,11 +22,12 @@ class AddrCenterImpl
     ErrorCode UpdateEmail(const EmailDto& dto);
     ErrorCode UpdateGroup(const GroupDto& dto);
     std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
-    ErrorCode ImportEmail(const std::string& file_path, ImportFileType type);
+    ErrorCode ImportEmails(const std::string& file_path, FileType type);
+    ErrorCode ExportEmails(const std::string& file_path, FileType type);
 
   private:
     AddrCenterImpl();
-    ~AddrCenterImpl() = default;
+    ~AddrCenterImpl();
     AddrCenterImpl(const AddrCenterImpl&) = delete;
     AddrCenterImpl& operator=(const AddrCenterImpl&) = delete;
     AddrCenterImpl(AddrCenterImpl&&) = delete;

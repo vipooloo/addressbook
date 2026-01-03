@@ -35,4 +35,5 @@ void Add()
         }
         std::cout << std::endl;
     }
+    AddrCenter::ExportEmails("emails.csv");
 }
