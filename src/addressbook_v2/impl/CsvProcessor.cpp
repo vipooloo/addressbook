@@ -98,13 +98,12 @@ void CsvBase::ParseLine(const std::string& line_str, std::vector<std::string>& r
                 row_out.push_back(current_cell);
                 current_cell.clear();
             }
-            else
+            else if (c != '\r' && c != '\n')
             {
-                if (c != '\r' && c != '\n')
-                {
-                    current_cell.push_back(c);
-                }
+                current_cell.push_back(c);
             }
+            else
+            {}
         }
     }
     // 添加最后一个单元格
@@ -238,13 +237,13 @@ CsvStatus CsvReader::ReadBatch(uint32_t max_rows, std::vector<std::vector<std::s
 // CsvWriter 实现
 // ==========================================
 
-CsvWriter::CsvWriter(const std::string& file_name, const std::vector<std::string>& header_list, bool is_append)
+CsvWriter::CsvWriter(const std::string& file_name, const std::vector<std::string>& header_list)
   : CsvBase(file_name, header_list)
   , m_ofs{}
 {
-    // 如果是追加模式使用 app，否则使用 trunc (覆盖)
     std::ios_base::openmode mode = std::ios::out;
-    if (is_append)
+    bool has_content = GetFileSize(file_name) > 0;
+    if (has_content)
     {
         mode |= std::ios::app;
     }
@@ -257,8 +256,8 @@ CsvWriter::CsvWriter(const std::string& file_name, const std::vector<std::string
 
     if (m_ofs.is_open())
     {
-        // 如果不是追加模式，则需要写入表头
-        if (!is_append)
+        // 3. 只有在新文件（或空文件）模式下，才写入表头
+        if (!has_content)
         {
             const std::vector<std::string>& fixed_headers = GetFixedHeaders();
             for (size_t i = 0; i < fixed_headers.size(); ++i)
