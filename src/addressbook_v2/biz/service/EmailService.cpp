@@ -313,6 +313,7 @@ std::pair<ErrorCode, SearchResult> EmailService::SearchEmail(const std::string& 
             }
             return EmailDto();
         });
+        trans_guard.Commit();
         result.SetTotalRecords(page_result.GetTotalRecords());
         result.SetRecords(dtos);
     }
