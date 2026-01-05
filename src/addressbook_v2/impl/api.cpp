@@ -35,5 +35,9 @@ void Add()
         }
         std::cout << std::endl;
     }
-    AddrCenter::ExportEmails("emails.csv");
+    ImportExportCallback callback = [](const std::string& file_name, bool) {
+        std::cout << "文件名:" << file_name << std::endl;
+    };
+    AddrCenter::ExportEmails("emails.csv", callback);
+    AddrCenter::ExportEmails(callback);
 }

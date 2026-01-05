@@ -1,9 +1,9 @@
 #ifndef ADDRCENTER_H
 #define ADDRCENTER_H
 
+#include "AddrCenterDefs.h"
 #include "AddressResultCodeDefs.h"
 #include "EmailDto.h"
-#include "FileType.h"
 #include "GroupDto.h"
 #include "SearchResult.h"
 
@@ -18,8 +18,9 @@ class AddrCenter
     static ErrorCode UpdateGroup(const GroupDto& dto);
     static std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page = 1, uint32_t page_size = 10);
     /*---------------------------------------------------*/
-    static ErrorCode ImportEmails(const std::string& file_path, FileType type = FileType::CSV);
-    static ErrorCode ExportEmails(const std::string& file_path, FileType type = FileType::CSV);
+    static ErrorCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
+    static ErrorCode ExportEmails(const ImportExportCallback& cb);
+    static ErrorCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
 
   private:
     AddrCenter() = delete;

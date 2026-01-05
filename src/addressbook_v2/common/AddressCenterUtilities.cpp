@@ -1,8 +1,14 @@
 #include "AddressCenterUtilities.h"
 #include <algorithm>
 #include <cerrno>
+#include <chrono>  // std::chrono::system_clock
 #include <climits>
 #include <cstdlib>
+#include <ctime>    // std::time_t, localtime_r
+#include <iomanip>  // std::put_time
+#include <iostream>
+#include <sstream>  // std::stringstream
+#include <string>
 
 std::vector<uint32_t> AddressCenterUtilities::GetSortedUniqueRids(const std::vector<uint32_t>& rids)
 {
@@ -89,4 +95,41 @@ std::vector<uint32_t> AddressCenterUtilities::ConvertToNumbers(const std::vector
     std::vector<uint32_t> numbers;
     std::transform(s.begin(), s.end(), std::back_inserter(numbers), &AddressCenterUtilities::ConvertToNumber);
     return numbers;
+}
+
+std::string AddressCenterUtilities::GenerateTimestampedFileName(const std::string& prefix, const std::string& suffix)
+{
+    // 1. 获取当前系统时间
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+    // 2. 使用 localtime_r (Linux/POSIX 专用)
+    // 区别：我们需要自己定义一个 tm 结构体变量，而不是用指针接收系统的静态变量
+    std::tm now_tm = {};  // 初始化为空
+
+    // localtime_r 的第一个参数是时间戳指针，第二个参数是接收结果的 buffer 指针
+    // 它返回值也是这个 buffer 指针，如果失败返回 NULL
+    if (localtime_r(&now_c, &now_tm) == nullptr)
+    {
+        // 极端情况下的错误处理（通常不会发生），可以返回一个默认值或空字符串
+        return prefix + "_error" + suffix;
+    }
+
+    // 3. 格式化拼接
+    std::stringstream ss;
+    ss << prefix;
+
+    // 智能补全下划线：如果前缀不为空且没自带下划线，就补一个
+    if (!prefix.empty() && prefix.back() != '_')
+    {
+        ss << "_";
+    }
+
+    // 4. 使用 put_time 格式化
+    // 格式：YYYY.MM.DD_HHMMSS (例如 2026.01.05_143005)
+    ss << std::put_time(&now_tm, "%Y.%m.%d_%H%M%S");
+
+    ss << suffix;
+
+    return ss.str();
 }

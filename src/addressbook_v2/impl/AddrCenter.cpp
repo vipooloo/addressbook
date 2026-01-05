@@ -36,12 +36,17 @@ std::pair<ErrorCode, SearchResult> AddrCenter::SearchEmail(const std::string& ke
     return AddrCenterImpl::GetInstance().SearchEmail(keyword, current_page, page_size);
 }
 
-ErrorCode AddrCenter::ImportEmails(const std::string& file_path, FileType type)
+ErrorCode AddrCenter::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
 {
-    return AddrCenterImpl::GetInstance().ImportEmails(file_path, type);
+    return AddrCenterImpl::GetInstance().ImportEmails(file_path, cb);
 }
 
-ErrorCode AddrCenter::ExportEmails(const std::string& file_path, FileType type)
+ErrorCode AddrCenter::ExportEmails(const ImportExportCallback& cb)
 {
-    return AddrCenterImpl::GetInstance().ExportEmails(file_path, type);
+    return AddrCenterImpl::GetInstance().ExportEmails("", cb);
+}
+
+ErrorCode AddrCenter::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
+{
+    return AddrCenterImpl::GetInstance().ExportEmails(file_path, cb);
 }

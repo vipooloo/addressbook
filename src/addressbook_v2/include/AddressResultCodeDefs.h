@@ -1,7 +1,9 @@
 #ifndef ADDRESSRESULTCODEDEFS_H
 #define ADDRESSRESULTCODEDEFS_H
 
-enum class ErrorCode
+#include <cstdint>
+
+enum class ErrorCode : uint8_t
 {
     kSuccess = 0,         // 成功
     kInvalidParam = 1,    // 参数无效

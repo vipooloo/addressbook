@@ -4,6 +4,8 @@
 #include <cstdint>
 
 static constexpr const char* DB_NAME = "addressbook.db";
+static constexpr const char* EMAIL_EXPORT_PREFIX = "emails";
+static constexpr const char* EXPORT_FILE_SUFFIX = ".csv";
 
 static constexpr uint32_t kMaxMailCount = 100;       ///< 最多支持多少个邮件
 static constexpr uint32_t kMaxGroupCount = 100;      ///< 最多支持多少个邮件组
