@@ -1,7 +1,6 @@
 #ifndef EMAILREPOSITORY_H
 #define EMAILREPOSITORY_H
 
-#include "AddrCenterResCodeDefs.h"
 #include "EmailEntity.h"
 #include "GroupEntity.h"
 #include "MailGroupRelation.h"
