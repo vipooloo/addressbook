@@ -9,6 +9,7 @@ AddrCenterImpl::AddrCenterImpl()
   : m_email_srv{}
   , m_evt_loop{std::bind(&AddrCenterImpl::EventHandler, this, std::placeholders::_1)}
   , m_mtx{}
+  , m_evt_dispatcher{}
 {
     m_evt_loop.Start();
 }
@@ -38,10 +39,10 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
             while (cur_page < total_pages)
             {
                 ++cur_page;
-                std::pair<ResultCode, SearchResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
+                std::pair<ResultCode, AddrCenterSearchResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
                 if (result.first == ResultCode::kSuccess)
                 {
-                    SearchResult& export_res = result.second;
+                    AddrCenterSearchResult& export_res = result.second;
                     const std::vector<EmailDto>& records = export_res.GetRecords();
                     std::vector<std::vector<std::string>> items;
                     std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
@@ -108,7 +109,7 @@ ResultCode AddrCenterImpl::UpdateGroup(const GroupDto& dto)
     return m_email_srv.UpdateGroup(dto);
 }
 
-std::pair<ResultCode, SearchResult> AddrCenterImpl::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, AddrCenterSearchResult> AddrCenterImpl::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.SearchEmail(keyword, current_page, page_size);
@@ -124,5 +125,14 @@ ResultCode AddrCenterImpl::ExportEmails(const std::string& file_path, const Impo
 {
     m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Export, file_path, cb));
     return ResultCode::kSuccess;
-    ;
+}
+
+void AddrCenterImpl::Register(const std::shared_ptr<IAddrCenterDataObserver>& observer)
+{
+    m_evt_dispatcher.Register(observer);
+}
+
+void AddrCenterImpl::Unregister(const std::shared_ptr<IAddrCenterDataObserver>& observer)
+{
+    m_evt_dispatcher.Unregister(observer);
 }

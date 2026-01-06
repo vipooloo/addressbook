@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-enum CsvStatus
+enum CsvStatus : uint8_t
 {
     CSV_SUCCESS = 0,
     CSV_ERROR_FILE_OPEN = 1,
@@ -17,7 +17,6 @@ enum CsvStatus
     CSV_ERROR_INIT_FAILED = 6
 };
 
-// --- 基类：包含公共逻辑 ---
 class CsvBase
 {
   public:

@@ -31,7 +31,7 @@ ResultCode AddrCenter::UpdateGroup(const GroupDto& dto)
     return AddrCenterImpl::GetInstance().UpdateGroup(dto);
 }
 
-std::pair<ResultCode, SearchResult> AddrCenter::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, AddrCenterSearchResult> AddrCenter::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
     return AddrCenterImpl::GetInstance().SearchEmail(keyword, current_page, page_size);
 }
@@ -49,4 +49,14 @@ ResultCode AddrCenter::ExportEmails(const ImportExportCallback& cb)
 ResultCode AddrCenter::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
 {
     return AddrCenterImpl::GetInstance().ExportEmails(file_path, cb);
+}
+
+void AddrCenter::Register(const std::shared_ptr<IAddrCenterDataObserver>& observer)
+{
+    AddrCenterImpl::GetInstance().Register(observer);
+}
+
+void AddrCenter::Unregister(const std::shared_ptr<IAddrCenterDataObserver>& observer)
+{
+    AddrCenterImpl::GetInstance().Unregister(observer);
 }

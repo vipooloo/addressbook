@@ -2,9 +2,9 @@
 #define EMAILSERVICE_H
 
 #include "AddrCenterDefs.h"
+#include "AddrCenterSearchResult.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
-#include "SearchResult.h"
 #include <memory>
 #include <vector>
 
@@ -25,7 +25,7 @@ class EmailService
     ResultCode UpdateEmail(const EmailDto& dto);
     ResultCode UpdateGroup(const GroupDto& dto);
 
-    std::pair<ResultCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
+    std::pair<ResultCode, AddrCenterSearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
 
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;

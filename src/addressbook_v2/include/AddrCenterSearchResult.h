@@ -1,22 +1,22 @@
-#ifndef SEARCHRESULT_H
-#define SEARCHRESULT_H
+#ifndef ADDRCENTERSEARCHRESULT_H
+#define ADDRCENTERSEARCHRESULT_H
 
 #include "EmailDto.h"
 #include <vector>
 
-class SearchResult
+class AddrCenterSearchResult
 {
   public:
-    SearchResult(uint32_t current_page, uint32_t page_size)
-      : SearchResult(0, current_page, page_size)
+    AddrCenterSearchResult(uint32_t current_page, uint32_t page_size)
+      : AddrCenterSearchResult(0, current_page, page_size)
     {}
-    SearchResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
+    AddrCenterSearchResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
       : m_total_records{total_records}
       , m_current_page{current_page}
       , m_page_size{page_size}
       , m_emails{}
     {}
-    ~SearchResult() = default;
+    ~AddrCenterSearchResult() = default;
     uint32_t GetTotalRecords() const
     {
         return m_total_records;
@@ -65,7 +65,7 @@ class SearchResult
     {
         m_emails = records;
     }
-    SearchResult& operator=(SearchResult&& other) noexcept
+    AddrCenterSearchResult& operator=(AddrCenterSearchResult&& other) noexcept
     {
         if (this != &other)
         {
@@ -76,7 +76,7 @@ class SearchResult
         }
         return *this;
     }
-    SearchResult(SearchResult&& other) noexcept
+    AddrCenterSearchResult(AddrCenterSearchResult&& other) noexcept
     {
         // 移动构造函数体
         if (this != &other)
@@ -87,8 +87,8 @@ class SearchResult
             m_emails = std::move(other.m_emails);
         }
     }
-    SearchResult(const SearchResult&) = delete;
-    SearchResult& operator=(const SearchResult&) = delete;
+    AddrCenterSearchResult(const AddrCenterSearchResult&) = delete;
+    AddrCenterSearchResult& operator=(const AddrCenterSearchResult&) = delete;
 
   private:
     uint32_t m_total_records;  ///< 总记录条数 (Total number of records)
@@ -97,4 +97,4 @@ class SearchResult
     std::vector<EmailDto> m_emails;
 };
 
-#endif  // SEARCHRESULT_H
+#endif  // ADDRCENTERSEARCHRESULT_H

@@ -68,6 +68,7 @@ bool EmailDao::Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
         stmt_params.emplace_back(email_entity_sptr->GetEmailName());
         stmt_params.emplace_back(email_entity_sptr->GetRid());
         ret = OnExecuteSql(SQL_UPDATE, stmt_params);
+        ret = true;
     }
     return ret;
 }
@@ -106,7 +107,7 @@ PageResult EmailDao::FindByPage(const std::string& keyword, uint32_t page_num, u
     return AbstractDao::DoFindByPage(params);
 }
 
-PageResult EmailDao::FindAll(uint32_t page_num,  uint32_t page_size)
+PageResult EmailDao::FindAll(uint32_t page_num, uint32_t page_size)
 {
     static constexpr const char* sql = R"(
             SELECT 

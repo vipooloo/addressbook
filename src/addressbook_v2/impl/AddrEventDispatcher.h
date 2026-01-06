@@ -1,7 +1,7 @@
 #ifndef ADDREVENTDISPATCHER_H
 #define ADDREVENTDISPATCHER_H
 
-#include "IAddrDataObserver.h"
+#include "IAddrCenterDataObserver.h"
 #include <list>
 #include <memory>
 #include <mutex>
@@ -12,9 +12,9 @@ class AddrEventDispatcher
     AddrEventDispatcher();
     ~AddrEventDispatcher() = default;
 
-    void Register(const std::shared_ptr<IAddrDataObserver>& observer);
+    void Register(const std::shared_ptr<IAddrCenterDataObserver>& observer);
 
-    void Unregister(const std::shared_ptr<IAddrDataObserver>& observer);
+    void Unregister(const std::shared_ptr<IAddrCenterDataObserver>& observer);
 
     void Notify(ChangeType type);
 
@@ -25,7 +25,7 @@ class AddrEventDispatcher
     AddrEventDispatcher& operator=(AddrEventDispatcher&&) = delete;
 
   private:
-    std::list<std::shared_ptr<IAddrDataObserver>> m_observers;
+    std::list<std::shared_ptr<IAddrCenterDataObserver>> m_observers;
     std::mutex m_mutex;
 };
 

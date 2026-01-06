@@ -289,11 +289,11 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-std::pair<ResultCode, SearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, AddrCenterSearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
-    std::pair<ResultCode, SearchResult> ret = std::make_pair(ResultCode::kSuccess, SearchResult(current_page, page_size));
+    std::pair<ResultCode, AddrCenterSearchResult> ret = std::make_pair(ResultCode::kSuccess, AddrCenterSearchResult(current_page, page_size));
     ResultCode& code = ret.first;
-    SearchResult& result = ret.second;
+    AddrCenterSearchResult& result = ret.second;
     if (m_mail_rep_sptr)
     {
         TransactionGuard trans_guard;
