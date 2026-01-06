@@ -5,14 +5,13 @@
 #include <memory>
 #include <vector>
 
-// 前置声明，减少头文件依赖
 class AbstractEntity;
 
 class PageResult
 {
   public:
     PageResult()
-      : PageResult(1, 10)
+      : PageResult(0, 0)
     {}
     PageResult(uint32_t current_page, uint32_t page_size)
       : m_total_records{0}

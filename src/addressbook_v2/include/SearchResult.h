@@ -7,9 +7,6 @@
 class SearchResult
 {
   public:
-    SearchResult()
-      : SearchResult(1, 10)
-    {}
     SearchResult(uint32_t current_page, uint32_t page_size)
       : SearchResult(0, current_page, page_size)
     {}

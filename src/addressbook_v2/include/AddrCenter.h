@@ -16,7 +16,7 @@ class AddrCenter
     static ErrorCode RemoveGroup(const std::vector<uint32_t>& rids);
     static ErrorCode UpdateEmail(const EmailDto& dto);
     static ErrorCode UpdateGroup(const GroupDto& dto);
-    static std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page = 1, uint32_t page_size = 10);
+    static std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page , uint32_t page_size);
     /*---------------------------------------------------*/
     static ErrorCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ErrorCode ExportEmails(const ImportExportCallback& cb);

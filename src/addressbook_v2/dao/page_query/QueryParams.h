@@ -14,12 +14,6 @@ enum class OrderType
 class QueryParams
 {
   public:
-    QueryParams()
-      : QueryParams(1, 10, OrderType::ASC, CustomWhere{""})
-    {}
-    explicit QueryParams(const CustomWhere& condition)
-      : QueryParams(1, 10, OrderType::ASC, condition)
-    {}
     QueryParams(uint32_t page, uint32_t page_size, const CustomWhere& conditions)
       : QueryParams(page, page_size, OrderType::ASC, conditions)
     {}
