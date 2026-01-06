@@ -1,9 +1,9 @@
-#ifndef ADDRESSRESULTCODEDEFS_H
-#define ADDRESSRESULTCODEDEFS_H
+#ifndef ADDRCENTERRESCODEDEFS_H
+#define ADDRCENTERRESCODEDEFS_H
 
 #include <cstdint>
 
-enum class ErrorCode : uint8_t
+enum class ResultCode : uint8_t
 {
     kSuccess = 0,         // 成功
     kInvalidParam = 1,    // 参数无效
@@ -15,4 +15,4 @@ enum class ErrorCode : uint8_t
     kNotable = 7,         // 不可用
 };
 
-#endif  // ADDRESSRESULTCODEDEFS_H
+#endif  // ADDRCENTERRESCODEDEFS_H

@@ -13,23 +13,23 @@ EmailService::EmailService()
 {
 }
 
-std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
+std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
 {
-    std::pair<ErrorCode, EmailDto> result = std::make_pair(ErrorCode::kSuccess, dto);
-    ErrorCode& ret = result.first;
+    std::pair<ResultCode, EmailDto> result = std::make_pair(ResultCode::kSuccess, dto);
+    ResultCode& ret = result.first;
     do
     {
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            ret = ErrorCode::kNotable;
+            ret = ResultCode::kNotable;
             break;
         }
         // 输入合法验证
         if (dto.GetName().empty() || dto.GetAddress().empty())
         {
             AB_LOG_E("Invalid email name or address");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         std::vector<uint32_t> group_rids = dto.GetGroupRids();
@@ -39,14 +39,14 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             }))
         {
             AB_LOG_E("Invalid group rid");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组数量是否超了规格上限
         if (group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard;
@@ -54,7 +54,7 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
         {
             AB_LOG_E("Exceed max email count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         // 检查邮件组是否存在
@@ -62,14 +62,14 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (!group_exist)
         {
             AB_LOG_E("Some groups do not exist");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组中是否还能关联邮件
         if (!m_mail_rep_sptr->CanAddEmail(group_rids, kMaxGroupsPerEmail))
         {
             AB_LOG_E("Some groups exceed max email count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         // 添加邮件
@@ -78,7 +78,7 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (0 == rid)
         {
             AB_LOG_E("Failed to add email to database");
-            ret = ErrorCode::kDbError;
+            ret = ResultCode::kDbError;
             break;
         }
         result.second.SetRid(rid);
@@ -87,23 +87,23 @@ std::pair<ErrorCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
     return result;
 }
 
-std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
+std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
 {
-    std::pair<ErrorCode, GroupDto> result = std::make_pair(ErrorCode::kSuccess, dto);
-    ErrorCode& ret = result.first;
+    std::pair<ResultCode, GroupDto> result = std::make_pair(ResultCode::kSuccess, dto);
+    ResultCode& ret = result.first;
     do
     {
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            ret = ErrorCode::kNotable;
+            ret = ResultCode::kNotable;
             break;
         }
         // 输入合法验证
         if (dto.GetGroupName().empty())
         {
             AB_LOG_E("Invalid group name");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         std::vector<uint32_t> mail_rids = dto.GetMailRids();
@@ -113,14 +113,14 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             }))
         {
             AB_LOG_E("Invalid mail rid");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件数量是否超了规格上限
         if (mail_rids.size() > kMaxEmailsPerGroup)
         {
             AB_LOG_E("Exceed max email count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard;
@@ -128,7 +128,7 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (m_mail_rep_sptr->GetGroupCount() >= kMaxGroupCount)
         {
             AB_LOG_E("Exceed max group count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         // 检查邮件是否存在
@@ -136,14 +136,14 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (!group_exist)
         {
             AB_LOG_E("Some mails do not exist");
-            ret = ErrorCode::kInvalidParam;
+            ret = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件是否还能关联邮件组
         if (!m_mail_rep_sptr->CanAddGroup(mail_rids, kMaxEmailsPerGroup))
         {
             AB_LOG_E("Some mails exceed max email count");
-            ret = ErrorCode::kExceedMaxCount;
+            ret = ResultCode::kExceedMaxCount;
             break;
         }
         // 添加邮件组
@@ -152,7 +152,7 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (0 == group_rid)
         {
             AB_LOG_E("Failed to add email to database");
-            ret = ErrorCode::kDbError;
+            ret = ResultCode::kDbError;
             break;
         }
         result.second.SetRid(group_rid);
@@ -161,28 +161,28 @@ std::pair<ErrorCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
     return result;
 }
 
-ErrorCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
+ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
 {
-    ErrorCode result = ErrorCode::kSuccess;
+    ResultCode result = ResultCode::kSuccess;
     do
     {
         if (rids.empty())
         {
             AB_LOG_E("Email rids is empty");
-            result = ErrorCode::kInvalidParam;
+            result = ResultCode::kInvalidParam;
             break;
         }
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            result = ErrorCode::kNotable;
+            result = ResultCode::kNotable;
             break;
         }
         TransactionGuard trans_guard;
         if (!m_mail_rep_sptr->RemoveEmail(rids))
         {
             AB_LOG_E("Failed to remove email from database");
-            result = ErrorCode::kDbError;
+            result = ResultCode::kDbError;
             break;
         }
         trans_guard.Commit();
@@ -191,28 +191,28 @@ ErrorCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
     return result;
 }
 
-ErrorCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
+ResultCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
 {
-    ErrorCode result = ErrorCode::kSuccess;
+    ResultCode result = ResultCode::kSuccess;
     do
     {
         if (rids.empty())
         {
             AB_LOG_E("Group rids is empty");
-            result = ErrorCode::kInvalidParam;
+            result = ResultCode::kInvalidParam;
             break;
         }
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Group repository is null");
-            result = ErrorCode::kNotable;
+            result = ResultCode::kNotable;
             break;
         }
         TransactionGuard trans_guard;
         if (!m_mail_rep_sptr->RemoveGroup(rids))
         {
             AB_LOG_E("Failed to remove group from database");
-            result = ErrorCode::kDbError;
+            result = ResultCode::kDbError;
             break;
         }
         trans_guard.Commit();
@@ -221,22 +221,22 @@ ErrorCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
     return result;
 }
 
-ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
+ResultCode EmailService::UpdateEmail(const EmailDto& dto)
 {
-    ErrorCode result = ErrorCode::kSuccess;
+    ResultCode result = ResultCode::kSuccess;
     do
     {
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            result = ErrorCode::kNotable;
+            result = ResultCode::kNotable;
             break;
         }
         // 输入合法验证
         if (dto.GetName().empty() || dto.GetAddress().empty())
         {
             AB_LOG_E("Invalid email name or address");
-            result = ErrorCode::kInvalidParam;
+            result = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组数量是否超了规格上限
@@ -244,7 +244,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
         if (new_group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
-            result = ErrorCode::kExceedMaxCount;
+            result = ResultCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard;
@@ -252,7 +252,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
         if (!m_mail_rep_sptr->RemoveGroupByMailRid(dto.GetRid()))
         {
             AB_LOG_E("Failed to remove group from database");
-            result = ErrorCode::kDbError;
+            result = ResultCode::kDbError;
             break;
         }
         // 检查邮件组是否存在
@@ -260,14 +260,14 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
         if (!group_exist)
         {
             AB_LOG_E("Some groups do not exist");
-            result = ErrorCode::kInvalidParam;
+            result = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组中是否还能关联邮件
         if (!m_mail_rep_sptr->CanAddEmail(new_group_rids, kMaxGroupsPerEmail))
         {
             AB_LOG_E("Some groups exceed max email count");
-            result = ErrorCode::kExceedMaxCount;
+            result = ResultCode::kExceedMaxCount;
             break;
         }
         // 更新邮件
@@ -275,7 +275,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
         if (!m_mail_rep_sptr->UpdateEmail(mail_entity_sptr, new_group_rids))
         {
             AB_LOG_E("Failed to update email to database");
-            result = ErrorCode::kDbError;
+            result = ResultCode::kDbError;
             break;
         }
         trans_guard.Commit();
@@ -283,16 +283,16 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
     return result;
 }
 
-ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
+ResultCode EmailService::UpdateGroup(const GroupDto& dto)
 {
     static_cast<void>(&dto);
     return {};
 }
 
-std::pair<ErrorCode, SearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, SearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
-    std::pair<ErrorCode, SearchResult> ret = std::make_pair(ErrorCode::kSuccess, SearchResult(current_page, page_size));
-    ErrorCode& code = ret.first;
+    std::pair<ResultCode, SearchResult> ret = std::make_pair(ResultCode::kSuccess, SearchResult(current_page, page_size));
+    ResultCode& code = ret.first;
     SearchResult& result = ret.second;
     if (m_mail_rep_sptr)
     {
@@ -320,7 +320,7 @@ std::pair<ErrorCode, SearchResult> EmailService::SearchEmail(const std::string& 
     }
     else
     {
-        code = ErrorCode::kDbError;
+        code = ResultCode::kDbError;
     }
     return ret;
 }

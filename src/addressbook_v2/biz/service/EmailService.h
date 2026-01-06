@@ -1,7 +1,7 @@
 #ifndef EMAILSERVICE_H
 #define EMAILSERVICE_H
 
-#include "AddressResultCodeDefs.h"
+#include "AddrCenterResCodeDefs.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
 #include "SearchResult.h"
@@ -16,16 +16,16 @@ class EmailService
     EmailService();
     ~EmailService() = default;
 
-    std::pair<ErrorCode, EmailDto> AddEmail(const EmailDto& dto);
-    std::pair<ErrorCode, GroupDto> AddGroup(const GroupDto& dto);
+    std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
+    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
 
-    ErrorCode RemoveEmail(const std::vector<uint32_t>& rids);
-    ErrorCode RemoveGroup(const std::vector<uint32_t>& rids);
+    ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
+    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
 
-    ErrorCode UpdateEmail(const EmailDto& dto);
-    ErrorCode UpdateGroup(const GroupDto& dto);
+    ResultCode UpdateEmail(const EmailDto& dto);
+    ResultCode UpdateGroup(const GroupDto& dto);
 
-    std::pair<ErrorCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
+    std::pair<ResultCode, SearchResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
 
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;

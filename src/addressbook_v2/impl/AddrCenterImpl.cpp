@@ -38,8 +38,8 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
             while (cur_page < total_pages)
             {
                 ++cur_page;
-                std::pair<ErrorCode, SearchResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
-                if (result.first == ErrorCode::kSuccess)
+                std::pair<ResultCode, SearchResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
+                if (result.first == ResultCode::kSuccess)
                 {
                     SearchResult& export_res = result.second;
                     const std::vector<EmailDto>& records = export_res.GetRecords();
@@ -72,57 +72,57 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
     }
 }
 
-std::pair<ErrorCode, EmailDto> AddrCenterImpl::AddEmail(const EmailDto& dto)
+std::pair<ResultCode, EmailDto> AddrCenterImpl::AddEmail(const EmailDto& dto)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.AddEmail(dto);
 }
 
-std::pair<ErrorCode, GroupDto> AddrCenterImpl::AddGroup(const GroupDto& dto)
+std::pair<ResultCode, GroupDto> AddrCenterImpl::AddGroup(const GroupDto& dto)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.AddGroup(dto);
 }
 
-ErrorCode AddrCenterImpl::RemoveEmail(const std::vector<uint32_t>& rids)
+ResultCode AddrCenterImpl::RemoveEmail(const std::vector<uint32_t>& rids)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.RemoveEmail(rids);
 }
 
-ErrorCode AddrCenterImpl::RemoveGroup(const std::vector<uint32_t>& rids)
+ResultCode AddrCenterImpl::RemoveGroup(const std::vector<uint32_t>& rids)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.RemoveGroup(rids);
 }
 
-ErrorCode AddrCenterImpl::UpdateEmail(const EmailDto& dto)
+ResultCode AddrCenterImpl::UpdateEmail(const EmailDto& dto)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.UpdateEmail(dto);
 }
 
-ErrorCode AddrCenterImpl::UpdateGroup(const GroupDto& dto)
+ResultCode AddrCenterImpl::UpdateGroup(const GroupDto& dto)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.UpdateGroup(dto);
 }
 
-std::pair<ErrorCode, SearchResult> AddrCenterImpl::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, SearchResult> AddrCenterImpl::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.SearchEmail(keyword, current_page, page_size);
 }
 
-ErrorCode AddrCenterImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
+ResultCode AddrCenterImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
 {
     m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, cb));
-    return ErrorCode::kSuccess;
+    return ResultCode::kSuccess;
 }
 
-ErrorCode AddrCenterImpl::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
+ResultCode AddrCenterImpl::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
 {
     m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Export, file_path, cb));
-    return ErrorCode::kSuccess;
+    return ResultCode::kSuccess;
     ;
 }
