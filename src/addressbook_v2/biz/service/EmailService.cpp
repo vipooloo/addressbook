@@ -285,6 +285,7 @@ ErrorCode EmailService::UpdateEmail(const EmailDto& dto)
 
 ErrorCode EmailService::UpdateGroup(const GroupDto& dto)
 {
+    static_cast<void>(&dto);
     return {};
 }
 

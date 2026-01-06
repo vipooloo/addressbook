@@ -48,13 +48,13 @@ class AbstractDao
     virtual uint32_t GetCount() const;
     virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
     {
-        (void)in_entity_sptr;
-        (void)out_entity_sptr;
+        static_cast<void>(in_entity_sptr);
+        static_cast<void>(out_entity_sptr);
         return false;
     }
     virtual bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
     {
-        (void)items;
+        static_cast<void>(items);
         return false;
     }
     virtual bool IsExist(const std::vector<uint32_t>& rids);
@@ -66,17 +66,19 @@ class AbstractDao
 
     virtual bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
     {
+        static_cast<void>(entity_sptr);
         return false;
     }
 
-    virtual PageResult FindAll(int32_t page, uint32_t size)
+    virtual PageResult FindAll(uint32_t page_num, uint32_t page_size)
     {
-        return {};
+        return {page_num, page_size};
     }
 
-    virtual PageResult FindByPage(const std::string& keyword, int32_t page, uint32_t size)
+    virtual PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size)
     {
-        return {};
+        static_cast<void>(&keyword);
+        return {page_num, page_size};
     }
 
   protected:
@@ -90,10 +92,10 @@ class AbstractDao
 
     uint32_t CalcPageOffset(const QueryParams& params) const;
     bool ValidatePageParams(const QueryParams& params) const;
-    // start_idx: 参数绑定的起始索引（因为前面可能有 UPDATE/INSERT 的参数）
     void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const;
     virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
     {
+        static_cast<void>(&stmt);
         return nullptr;
     }
     PageResult DoFindByPage(const QueryParams& params);

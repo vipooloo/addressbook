@@ -82,7 +82,7 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
     return std::make_shared<EmailEntity>(rid, email_address, email_name, group_rids, group_names);
 }
 
-PageResult EmailDao::FindByPage(const std::string& keyword, int32_t page, uint32_t size)
+PageResult EmailDao::FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size)
 {
     static constexpr const char* sql = R"(
             SELECT 
@@ -102,11 +102,11 @@ PageResult EmailDao::FindByPage(const std::string& keyword, int32_t page, uint32
     CustomWhere conditions(sql, where_sql);
     conditions.AddWhereArg("%" + keyword + "%");
     conditions.AddWhereArg("%" + keyword + "%");
-    QueryParams params(page, size, conditions);
+    QueryParams params(page_num, page_size, conditions);
     return AbstractDao::DoFindByPage(params);
 }
 
-PageResult EmailDao::FindAll(int32_t page, uint32_t size)
+PageResult EmailDao::FindAll(uint32_t page_num,  uint32_t page_size)
 {
     static constexpr const char* sql = R"(
             SELECT 
@@ -124,6 +124,6 @@ PageResult EmailDao::FindAll(int32_t page, uint32_t size)
 )";
     static constexpr const char* where_sql = "1 = 1";
     CustomWhere conditions(sql, where_sql);
-    QueryParams params(page, size, conditions);
+    QueryParams params(page_num, page_size, conditions);
     return AbstractDao::DoFindByPage(params);
 }

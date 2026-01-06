@@ -60,7 +60,7 @@ std::string StringUtility::rawDataToHexStr(const void* data_ptr, uint16_t data_l
     const uint8_t* ptr = static_cast<const uint8_t*>(data_ptr);
     for (uint16_t i = 0; i < data_len; ++i)
     {
-        oss << setw(2) << (int)ptr[i];
+        oss << setw(2) << static_cast<uint32_t>(ptr[i]);
         if (i < (data_len - 1))
             oss << delimiter;
     }

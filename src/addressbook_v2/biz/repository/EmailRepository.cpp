@@ -232,6 +232,7 @@ bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_spt
 
 bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr)
 {
+    static_cast<void>(entity_sptr);
     return false;
 }
 
@@ -245,18 +246,18 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
     return ret;
 }
 
-PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, int32_t page, uint32_t size)
+PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size)
 {
-    PageResult result(page, size);
+    PageResult result(page_num, page_size);
     if (m_mail_group_dao_sptr)
     {
         if (keyword.empty())
         {
-            result = m_mail_dao_sptr->FindAll(page, size);
+            result = m_mail_dao_sptr->FindAll(page_num, page_size);
         }
         else
         {
-            result = m_mail_dao_sptr->FindByPage(keyword, page, size);
+            result = m_mail_dao_sptr->FindByPage(keyword, page_num, page_size);
         }
     }
     return result;

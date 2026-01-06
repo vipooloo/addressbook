@@ -46,6 +46,7 @@ set(MYAPP_STRICT_COMPILE_FLAGS
     -Wnon-virtual-dtor           # 警告基类有虚函数但析构函数非虚
     -Woverloaded-virtual         # 警告函数重载可能隐藏基类虚函数
     -Wno-error=unused-parameter  # 忽略未使用函数参数的错误，即使 -Werror 生效
+    -Werror=old-style-cast      # 警告 C 风格的强制转换
 )
 
 # 设置输出目录

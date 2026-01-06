@@ -3,7 +3,7 @@
 
 uint8_t CalcCheckSum8(const void* data_ptr, size_t data_size)
 {
-    const uint8_t* byte_ptr = (const uint8_t*)data_ptr;
+    const uint8_t* byte_ptr = static_cast<const uint8_t*>(data_ptr);
     uint16_t acc = 0;
 
     for (size_t i = 0; i < data_size; ++i)
@@ -13,7 +13,7 @@ uint8_t CalcCheckSum8(const void* data_ptr, size_t data_size)
             acc = (acc & 0xff) + (acc >> 8);
     }
 
-    return ~((uint8_t)acc);
+    return ~(static_cast<uint8_t>(acc));
 }
 
 uint16_t CalcCheckSum16(const void* data_ptr, size_t data_size)
@@ -42,6 +42,6 @@ uint16_t CalcCheckSum16(const void* data_ptr, size_t data_size)
         }
     }
 
-    uint16_t ret = (uint16_t)acc;
+    uint16_t ret = static_cast<uint16_t>(acc);
     return ~ret;
 }

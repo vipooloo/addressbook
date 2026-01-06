@@ -33,7 +33,8 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
             uint32_t page_size = 10;
             uint32_t total_pages = 1;
             bool is_success = true;
-            std::string file_name = event_sptr->GetFilePath().empty() ? AddressCenterUtilities::GenerateTimestampedFileName(EMAIL_EXPORT_PREFIX, EXPORT_FILE_SUFFIX) : event_sptr->GetFilePath();
+            std::string file_name = event_sptr->GetFilePath();
+            std::string out_file_name = file_name.empty() ? AddressCenterUtilities::GenerateTimestampedFileName(EMAIL_EXPORT_PREFIX, EXPORT_FILE_SUFFIX) : file_name;
             while (cur_page < total_pages)
             {
                 ++cur_page;
@@ -51,7 +52,7 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
                         item.emplace_back(email);
                         return item;
                     });
-                    CsvWriter csv_writer(file_name, {"列A", "列B"});
+                    CsvWriter csv_writer(out_file_name, {"列A", "列B"});
                     csv_writer.WriteBatch(items);
                     total_pages = export_res.GetTotalPages();
                 }
@@ -65,7 +66,7 @@ void AddrCenterImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
             ImportExportCallback cb = event_sptr->GetCallback();
             if (cb)
             {
-                cb(file_name, is_success);
+                cb(out_file_name, is_success);
             }
         }
     }
