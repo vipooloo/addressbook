@@ -1,8 +1,8 @@
 #ifndef EMAILSERVICE_H
 #define EMAILSERVICE_H
 
-#include "AddrCenterDefs.h"
 #include "AddrCenterSearchResult.h"
+#include "AddressManagerDefs.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
 #include <memory>

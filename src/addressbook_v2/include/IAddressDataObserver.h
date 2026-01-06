@@ -12,11 +12,11 @@ enum class ChangeType : uint8_t
     kAddGroup,
 };
 
-class IAddrCenterDataObserver
+class IAddressDataObserver
 {
   public:
-    IAddrCenterDataObserver() = default;
-    virtual ~IAddrCenterDataObserver() = default;
+    IAddressDataObserver() = default;
+    virtual ~IAddressDataObserver() = default;
     virtual void OnChanged(ChangeType type) = 0;
 };
 

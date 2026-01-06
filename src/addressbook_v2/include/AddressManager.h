@@ -1,14 +1,14 @@
-#ifndef ADDRCENTER_H
-#define ADDRCENTER_H
+#ifndef ADDRESSMANAGER_H
+#define ADDRESSMANAGER_H
 
-#include "AddrCenterDefs.h"
 #include "AddrCenterSearchResult.h"
+#include "AddressManagerDefs.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
-#include "IAddrCenterDataObserver.h"
+#include "IAddressDataObserver.h"
 #include <memory>
 
-class AddrCenter
+class AddressManager
 {
   public:
     static std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
@@ -25,16 +25,16 @@ class AddrCenter
     static ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
 
     /*---------------------------------------------------*/
-    void Register(const std::shared_ptr<IAddrCenterDataObserver>& observer);
-    void Unregister(const std::shared_ptr<IAddrCenterDataObserver>& observer);
+    void Register(const std::shared_ptr<IAddressDataObserver>& observer);
+    void Unregister(const std::shared_ptr<IAddressDataObserver>& observer);
 
   private:
-    AddrCenter() = delete;
-    ~AddrCenter() = delete;
-    AddrCenter(const AddrCenter&) = delete;
-    AddrCenter& operator=(const AddrCenter&) = delete;
-    AddrCenter(AddrCenter&&) = delete;
-    AddrCenter& operator=(AddrCenter&&) = delete;
+    AddressManager() = delete;
+    ~AddressManager() = delete;
+    AddressManager(const AddressManager&) = delete;
+    AddressManager& operator=(const AddressManager&) = delete;
+    AddressManager(AddressManager&&) = delete;
+    AddressManager& operator=(AddressManager&&) = delete;
 };
 
-#endif  // ADDRCENTER_H
+#endif  // ADDRESSMANAGER_H

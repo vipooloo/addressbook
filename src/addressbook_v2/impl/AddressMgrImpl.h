@@ -1,18 +1,18 @@
-#ifndef ADDRCENTERIMPL_H
-#define ADDRCENTERIMPL_H
+#ifndef ADDRESSMGRIMPL_H
+#define ADDRESSMGRIMPL_H
 
-#include "AddrCenterDefs.h"
-#include "AddrEventDispatcher.h"
+#include "AddressManagerDefs.h"
+#include "AddressMgrEvtDispatcher.h"
 #include "EmailService.h"
 #include "EventLoop.h"
 #include <mutex>
 
-class AddrCenterImpl
+class AddressMgrImpl
 {
   public:
-    static AddrCenterImpl& GetInstance()
+    static AddressMgrImpl& GetInstance()
     {
-        static AddrCenterImpl instance;
+        static AddressMgrImpl instance;
         return instance;
     }
 
@@ -27,16 +27,16 @@ class AddrCenterImpl
     ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
 
-    void Register(const std::shared_ptr<IAddrCenterDataObserver>& observer);
-    void Unregister(const std::shared_ptr<IAddrCenterDataObserver>& observer);
+    void Register(const std::shared_ptr<IAddressDataObserver>& observer);
+    void Unregister(const std::shared_ptr<IAddressDataObserver>& observer);
 
   private:
-    AddrCenterImpl();
-    ~AddrCenterImpl();
-    AddrCenterImpl(const AddrCenterImpl&) = delete;
-    AddrCenterImpl& operator=(const AddrCenterImpl&) = delete;
-    AddrCenterImpl(AddrCenterImpl&&) = delete;
-    AddrCenterImpl& operator=(AddrCenterImpl&&) = delete;
+    AddressMgrImpl();
+    ~AddressMgrImpl();
+    AddressMgrImpl(const AddressMgrImpl&) = delete;
+    AddressMgrImpl& operator=(const AddressMgrImpl&) = delete;
+    AddressMgrImpl(AddressMgrImpl&&) = delete;
+    AddressMgrImpl& operator=(AddressMgrImpl&&) = delete;
 
     void EventHandler(const std::shared_ptr<IEvent>& evt_sptr);
 
@@ -44,7 +44,7 @@ class AddrCenterImpl
     EmailService m_email_srv;
     EventLoop m_evt_loop;
     std::mutex m_mtx;
-    AddrEventDispatcher m_evt_dispatcher;
+    AddressMgrEvtDispatcher m_evt_dispatcher;
 };
 
-#endif  // ADDRCENTERIMPL_H
+#endif  // ADDRESSMGRIMPL_H
