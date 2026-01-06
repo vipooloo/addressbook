@@ -1,13 +1,14 @@
-#include "AddrMgrEvtDispatcher.h"
+#include "EventDispatcher.h"
 #include <algorithm>
 
-AddrMgrEvtDispatcher::AddrMgrEvtDispatcher()
+namespace addrbook {
+EventDispatcher::EventDispatcher()
   : m_observers{}
   , m_mutex{}
 {
 }
 
-void AddrMgrEvtDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+void EventDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     std::list<std::shared_ptr<IAddressMgrDataObserver>>::const_iterator it = std::find(m_observers.cbegin(), m_observers.cend(), observer);
@@ -17,7 +18,7 @@ void AddrMgrEvtDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserve
     }
 }
 
-void AddrMgrEvtDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+void EventDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     std::remove_if(m_observers.begin(), m_observers.end(), [&observer](const std::shared_ptr<IAddressMgrDataObserver>& sptr) {
@@ -25,7 +26,7 @@ void AddrMgrEvtDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObser
     });
 }
 
-void AddrMgrEvtDispatcher::Notify(ChangeType type)
+void EventDispatcher::Notify(ChangeType type)
 {
     std::list<std::shared_ptr<IAddressMgrDataObserver>> observers_copy;
     {
@@ -40,3 +41,4 @@ void AddrMgrEvtDispatcher::Notify(ChangeType type)
         }
     }
 }
+}  // namespace addrbook

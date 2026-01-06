@@ -1,10 +1,11 @@
 #include "AddrMgrConfigDefs.h"
-#include "AddrMgrCsvProcessor.h"
 #include "AddrMgrImpl.h"
 #include "AddrMgrLog.h"
 #include "AddrMgrUtilities.h"
+#include "CsvProcessor.h"
 #include <algorithm>
 
+namespace addrbook {
 AddrMgrImpl::AddrMgrImpl()
   : m_email_srv{}
   , m_evt_loop{std::bind(&AddrMgrImpl::EventHandler, this, std::placeholders::_1)}
@@ -53,7 +54,7 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
                         item.emplace_back(email);
                         return item;
                     });
-                    CsvWriter csv_writer(out_file_name, {"列A", "列B"});
+                    addrbook::CsvWriter csv_writer(out_file_name, {"列A", "列B"});
                     csv_writer.WriteBatch(items);
                     total_pages = export_res.GetTotalPages();
                 }
@@ -136,3 +137,5 @@ void AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& obs
 {
     m_evt_dispatcher.Unregister(observer);
 }
+
+}  // namespace addrbook

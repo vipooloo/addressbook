@@ -1,9 +1,10 @@
-#include "AddrMgrCsvProcessor.h"
+#include "CsvProcessor.h"
 #include <iostream>
 
 // ==========================================
 // CsvBase 实现
 // ==========================================
+namespace addrbook {
 
 size_t CsvBase::GetFileSize(const std::string& file_name)
 {
@@ -334,3 +335,4 @@ CsvStatus CsvWriter::WriteBatch(const std::vector<std::vector<std::string>>& bat
 
     return current_status;
 }
+}  // namespace addrbook

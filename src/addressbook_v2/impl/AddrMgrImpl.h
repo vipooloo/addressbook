@@ -2,11 +2,12 @@
 #define ADDRMGRIMPL_H
 
 #include "AddressMgrDefs.h"
-#include "AddrMgrEvtDispatcher.h"
 #include "EmailService.h"
+#include "EventDispatcher.h"
 #include "EventLoop.h"
 #include <mutex>
 
+namespace addrbook {
 class AddrMgrImpl
 {
   public:
@@ -44,7 +45,8 @@ class AddrMgrImpl
     EmailService m_email_srv;
     EventLoop m_evt_loop;
     std::mutex m_mtx;
-    AddrMgrEvtDispatcher m_evt_dispatcher;
+    EventDispatcher m_evt_dispatcher;
 };
+}  // namespace addrbook
 
 #endif  // ADDRMGRIMPL_H

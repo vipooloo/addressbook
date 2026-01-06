@@ -1,10 +1,12 @@
-#ifndef CSV_PROCESSOR_H
-#define CSV_PROCESSOR_H
+#ifndef CSVPROCESSOR_H
+#define CSVPROCESSOR_H
 
 #include <cstdint>
 #include <fstream>
 #include <string>
 #include <vector>
+
+namespace addrbook {
 
 enum CsvStatus : uint8_t
 {
@@ -90,4 +92,6 @@ class CsvWriter : public CsvBase
     std::ofstream m_ofs;
 };
 
-#endif  // CSV_PROCESSOR_H
+}  // namespace addrbook
+
+#endif  // CSVPROCESSOR_H
