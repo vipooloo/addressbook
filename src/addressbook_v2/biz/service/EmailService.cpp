@@ -1,6 +1,6 @@
-#include "AddrCenterLog.h"
-#include "AddressBookConfigDefs.h"
-#include "AddressCenterUtilities.h"
+#include "AddrMgrLog.h"
+#include "AddrMgrConfigDefs.h"
+#include "AddrMgrUtilities.h"
 #include "EmailEntity.h"
 #include "EmailRepository.h"
 #include "EmailService.h"
@@ -289,11 +289,11 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-std::pair<ResultCode, AddrCenterSearchResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
-    std::pair<ResultCode, AddrCenterSearchResult> ret = std::make_pair(ResultCode::kSuccess, AddrCenterSearchResult(current_page, page_size));
+    std::pair<ResultCode, SearchEmailResult> ret = std::make_pair(ResultCode::kSuccess, SearchEmailResult(current_page, page_size));
     ResultCode& code = ret.first;
-    AddrCenterSearchResult& result = ret.second;
+    SearchEmailResult& result = ret.second;
     if (m_mail_rep_sptr)
     {
         TransactionGuard trans_guard;
@@ -308,8 +308,8 @@ std::pair<ResultCode, AddrCenterSearchResult> EmailService::SearchEmail(const st
                 const std::string& email_address = mail_entity_sptr->GetEmailAddress();
                 const std::string& email_name = mail_entity_sptr->GetEmailName();
                 const std::string& group_rids = mail_entity_sptr->GetGroupRids();
-                std::vector<uint32_t> rids = AddressCenterUtilities::ConvertToNumbers(AddressCenterUtilities::Split(group_rids, ","));
-                std::vector<std::string> group_names = AddressCenterUtilities::Split(mail_entity_sptr->GetGroupNames(), "|##|");
+                std::vector<uint32_t> rids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(group_rids, ","));
+                std::vector<std::string> group_names = AddrMgrUtilities::Split(mail_entity_sptr->GetGroupNames(), "|##|");
                 return EmailDto(rid, email_address, email_name, rids, group_names);
             }
             return EmailDto();

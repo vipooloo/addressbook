@@ -1,4 +1,4 @@
-#include "AddrCenterLog.h"
+#include "AddrMgrLog.h"
 #include "EmailDao.h"
 #include "EmailEntity.h"
 #include <algorithm>

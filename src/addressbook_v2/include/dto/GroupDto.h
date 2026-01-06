@@ -1,7 +1,7 @@
 #ifndef GROUPDTO_H
 #define GROUPDTO_H
 
-#include "AddressCenterUtilities.h"
+#include "AddrMgrUtilities.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@ class GroupDto
     GroupDto(uint32_t rid, const std::string& group_name, const std::vector<uint32_t>& mail_rids)
       : m_rid{rid}
       , m_group_name{group_name}
-      , m_mail_rids{AddressCenterUtilities::GetSortedUniqueRids(mail_rids)}
+      , m_mail_rids{AddrMgrUtilities::GetSortedUniqueRids(mail_rids)}
     {
     }
     void SetRid(uint32_t rid)
@@ -48,7 +48,7 @@ class GroupDto
     }
     void SetMailRids(const std::vector<uint32_t>& rids)
     {
-        m_mail_rids = AddressCenterUtilities::GetSortedUniqueRids(rids);
+        m_mail_rids = AddrMgrUtilities::GetSortedUniqueRids(rids);
     }
 
   private:

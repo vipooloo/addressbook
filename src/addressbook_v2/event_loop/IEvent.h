@@ -1,7 +1,7 @@
 #ifndef IEVENT_H
 #define IEVENT_H
 
-#include "AddressManagerDefs.h"
+#include "AddressMgrDefs.h"
 #include <cstdint>
 #include <string>
 

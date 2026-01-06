@@ -1,6 +1,6 @@
 #include "AbstractDao.h"
-#include "AddrCenterLog.h"
-#include "AddressCenterUtilities.h"
+#include "AddrMgrLog.h"
+#include "AddrMgrUtilities.h"
 #include <algorithm>
 #include <sqlite3.h>
 
@@ -36,7 +36,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
     bool ret = false;
     if (!rids.empty())
     {
-        std::string ids = AddressCenterUtilities::JoinIds(rids);
+        std::string ids = AddrMgrUtilities::JoinIds(rids);
         std::string sql = "SELECT COUNT(rid) FROM " + m_table_name + " WHERE rid IN (" + ids + ");";
         SQLite::Statement stmt(GetDb(), sql);
         int32_t code = stmt.tryExecuteStep();
@@ -62,7 +62,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
 
 bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
 {
-    std::string str_ids = AddressCenterUtilities::JoinIds(rids);
+    std::string str_ids = AddrMgrUtilities::JoinIds(rids);
     std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
     snprintf(sql_buffer.data(), sql_buffer.size(), m_sql_delete_by_rid.c_str(), str_ids.c_str());
     return OnExecuteSql(sql_buffer.data());

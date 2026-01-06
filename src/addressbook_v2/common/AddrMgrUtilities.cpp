@@ -1,4 +1,4 @@
-#include "AddressCenterUtilities.h"
+#include "AddrMgrUtilities.h"
 #include <algorithm>
 #include <cerrno>
 #include <chrono>  // std::chrono::system_clock
@@ -10,7 +10,7 @@
 #include <sstream>  // std::stringstream
 #include <string>
 
-std::vector<uint32_t> AddressCenterUtilities::GetSortedUniqueRids(const std::vector<uint32_t>& rids)
+std::vector<uint32_t> AddrMgrUtilities::GetSortedUniqueRids(const std::vector<uint32_t>& rids)
 {
     std::vector<uint32_t> unique_rids = rids;
     std::sort(unique_rids.begin(), unique_rids.end());
@@ -19,7 +19,7 @@ std::vector<uint32_t> AddressCenterUtilities::GetSortedUniqueRids(const std::vec
     return unique_rids;
 }
 
-std::string AddressCenterUtilities::JoinIds(const std::vector<uint32_t>& rids)
+std::string AddrMgrUtilities::JoinIds(const std::vector<uint32_t>& rids)
 {
     std::string result;
     if (!rids.empty())
@@ -36,7 +36,7 @@ std::string AddressCenterUtilities::JoinIds(const std::vector<uint32_t>& rids)
     return result;
 }
 
-std::vector<std::string> AddressCenterUtilities::Split(const std::string& s, const std::string& delimiter)
+std::vector<std::string> AddrMgrUtilities::Split(const std::string& s, const std::string& delimiter)
 {
     std::vector<std::string> tokens;
 
@@ -71,7 +71,7 @@ std::vector<std::string> AddressCenterUtilities::Split(const std::string& s, con
     return tokens;
 }
 
-uint32_t AddressCenterUtilities::ConvertToNumber(const std::string& s)
+uint32_t AddrMgrUtilities::ConvertToNumber(const std::string& s)
 {
     const char* begin = s.c_str();
     char* end = nullptr;
@@ -90,14 +90,14 @@ uint32_t AddressCenterUtilities::ConvertToNumber(const std::string& s)
     return static_cast<uint32_t>(x);
 }
 
-std::vector<uint32_t> AddressCenterUtilities::ConvertToNumbers(const std::vector<std::string>& s)
+std::vector<uint32_t> AddrMgrUtilities::ConvertToNumbers(const std::vector<std::string>& s)
 {
     std::vector<uint32_t> numbers;
-    std::transform(s.begin(), s.end(), std::back_inserter(numbers), &AddressCenterUtilities::ConvertToNumber);
+    std::transform(s.begin(), s.end(), std::back_inserter(numbers), &AddrMgrUtilities::ConvertToNumber);
     return numbers;
 }
 
-std::string AddressCenterUtilities::GenerateTimestampedFileName(const std::string& prefix, const std::string& suffix)
+std::string AddrMgrUtilities::GenerateTimestampedFileName(const std::string& prefix, const std::string& suffix)
 {
     // 1. 获取当前系统时间
     auto now = std::chrono::system_clock::now();

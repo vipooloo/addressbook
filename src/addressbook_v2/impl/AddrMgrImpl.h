@@ -1,0 +1,50 @@
+#ifndef ADDRMGRIMPL_H
+#define ADDRMGRIMPL_H
+
+#include "AddressMgrDefs.h"
+#include "AddrMgrEvtDispatcher.h"
+#include "EmailService.h"
+#include "EventLoop.h"
+#include <mutex>
+
+class AddrMgrImpl
+{
+  public:
+    static AddrMgrImpl& GetInstance()
+    {
+        static AddrMgrImpl instance;
+        return instance;
+    }
+
+    std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
+    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
+    ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
+    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
+    ResultCode UpdateEmail(const EmailDto& dto);
+    ResultCode UpdateGroup(const GroupDto& dto);
+    std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
+
+    ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
+    ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
+
+    void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+    void Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+
+  private:
+    AddrMgrImpl();
+    ~AddrMgrImpl();
+    AddrMgrImpl(const AddrMgrImpl&) = delete;
+    AddrMgrImpl& operator=(const AddrMgrImpl&) = delete;
+    AddrMgrImpl(AddrMgrImpl&&) = delete;
+    AddrMgrImpl& operator=(AddrMgrImpl&&) = delete;
+
+    void EventHandler(const std::shared_ptr<IEvent>& evt_sptr);
+
+  private:
+    EmailService m_email_srv;
+    EventLoop m_evt_loop;
+    std::mutex m_mtx;
+    AddrMgrEvtDispatcher m_evt_dispatcher;
+};
+
+#endif  // ADDRMGRIMPL_H

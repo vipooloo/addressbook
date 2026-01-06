@@ -2,7 +2,7 @@
 #define ABSTRACTDAO_H
 
 #include "AbstractEntity.h"
-#include "AddressBookConfigDefs.h"
+#include "AddrMgrConfigDefs.h"
 #include "CustomWhere.h"
 #include "PageResult.h"
 #include "QueryParams.h"

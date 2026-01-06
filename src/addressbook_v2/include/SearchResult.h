@@ -1,22 +1,23 @@
-#ifndef ADDRCENTERSEARCHRESULT_H
-#define ADDRCENTERSEARCHRESULT_H
+#ifndef SEARCHRESULT_H
+#define SEARCHRESULT_H
 
-#include "EmailDto.h"
+#include <cstdint>
 #include <vector>
 
-class AddrCenterSearchResult
+class SearchResult
 {
   public:
-    AddrCenterSearchResult(uint32_t current_page, uint32_t page_size)
-      : AddrCenterSearchResult(0, current_page, page_size)
+    SearchResult(uint32_t current_page, uint32_t page_size)
+      : SearchResult(0, current_page, page_size)
     {}
-    AddrCenterSearchResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
+    SearchResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
       : m_total_records{total_records}
       , m_current_page{current_page}
       , m_page_size{page_size}
-      , m_emails{}
     {}
-    ~AddrCenterSearchResult() = default;
+
+    virtual ~SearchResult() = default;
+
     uint32_t GetTotalRecords() const
     {
         return m_total_records;
@@ -30,11 +31,6 @@ class AddrCenterSearchResult
     uint32_t GetPageSize() const
     {
         return m_page_size;
-    }
-
-    const std::vector<EmailDto>& GetRecords() const
-    {
-        return m_emails;
     }
 
     uint32_t GetTotalPages() const
@@ -51,6 +47,7 @@ class AddrCenterSearchResult
     {
         m_total_records = total_records;
     }
+
     void SetCurrentPage(uint32_t current_page)
     {
         m_current_page = current_page;
@@ -61,40 +58,31 @@ class AddrCenterSearchResult
         m_page_size = page_size;
     }
 
-    void SetRecords(const std::vector<EmailDto>& records)
+    SearchResult(SearchResult&& other) noexcept
     {
-        m_emails = records;
+        m_total_records = other.m_total_records;
+        m_current_page = other.m_current_page;
+        m_page_size = other.m_page_size;
     }
-    AddrCenterSearchResult& operator=(AddrCenterSearchResult&& other) noexcept
+
+    SearchResult& operator=(SearchResult&& other) noexcept
     {
         if (this != &other)
         {
             m_total_records = other.m_total_records;
             m_current_page = other.m_current_page;
             m_page_size = other.m_page_size;
-            m_emails = std::move(other.m_emails);
         }
         return *this;
     }
-    AddrCenterSearchResult(AddrCenterSearchResult&& other) noexcept
-    {
-        // 移动构造函数体
-        if (this != &other)
-        {
-            m_total_records = other.m_total_records;
-            m_current_page = other.m_current_page;
-            m_page_size = other.m_page_size;
-            m_emails = std::move(other.m_emails);
-        }
-    }
-    AddrCenterSearchResult(const AddrCenterSearchResult&) = delete;
-    AddrCenterSearchResult& operator=(const AddrCenterSearchResult&) = delete;
+
+    SearchResult(const SearchResult&) = delete;
+    SearchResult& operator=(const SearchResult&) = delete;
 
   private:
     uint32_t m_total_records;  ///< 总记录条数 (Total number of records)
     uint32_t m_current_page;   ///< 当前页码 (Current page number, 1-based)
     uint32_t m_page_size;      ///< 每页容量 (Items per page)
-    std::vector<EmailDto> m_emails;
 };
 
-#endif  // ADDRCENTERSEARCHRESULT_H
+#endif  // SEARCHRESULT_H

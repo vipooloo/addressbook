@@ -1,5 +1,5 @@
-#ifndef ADDRCENTERLOG_H
-#define ADDRCENTERLOG_H
+#ifndef ADDRMGRLOG_H
+#define ADDRMGRLOG_H
 
 #include "Log.h"
 
@@ -7,4 +7,4 @@
 #define AB_LOG_E(fmt, ...) LOGP_ERROR_M("AddressManager", fmt, ##__VA_ARGS__)
 #define AB_LOG_W(fmt, ...) LOGP_WARN_M("AddressManager", fmt, ##__VA_ARGS__)
 
-#endif  // ADDRCENTERLOG_H
+#endif  // ADDRMGRLOG_H

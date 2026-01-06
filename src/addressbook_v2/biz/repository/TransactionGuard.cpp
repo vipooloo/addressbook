@@ -1,5 +1,5 @@
 #include "AbstractDao.h"
-#include "AddrCenterLog.h"
+#include "AddrMgrLog.h"
 #include "TransactionGuard.h"
 
 static constexpr const char* SQL_BEGIN_TRANSACTION = "BEGIN TRANSACTION";

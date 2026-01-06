@@ -1,5 +1,5 @@
-#include "AddrCenterLog.h"
-#include "AddressCenterUtilities.h"
+#include "AddrMgrLog.h"
+#include "AddrMgrUtilities.h"
 #include "MailGroupDao.h"
 #include "MailGroupRelation.h"
 #include <algorithm>
@@ -97,7 +97,7 @@ bool MailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& group_id
 
 bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
 {
-    std::string str_ids = AddressCenterUtilities::JoinIds(ids);
+    std::string str_ids = AddrMgrUtilities::JoinIds(ids);
     std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
     snprintf(sql_buffer.data(), sql_buffer.size(), content.c_str(), str_ids.c_str());
 

@@ -1,5 +1,5 @@
-#ifndef ADDRESSMANAGERDEFS_H
-#define ADDRESSMANAGERDEFS_H
+#ifndef ADDRESSMGRDEFS_H
+#define ADDRESSMGRDEFS_H
 
 #include <cstdint>
 #include <functional>
@@ -22,4 +22,4 @@ enum class ResultCode : uint8_t
     kNotable = 7,         // 不可用
 };
 
-#endif  // ADDRESSMANAGERDEFS_H
+#endif  // ADDRESSMGRDEFS_H

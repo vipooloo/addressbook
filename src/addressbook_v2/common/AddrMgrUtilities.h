@@ -1,11 +1,11 @@
-#ifndef ADDRESSCENTERUTILITIES_H
-#define ADDRESSCENTERUTILITIES_H
+#ifndef ADDRMGRUTILITIES_H
+#define ADDRMGRUTILITIES_H
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-class AddressCenterUtilities
+class AddrMgrUtilities
 {
   public:
     static std::vector<uint32_t> GetSortedUniqueRids(const std::vector<uint32_t>& rids);
@@ -22,4 +22,4 @@ class AddressCenterUtilities
     static std::string GenerateTimestampedFileName(const std::string& prefix, const std::string& suffix);
 };
 
-#endif  // ADDRESSCENTERUTILITIES_H
+#endif  // ADDRMGRUTILITIES_H
