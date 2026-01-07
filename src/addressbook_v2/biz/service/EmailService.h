@@ -3,6 +3,7 @@
 
 #include "AddressMgrDefs.h"
 #include "EmailDto.h"
+#include "EventDispatcher.h"
 #include "GroupDto.h"
 #include "SearchEmailResult.h"
 #include <memory>
@@ -14,7 +15,7 @@ class EmailRepository;
 class EmailService
 {
   public:
-    EmailService();
+    explicit EmailService(EventDispatcher& dispatcher);
     ~EmailService() = default;
 
     std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
@@ -29,6 +30,10 @@ class EmailService
     std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
 
   private:
+    void DataChanged(ResultCode res, ChangeType type);
+
+  private:
+    EventDispatcher& m_env_dispatcher;
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;
 };
 }  // namespace addrbook

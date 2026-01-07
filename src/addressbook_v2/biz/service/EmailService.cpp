@@ -9,28 +9,29 @@
 #include <algorithm>
 
 namespace addrbook {
-EmailService::EmailService()
-  : m_mail_rep_sptr{std::make_shared<EmailRepository>()}
+EmailService::EmailService(EventDispatcher& dispatcher)
+  : m_env_dispatcher{dispatcher}
+  , m_mail_rep_sptr{std::make_shared<EmailRepository>()}
 {
 }
 
 std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
 {
     std::pair<ResultCode, EmailDto> result = std::make_pair(ResultCode::kSuccess, dto);
-    ResultCode& ret = result.first;
+    ResultCode& res_code = result.first;
     do
     {
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            ret = ResultCode::kNotable;
+            res_code = ResultCode::kNotable;
             break;
         }
         // 输入合法验证
         if (dto.GetName().empty() || dto.GetAddress().empty())
         {
             AB_LOG_E("Invalid email name or address");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         std::vector<uint32_t> group_rids = dto.GetGroupRids();
@@ -40,14 +41,14 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             }))
         {
             AB_LOG_E("Invalid group rid");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组数量是否超了规格上限
         if (group_rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Exceed max group count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard;
@@ -55,7 +56,7 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
         {
             AB_LOG_E("Exceed max email count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         // 检查邮件组是否存在
@@ -63,14 +64,14 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (!group_exist)
         {
             AB_LOG_E("Some groups do not exist");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件组中是否还能关联邮件
         if (!m_mail_rep_sptr->CanAddEmail(group_rids, kMaxGroupsPerEmail))
         {
             AB_LOG_E("Some groups exceed max email count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         // 添加邮件
@@ -79,32 +80,33 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         if (0 == rid)
         {
             AB_LOG_E("Failed to add email to database");
-            ret = ResultCode::kDbError;
+            res_code = ResultCode::kDbError;
             break;
         }
         result.second.SetRid(rid);
         trans_guard.Commit();
     } while (false);
+    DataChanged(res_code, ChangeType::kAddEmail);
     return result;
 }
 
 std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
 {
     std::pair<ResultCode, GroupDto> result = std::make_pair(ResultCode::kSuccess, dto);
-    ResultCode& ret = result.first;
+    ResultCode& res_code = result.first;
     do
     {
         if (!m_mail_rep_sptr)
         {
             AB_LOG_E("Email repository is null");
-            ret = ResultCode::kNotable;
+            res_code = ResultCode::kNotable;
             break;
         }
         // 输入合法验证
         if (dto.GetGroupName().empty())
         {
             AB_LOG_E("Invalid group name");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         std::vector<uint32_t> mail_rids = dto.GetMailRids();
@@ -114,14 +116,14 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             }))
         {
             AB_LOG_E("Invalid mail rid");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件数量是否超了规格上限
         if (mail_rids.size() > kMaxEmailsPerGroup)
         {
             AB_LOG_E("Exceed max email count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         TransactionGuard trans_guard;
@@ -129,7 +131,7 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (m_mail_rep_sptr->GetGroupCount() >= kMaxGroupCount)
         {
             AB_LOG_E("Exceed max group count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         // 检查邮件是否存在
@@ -137,14 +139,14 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (!group_exist)
         {
             AB_LOG_E("Some mails do not exist");
-            ret = ResultCode::kInvalidParam;
+            res_code = ResultCode::kInvalidParam;
             break;
         }
         // 检查邮件是否还能关联邮件组
         if (!m_mail_rep_sptr->CanAddGroup(mail_rids, kMaxEmailsPerGroup))
         {
             AB_LOG_E("Some mails exceed max email count");
-            ret = ResultCode::kExceedMaxCount;
+            res_code = ResultCode::kExceedMaxCount;
             break;
         }
         // 添加邮件组
@@ -153,7 +155,7 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         if (0 == group_rid)
         {
             AB_LOG_E("Failed to add email to database");
-            ret = ResultCode::kDbError;
+            res_code = ResultCode::kDbError;
             break;
         }
         result.second.SetRid(group_rid);
@@ -325,4 +327,13 @@ std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::st
     }
     return ret;
 }
+
+void EmailService::DataChanged(ResultCode res, ChangeType type)
+{
+    if (ResultCode::kSuccess == res)
+    {
+        m_env_dispatcher.Notify(type);
+    }
+}
+
 }  // namespace addrbook

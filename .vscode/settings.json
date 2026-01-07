@@ -73,6 +73,7 @@
         "variant": "cpp",
         "climits": "cpp",
         "cerrno": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "icheckerh": "cpp"
     }
 }

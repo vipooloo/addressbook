@@ -7,10 +7,10 @@
 
 namespace addrbook {
 AddrMgrImpl::AddrMgrImpl()
-  : m_email_srv{}
-  , m_evt_loop{std::bind(&AddrMgrImpl::EventHandler, this, std::placeholders::_1)}
+  : m_evt_loop{std::bind(&AddrMgrImpl::EventHandler, this, std::placeholders::_1)}
   , m_mtx{}
   , m_evt_dispatcher{}
+  , m_email_srv{m_evt_dispatcher}
 {
     m_evt_loop.Start();
 }
@@ -25,6 +25,7 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
     std::shared_ptr<ImportExportEvent> event_sptr = std::static_pointer_cast<ImportExportEvent>(evt_sptr);
     if (event_sptr)
     {
+        std::lock_guard<std::mutex> lock(m_mtx);
         EventType event_type = event_sptr->GetType();
         if (EventType::EMail_Import == event_type)
         {

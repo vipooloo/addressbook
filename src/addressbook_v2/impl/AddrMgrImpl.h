@@ -42,10 +42,10 @@ class AddrMgrImpl
     void EventHandler(const std::shared_ptr<IEvent>& evt_sptr);
 
   private:
-    EmailService m_email_srv;
     EventLoop m_evt_loop;
     std::mutex m_mtx;
     EventDispatcher m_evt_dispatcher;
+    EmailService m_email_srv;
 };
 }  // namespace addrbook
 
