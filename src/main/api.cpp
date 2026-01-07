@@ -1,5 +1,4 @@
 #include "AddressManager.h"
-#include "EmailEntity.h"
 #include "api.h"
 #include <iostream>
 
