@@ -8,6 +8,8 @@ static constexpr uint32_t SQL_BUFFER_SIZE = 512;
 static constexpr const char* SQL_QUERY_COUNT = "SELECT COUNT(*) FROM %s WHERE %s;";
 static constexpr const char* SQL_QUERY = "SELECT * FROM %s WHERE %s ORDER BY rid %s LIMIT ? OFFSET ?;";
 
+namespace addrbook {
+
 AbstractDao::AbstractDao(const std::string& table_name)
   : m_table_name{table_name}
   , m_sql_count{"SELECT COUNT(*) FROM " + table_name + ";"}
@@ -233,3 +235,4 @@ std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std
     }
     return records;
 }
+}  // namespace addrbook

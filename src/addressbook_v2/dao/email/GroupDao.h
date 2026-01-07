@@ -3,6 +3,7 @@
 
 #include "AbstractDao.h"
 
+namespace addrbook {
 class GroupDao : public AbstractDao
 {
   public:
@@ -11,5 +12,6 @@ class GroupDao : public AbstractDao
     bool Create() override;
     bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
 };
+}  // namespace addrbook
 
 #endif  // GROUPDAO_H

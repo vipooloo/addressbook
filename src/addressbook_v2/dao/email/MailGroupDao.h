@@ -4,6 +4,7 @@
 #include "AbstractDao.h"
 #include <map>
 
+namespace addrbook {
 class MailGroupDao : public AbstractDao
 {
   public:
@@ -20,5 +21,6 @@ class MailGroupDao : public AbstractDao
   private:
     bool HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const;
 };
+}  // namespace addrbook
 
 #endif  // MAILGROUPDAO_H

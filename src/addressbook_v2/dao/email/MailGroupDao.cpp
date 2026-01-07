@@ -40,6 +40,7 @@ static constexpr const char* SQL_CHECK_OVER_EMAIL_LIMIT = R"(
 )";
 static constexpr const char* SQL_REMOVE_BY_EMAIL_RID = R"(DELETE FROM GROUPMAPPING WHERE m_rid = ?;)";
 
+namespace addrbook {
 MailGroupDao::MailGroupDao()
   : AbstractDao(SQL_TABLE_NAME)
 {
@@ -118,3 +119,4 @@ bool MailGroupDao::RemoveByEmailRid(uint32_t email_rid)
     StmtParam param(email_rid);
     return AbstractDao::OnExecuteSql(SQL_REMOVE_BY_EMAIL_RID, {param});
 }
+}  // namespace addrbook

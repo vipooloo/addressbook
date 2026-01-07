@@ -11,6 +11,7 @@ enum class OrderType
     DESC
 };
 
+namespace addrbook {
 class QueryParams
 {
   public:
@@ -63,5 +64,6 @@ class QueryParams
     OrderType m_order_by;
     CustomWhere m_conditions;
 };
+}  // namespace addrbook
 
 #endif  // QUERYPARAMS_H

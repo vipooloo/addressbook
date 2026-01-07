@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS email (
 static constexpr const char* SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
 static constexpr const char* SQL_UPDATE = "UPDATE email SET email_address = ?, email_name = ? WHERE rid = ?;";
 
+namespace addrbook {
 EmailDao::EmailDao()
   : AbstractDao(SQL_TABLE_NAME)
 {
@@ -128,3 +129,4 @@ PageResult EmailDao::FindAll(uint32_t page_num, uint32_t page_size)
     QueryParams params(page_num, page_size, conditions);
     return AbstractDao::DoFindByPage(params);
 }
+}  // namespace addrbook

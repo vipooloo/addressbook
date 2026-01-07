@@ -4,6 +4,7 @@
 #include "MailGroupDao.h"
 #include <algorithm>
 
+namespace addrbook {
 EmailRepository::EmailRepository()
   : m_mail_dao_sptr{std::make_shared<EmailDao>()}
   , m_group_dao_sptr{std::make_shared<GroupDao>()}
@@ -261,3 +262,4 @@ PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint3
     }
     return result;
 }
+}  // namespace addrbook

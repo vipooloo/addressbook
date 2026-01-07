@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <memory>
 
+namespace addrbook {
 class EmailDao;
 class GroupDao;
 class MailGroupDao;
@@ -47,5 +48,6 @@ class EmailRepository
     std::shared_ptr<GroupDao> m_group_dao_sptr;
     std::shared_ptr<MailGroupDao> m_mail_group_dao_sptr;
 };
+}  // namespace addrbook
 
 #endif  // EMAILREPOSITORY_H

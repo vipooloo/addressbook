@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+namespace addrbook {
 class CustomWhere
 {
   public:
@@ -40,5 +41,6 @@ class CustomWhere
     std::string m_whree_sql;          // 例如: "WHERE (name LIKE ? OR email LIKE ?) AND status = ?"
     std::vector<std::string> m_args;  // 例如: {"%Tom%", "%Tom%", "1"}
 };
+}  // namespace addrbook
 
 #endif  // CUSTOMWHERE_H

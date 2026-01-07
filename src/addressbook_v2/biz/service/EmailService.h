@@ -1,13 +1,14 @@
 #ifndef EMAILSERVICE_H
 #define EMAILSERVICE_H
 
-#include "SearchEmailResult.h"
 #include "AddressMgrDefs.h"
 #include "EmailDto.h"
 #include "GroupDto.h"
+#include "SearchEmailResult.h"
 #include <memory>
 #include <vector>
 
+namespace addrbook {
 class EmailRepository;
 
 class EmailService
@@ -30,5 +31,6 @@ class EmailService
   private:
     std::shared_ptr<EmailRepository> m_mail_rep_sptr;
 };
+}  // namespace addrbook
 
 #endif  // EMAILSERVICE_H

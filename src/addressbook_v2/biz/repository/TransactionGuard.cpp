@@ -6,6 +6,7 @@ static constexpr const char* SQL_BEGIN_TRANSACTION = "BEGIN TRANSACTION";
 static constexpr const char* SQL_COMMIT_TRANSACTION = "COMMIT TRANSACTION";
 static constexpr const char* SQL_ROLLBACK_TRANSACTION = "ROLLBACK TRANSACTION";
 
+namespace addrbook {
 TransactionGuard::TransactionGuard()
   : m_bCommited{false}
 {
@@ -41,3 +42,4 @@ bool TransactionGuard::Execute(const char* sql)
     }
     return ret;
 }
+}  // namespace addrbook

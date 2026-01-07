@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+namespace addrbook {
 class SQLiteConn
 {
   public:
@@ -111,5 +112,6 @@ class AbstractDao
     std::string m_sql_delete_by_rid;
     std::string m_sql_delete_all;
 };
+}  // namespace addrbook
 
 #endif  // ABSTRACTDAO_H

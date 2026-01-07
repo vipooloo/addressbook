@@ -1,5 +1,5 @@
-#include "AddrMgrLog.h"
 #include "AddrMgrConfigDefs.h"
+#include "AddrMgrLog.h"
 #include "AddrMgrUtilities.h"
 #include "EmailEntity.h"
 #include "EmailRepository.h"
@@ -8,6 +8,7 @@
 #include "TransactionGuard.h"
 #include <algorithm>
 
+namespace addrbook {
 EmailService::EmailService()
   : m_mail_rep_sptr{std::make_shared<EmailRepository>()}
 {
@@ -324,3 +325,4 @@ std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::st
     }
     return ret;
 }
+}  // namespace addrbook

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS mail_group (
 )";
 static constexpr const char* SQL_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
+namespace addrbook {
 GroupDao::GroupDao()
   : AbstractDao(SQL_TABLE_NAME)
 {
@@ -50,3 +51,5 @@ bool GroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, con
     }
     return ret;
 }
+
+}  // namespace addrbook

@@ -1,6 +1,7 @@
 #ifndef TRANSACTIONGUARD_H
 #define TRANSACTIONGUARD_H
 
+namespace addrbook {
 class TransactionGuard
 {
   public:
@@ -19,5 +20,6 @@ class TransactionGuard
   private:
     bool m_bCommited;
 };
+}  // namespace addrbook
 
 #endif  // TRANSACTIONGUARD_H

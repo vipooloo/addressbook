@@ -3,6 +3,7 @@
 
 #include "AbstractDao.h"
 
+namespace addrbook {
 class EmailDao : public AbstractDao
 {
   public:
@@ -11,7 +12,7 @@ class EmailDao : public AbstractDao
     bool Create() override;
     bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
     bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr) override;
-    PageResult FindAll(uint32_t page_num,  uint32_t page_size) override;
+    PageResult FindAll(uint32_t page_num, uint32_t page_size) override;
     PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size) override;
 
   protected:
@@ -19,5 +20,6 @@ class EmailDao : public AbstractDao
 
   private:
 };
+}  // namespace addrbook
 
 #endif  // EMAILDAO_H
