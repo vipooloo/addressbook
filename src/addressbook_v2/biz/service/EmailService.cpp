@@ -1,6 +1,7 @@
 #include "AddrMgrConfigDefs.h"
 #include "AddrMgrLog.h"
 #include "AddrMgrUtilities.h"
+#include "CheckerProvider.h"
 #include "EmailEntity.h"
 #include "EmailRepository.h"
 #include "EmailService.h"
