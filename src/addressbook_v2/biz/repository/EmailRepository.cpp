@@ -24,17 +24,15 @@ EmailRepository::EmailRepository()
     }
 }
 
-uint32_t EmailRepository::AddEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& rids)
+uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<uint32_t>& rids)
 {
     uint32_t rid = 0;
-    if (m_mail_dao_sptr && entity_sptr)
+    if (m_mail_dao_sptr)
     {
-        std::shared_ptr<AbstractEntity> out_entity_sptr = std::make_shared<EmailEntity>();
-        bool result = m_mail_dao_sptr->Insert(entity_sptr, out_entity_sptr);
-        if (out_entity_sptr && result)
+        std::pair<bool, EmailEntity> result = m_mail_dao_sptr->Insert(entity);
+        if (result.first)
         {
-            uint32_t email_rid = out_entity_sptr->GetRid();
-            // 添加邮件到组的映射关系
+            uint32_t email_rid = result.second.GetRid();
             std::vector<std::shared_ptr<AbstractEntity>> relations;
             relations.reserve(rids.size());
             std::transform(
@@ -46,7 +44,7 @@ uint32_t EmailRepository::AddEmail(const std::shared_ptr<EmailEntity>& entity_sp
                 });
             if (AddEmailToGroupRelation(relations))
             {
-                rid = out_entity_sptr->GetRid();
+                rid = email_rid;
             }
         }
     }

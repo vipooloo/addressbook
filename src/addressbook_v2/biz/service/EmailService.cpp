@@ -53,8 +53,8 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             break;
         }
         // 添加邮件
-        std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetName(), dto.GetAddress());
-        uint32_t rid = m_mail_rep_sptr->AddEmail(mail_entity_sptr, group_rids);
+        EmailEntity entity = EmailEntity(dto.GetName(), dto.GetAddress());
+        uint32_t rid = m_mail_rep_sptr->AddEmail(entity, group_rids);
         if (0 == rid)
         {
             AB_LOG_E("Failed to add email to database");

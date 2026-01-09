@@ -19,7 +19,7 @@ class EmailRepository
     EmailRepository();
     ~EmailRepository() = default;
 
-    uint32_t AddEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& rids);
+    uint32_t AddEmail(const EmailEntity& entity, const std::vector<uint32_t>& rids);
     bool IsMailExist(const std::vector<uint32_t>& mail_ids) const;
     uint32_t GetEmailCount() const;
     bool CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit);

@@ -2,6 +2,7 @@
 #define EMAILDAO_H
 
 #include "AbstractDao.h"
+#include "EmailEntity.h"
 
 namespace addrbook {
 class EmailDao : public AbstractDao
@@ -10,8 +11,8 @@ class EmailDao : public AbstractDao
     EmailDao();
     ~EmailDao() override = default;
     bool Create() override;
-    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr);
-    bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr);
+    std::pair<bool, EmailEntity> Insert(const EmailEntity& entity);
+    bool Update(const std::shared_ptr<EmailEntity>& entity_sptr);
     PageResult FindAll(uint32_t page_num, uint32_t page_size);
     PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size);
 

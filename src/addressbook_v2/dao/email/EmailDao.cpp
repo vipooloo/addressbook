@@ -1,6 +1,5 @@
 #include "AddrMgrLog.h"
 #include "EmailDao.h"
-#include "EmailEntity.h"
 #include <algorithm>
 #include <array>
 #include <iostream>
@@ -28,37 +27,24 @@ bool EmailDao::Create()
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
-bool EmailDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
+std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
 {
-    bool ret = false;
-    std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(in_entity_sptr);
-    if (email_entity_sptr)
+    std::pair<bool, EmailEntity> result = {false, entity};
+
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+    stmt.bind(1, entity.GetEmailAddress());
+    stmt.bind(2, entity.GetEmailName());
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_DONE == code)
     {
-        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-        stmt.bind(1, email_entity_sptr->GetEmailAddress());
-        stmt.bind(2, email_entity_sptr->GetEmailName());
-        int32_t code = stmt.tryExecuteStep();
-        if (SQLITE_DONE == code)
-        {
-            std::shared_ptr<EmailEntity> new_entity_sptr = std::static_pointer_cast<EmailEntity>(out_entity_sptr);
-            if (new_entity_sptr)
-            {
-                new_entity_sptr->SetEmailAddress(email_entity_sptr->GetEmailAddress());
-                new_entity_sptr->SetEmailName(email_entity_sptr->GetEmailName());
-                int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
-                new_entity_sptr->SetRid(rid);
-                ret = true;
-            }
-        }
-        else
-        {
-            AB_LOG_E("Insert email failed, code: %d", code);
-        }
+        int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+        result.first = true;
+        result.second.SetRid(rid);
     }
-    return ret;
+    return result;
 }
 
-bool EmailDao::Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
+bool EmailDao::Update(const std::shared_ptr<EmailEntity>& entity_sptr)
 {
     bool ret = false;
     std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(entity_sptr);
