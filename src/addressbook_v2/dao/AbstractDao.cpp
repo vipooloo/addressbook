@@ -70,23 +70,6 @@ bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
     return OnExecuteSql(sql_buffer.data());
 }
 
-// 计算分页偏移量
-uint32_t AbstractDao::CalcPageOffset(const QueryParams& params) const
-{
-    return (params.GetPage() - 1) * params.GetPageSize();
-}
-
-// 校验分页参数
-bool AbstractDao::ValidatePageParams(const QueryParams& params) const
-{
-    bool result = true;
-    if (params.GetPage() < 1 || params.GetPageSize() < 1)
-    {
-        result = false;
-    }
-    return result;
-}
-
 void AbstractDao::BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const
 {
     for (const std::string& arg : args)

@@ -10,7 +10,7 @@ class GroupDao : public AbstractDao
     GroupDao();
     ~GroupDao() override = default;
     bool Create() override;
-    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
+    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr);
 };
 }  // namespace addrbook
 

@@ -47,39 +47,11 @@ class AbstractDao
         return true;
     }
     virtual uint32_t GetCount() const;
-    virtual bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
-    {
-        static_cast<void>(in_entity_sptr);
-        static_cast<void>(out_entity_sptr);
-        return false;
-    }
-    virtual bool InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
-    {
-        static_cast<void>(items);
-        return false;
-    }
     virtual bool IsExist(const std::vector<uint32_t>& rids);
     virtual bool Remove(const std::vector<uint32_t>& rids);
     virtual bool RemoveAll()
     {
         return OnExecuteSql(m_sql_delete_all);
-    }
-
-    virtual bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr)
-    {
-        static_cast<void>(entity_sptr);
-        return false;
-    }
-
-    virtual PageResult FindAll(uint32_t page_num, uint32_t page_size)
-    {
-        return {page_num, page_size};
-    }
-
-    virtual PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size)
-    {
-        static_cast<void>(&keyword);
-        return {page_num, page_size};
     }
 
   protected:
@@ -91,15 +63,17 @@ class AbstractDao
     bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
     bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;
 
-    uint32_t CalcPageOffset(const QueryParams& params) const;
-    bool ValidatePageParams(const QueryParams& params) const;
+    uint32_t CalcPageOffset(const QueryParams& params) const
+    {
+        return (params.GetPage() - 1) * params.GetPageSize();
+    }
     void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const;
+    PageResult DoFindByPage(const QueryParams& params);
     virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
     {
         static_cast<void>(&stmt);
         return nullptr;
     }
-    PageResult DoFindByPage(const QueryParams& params);
 
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);

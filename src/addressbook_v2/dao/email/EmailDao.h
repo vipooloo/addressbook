@@ -10,10 +10,10 @@ class EmailDao : public AbstractDao
     EmailDao();
     ~EmailDao() override = default;
     bool Create() override;
-    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr) override;
-    bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr) override;
-    PageResult FindAll(uint32_t page_num, uint32_t page_size) override;
-    PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size) override;
+    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr);
+    bool Update(const std::shared_ptr<AbstractEntity>& entity_sptr);
+    PageResult FindAll(uint32_t page_num, uint32_t page_size);
+    PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size);
 
   protected:
     std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt) override;
