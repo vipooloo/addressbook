@@ -34,7 +34,7 @@ class EmailRepository
     bool RemoveGroup(const std::vector<uint32_t>& group_ids);
     bool RemoveGroupByMailRid(uint32_t mail_rid);
 
-    bool UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& new_group_rids);
+    bool UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids);
     bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
 
     PageResult GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size);

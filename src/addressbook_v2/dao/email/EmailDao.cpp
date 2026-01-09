@@ -44,20 +44,13 @@ std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
     return result;
 }
 
-bool EmailDao::Update(const std::shared_ptr<EmailEntity>& entity_sptr)
+bool EmailDao::Update(const EmailEntity& entity)
 {
-    bool ret = false;
-    std::shared_ptr<EmailEntity> email_entity_sptr = std::static_pointer_cast<EmailEntity>(entity_sptr);
-    if (email_entity_sptr)
-    {
-        std::vector<StmtParam> stmt_params;
-        stmt_params.emplace_back(email_entity_sptr->GetEmailAddress());
-        stmt_params.emplace_back(email_entity_sptr->GetEmailName());
-        stmt_params.emplace_back(email_entity_sptr->GetRid());
-        ret = OnExecuteSql(SQL_UPDATE, stmt_params);
-        ret = true;
-    }
-    return ret;
+    std::vector<StmtParam> stmt_params;
+    stmt_params.emplace_back(entity.GetEmailAddress());
+    stmt_params.emplace_back(entity.GetEmailName());
+    stmt_params.emplace_back(entity.GetRid());
+    return OnExecuteSql(SQL_UPDATE, stmt_params);
 }
 
 std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement& stmt)

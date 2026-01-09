@@ -198,17 +198,17 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
     return result;
 }
 
-bool EmailRepository::UpdateEmail(const std::shared_ptr<EmailEntity>& entity_sptr, const std::vector<uint32_t>& new_group_rids)
+bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids)
 {
     bool result = true;
-    if (m_mail_dao_sptr && entity_sptr)
+    if (m_mail_dao_sptr)
     {
         // 更新邮件表信息
-        result = m_mail_dao_sptr->Update(entity_sptr);
+        result = m_mail_dao_sptr->Update(entity);
         if (result && !new_group_rids.empty())
         {
             // 映射表中增加信息
-            uint32_t email_rid = entity_sptr->GetRid();
+            uint32_t email_rid = entity.GetRid();
             // 添加邮件到组的映射关系
             std::vector<std::shared_ptr<AbstractEntity>> relations;
             relations.reserve(new_group_rids.size());

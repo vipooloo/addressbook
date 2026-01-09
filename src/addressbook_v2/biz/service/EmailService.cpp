@@ -252,8 +252,8 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         // 更新邮件
-        std::shared_ptr<EmailEntity> mail_entity_sptr = std::make_shared<EmailEntity>(dto.GetRid(), dto.GetName(), dto.GetAddress());
-        if (!m_mail_rep_sptr->UpdateEmail(mail_entity_sptr, new_group_rids))
+        EmailEntity entity = EmailEntity(dto.GetRid(), dto.GetName(), dto.GetAddress());
+        if (!m_mail_rep_sptr->UpdateEmail(entity, new_group_rids))
         {
             AB_LOG_E("Failed to update email to database");
             result = ResultCode::kDbError;
