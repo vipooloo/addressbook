@@ -5,7 +5,7 @@
 
 std::pair<ResultCode, EmailDto> AddressManager::AddEmail(const EmailDto& dto)
 {
-    if (CheckerProvider::GetInstance().Verify(dto))
+    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
     {
         return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
     }

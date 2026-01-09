@@ -3,6 +3,7 @@
 
 #include "EmailDtoChecker.h"
 
+namespace addrbook {
 class CheckerProvider
 {
   public:
@@ -28,5 +29,6 @@ class CheckerProvider
   private:
     EmailDtoChecker m_email_checker;
 };
+}  // namespace addrbook
 
 #endif  // CHECKERPROVIDER_H

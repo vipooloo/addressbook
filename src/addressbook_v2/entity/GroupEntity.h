@@ -9,11 +9,11 @@ class GroupEntity : public AbstractEntity
 {
   public:
     GroupEntity()
-      : GroupEntity(0, {})
+      : GroupEntity(0, "")
     {}
 
     explicit GroupEntity(uint32_t rid)
-      : GroupEntity(rid, {})
+      : GroupEntity(rid, "")
     {}
 
     explicit GroupEntity(const std::string& group_name)

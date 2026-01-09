@@ -8,11 +8,11 @@ class EmailEntity : public AbstractEntity
 {
   public:
     EmailEntity()
-      : EmailEntity(0, {}, {})
+      : EmailEntity(0, "", "")
     {}
 
     explicit EmailEntity(uint32_t rid)
-      : EmailEntity(rid, {}, {})
+      : EmailEntity(rid, "", "")
     {}
 
     EmailEntity(const std::string& email_address, const std::string& email_name)
