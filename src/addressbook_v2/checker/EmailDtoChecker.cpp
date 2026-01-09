@@ -2,6 +2,7 @@
 #include "AddrMgrLog.h"
 #include "EmailDtoChecker.h"
 #include <algorithm>
+#include <set>
 
 EmailDtoChecker::EmailDtoChecker()
   : m_rules{}
@@ -18,6 +19,7 @@ bool EmailDtoChecker::Verify(const EmailDto& dto) const
 
 void EmailDtoChecker::InitInternalRules()
 {
+    m_rules.emplace_back(std::bind(&EmailDtoChecker::BasickInfoCheck, this, std::placeholders::_1));
 }
 
 bool EmailDtoChecker::BasickInfoCheck(const EmailDto& dto) const
@@ -46,6 +48,12 @@ bool EmailDtoChecker::BasickInfoCheck(const EmailDto& dto) const
         if (rids.size() > kMaxGroupsPerEmail)
         {
             AB_LOG_E("Too many groups");
+            break;
+        }
+        std::set<uint32_t> rid_set(rids.cbegin(), rids.cend());
+        if (rid_set.size() != rids.size())
+        {
+            AB_LOG_E("Duplicate group rid");
             break;
         }
         ret = true;

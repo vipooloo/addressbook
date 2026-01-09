@@ -1,9 +1,18 @@
 #include "AddrMgrImpl.h"
+#include "AddrMgrUtilities.h"
 #include "AddressManager.h"
+#include "CheckerProvider.h"
 
 std::pair<ResultCode, EmailDto> AddressManager::AddEmail(const EmailDto& dto)
 {
-    return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
+    if (CheckerProvider::GetInstance().Verify(dto))
+    {
+        return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
+    }
+    else
+    {
+        return std::make_pair(ResultCode::kInvalidParam, dto);
+    }
 }
 
 std::pair<ResultCode, GroupDto> AddressManager::AddGroup(const GroupDto& dto)

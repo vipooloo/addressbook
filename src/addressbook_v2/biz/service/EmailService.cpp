@@ -28,30 +28,6 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             res_code = ResultCode::kNotable;
             break;
         }
-        // 输入合法验证
-        if (dto.GetName().empty() || dto.GetAddress().empty())
-        {
-            AB_LOG_E("Invalid email name or address");
-            res_code = ResultCode::kInvalidParam;
-            break;
-        }
-        std::vector<uint32_t> group_rids = dto.GetGroupRids();
-        // 检查其中是否还有rid=0
-        if (std::any_of(group_rids.cbegin(), group_rids.cend(), [](uint32_t rid) {
-                return rid == 0;
-            }))
-        {
-            AB_LOG_E("Invalid group rid");
-            res_code = ResultCode::kInvalidParam;
-            break;
-        }
-        // 检查邮件组数量是否超了规格上限
-        if (group_rids.size() > kMaxGroupsPerEmail)
-        {
-            AB_LOG_E("Exceed max group count");
-            res_code = ResultCode::kExceedMaxCount;
-            break;
-        }
         TransactionGuard trans_guard;
         // 检查邮件是否超过最大数量限制
         if (m_mail_rep_sptr->GetEmailCount() >= kMaxMailCount)
@@ -61,6 +37,7 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
             break;
         }
         // 检查邮件组是否存在
+        std::vector<uint32_t> group_rids = dto.GetGroupRids();
         bool group_exist = m_mail_rep_sptr->IsGroupExist(group_rids);
         if (!group_exist)
         {
