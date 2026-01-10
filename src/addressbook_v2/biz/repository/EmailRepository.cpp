@@ -33,14 +33,15 @@ uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<
         if (result.first)
         {
             uint32_t email_rid = result.second.GetRid();
-            std::vector<std::shared_ptr<AbstractEntity>> relations;
+            std::vector<MailGroupRelation> relations;
+
             relations.reserve(rids.size());
             std::transform(
                 rids.cbegin(),
                 rids.cend(),
                 std::back_inserter(relations),
                 [email_rid](uint32_t group_rid) {
-                    return std::make_shared<MailGroupRelation>(email_rid, group_rid);
+                    return MailGroupRelation(email_rid, group_rid);
                 });
             if (AddEmailToGroupRelation(relations))
             {
@@ -60,14 +61,14 @@ uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<
         if (result.first)
         {
             uint32_t group_rid = result.second.GetRid();
-            std::vector<std::shared_ptr<AbstractEntity>> relations;
+            std::vector<MailGroupRelation> relations;
             relations.reserve(rids.size());
             std::transform(
                 rids.cbegin(),
                 rids.cend(),
                 std::back_inserter(relations),
                 [group_rid](uint32_t email_rid) {
-                    return std::make_shared<MailGroupRelation>(email_rid, group_rid);
+                    return MailGroupRelation(email_rid, group_rid);
                 });
             if (AddEmailToGroupRelation(relations))
             {
@@ -118,7 +119,7 @@ bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& group_ids, uint32
     return result;
 }
 
-bool EmailRepository::AddEmailToGroupRelation(const std::vector<std::shared_ptr<AbstractEntity>>& items)
+bool EmailRepository::AddEmailToGroupRelation(const std::vector<MailGroupRelation>& items)
 {
     bool result = false;
     if (m_mail_dao_sptr)
@@ -208,14 +209,14 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
             // 映射表中增加信息
             uint32_t email_rid = entity.GetRid();
             // 添加邮件到组的映射关系
-            std::vector<std::shared_ptr<AbstractEntity>> relations;
+            std::vector<MailGroupRelation> relations;
             relations.reserve(new_group_rids.size());
             std::transform(
                 new_group_rids.cbegin(),
                 new_group_rids.cend(),
                 std::back_inserter(relations),
                 [email_rid](uint32_t group_rid) {
-                    return std::make_shared<MailGroupRelation>(email_rid, group_rid);
+                    return MailGroupRelation(email_rid, group_rid);
                 });
             if (!AddEmailToGroupRelation(relations))
             {

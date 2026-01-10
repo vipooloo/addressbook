@@ -51,36 +51,17 @@ bool MailGroupDao::Create()
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
-bool MailGroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
-{
-    (void)out_entity_sptr;
-    bool ret = false;
-    std::shared_ptr<MailGroupRelation> relation_entity_sptr = std::static_pointer_cast<MailGroupRelation>(in_entity_sptr);
-    if (relation_entity_sptr)
-    {
-        std::vector<StmtParam> stmt_params;
-        stmt_params.emplace_back(relation_entity_sptr->GetMailRid());
-        stmt_params.emplace_back(relation_entity_sptr->GetGroupRid());
-        ret = AbstractDao::OnExecuteSql(SQL_INSERT, stmt_params);
-    }
-    return ret;
-}
-
-bool MailGroupDao::InsertBatch(const std::vector<std::shared_ptr<AbstractEntity>>& items)
+bool MailGroupDao::InsertBatch(const std::vector<MailGroupRelation>& items)
 {
     std::vector<std::vector<StmtParam>> stmt_paramss;
     std::transform(
         items.cbegin(),
         items.cend(),
         std::back_inserter(stmt_paramss),
-        [](const std::shared_ptr<AbstractEntity>& item) {
-            std::shared_ptr<MailGroupRelation> entity_sptr = std::static_pointer_cast<MailGroupRelation>(item);
+        [](const MailGroupRelation& item) {
             std::vector<StmtParam> stmt_params;
-            if (entity_sptr)
-            {
-                stmt_params.emplace_back(entity_sptr->GetMailRid());
-                stmt_params.emplace_back(entity_sptr->GetGroupRid());
-            }
+            stmt_params.emplace_back(item.GetMailRid());
+            stmt_params.emplace_back(item.GetGroupRid());
             return stmt_params;
         });
     return AbstractDao::OnExecuteSql(SQL_INSERT, stmt_paramss);
