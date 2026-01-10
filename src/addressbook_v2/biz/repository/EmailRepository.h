@@ -3,10 +3,10 @@
 
 #include "EmailDao.h"
 #include "EmailEntity.h"
+#include "EmailGroupDao.h"
+#include "EmailGroupEntity.h"
 #include "GroupDao.h"
 #include "GroupEntity.h"
-#include "MailGroupDao.h"
-#include "MailGroupRelation.h"
 #include "PageResult.h"
 #include <cstdint>
 #include <memory>
@@ -42,7 +42,7 @@ class EmailRepository
   private:
     EmailDao m_mail_dao;
     GroupDao m_group_dao;
-    MailGroupDao m_mail_group_dao;
+    EmailGroupDao m_mail_group_dao;
 };
 }  // namespace addrbook
 

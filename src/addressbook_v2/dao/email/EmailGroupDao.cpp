@@ -1,7 +1,6 @@
 #include "AddrMgrLog.h"
 #include "AddrMgrUtilities.h"
-#include "MailGroupDao.h"
-#include "MailGroupRelation.h"
+#include "EmailGroupDao.h"
 #include <algorithm>
 #include <array>
 #include <sqlite3.h>
@@ -41,24 +40,24 @@ static constexpr const char* SQL_CHECK_OVER_EMAIL_LIMIT = R"(
 static constexpr const char* SQL_REMOVE_BY_EMAIL_RID = R"(DELETE FROM GROUPMAPPING WHERE m_rid = ?;)";
 
 namespace addrbook {
-MailGroupDao::MailGroupDao()
+EmailGroupDao::EmailGroupDao()
   : AbstractDao(SQL_TABLE_NAME)
 {
 }
 
-bool MailGroupDao::Create()
+bool EmailGroupDao::Create()
 {
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
-bool MailGroupDao::InsertBatch(const std::vector<MailGroupRelation>& items)
+bool EmailGroupDao::InsertBatch(const std::vector<EmailGroupEntity>& items)
 {
     std::vector<std::vector<StmtParam>> stmt_paramss;
     std::transform(
         items.cbegin(),
         items.cend(),
         std::back_inserter(stmt_paramss),
-        [](const MailGroupRelation& item) {
+        [](const EmailGroupEntity& item) {
             std::vector<StmtParam> stmt_params;
             stmt_params.emplace_back(item.GetMailRid());
             stmt_params.emplace_back(item.GetGroupRid());
@@ -67,17 +66,17 @@ bool MailGroupDao::InsertBatch(const std::vector<MailGroupRelation>& items)
     return AbstractDao::OnExecuteSql(SQL_INSERT, stmt_paramss);
 }
 
-bool MailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
+bool EmailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
 {
     return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
 }
 
-bool MailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
+bool EmailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
 {
     return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
 }
 
-bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
+bool EmailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
 {
     std::string str_ids = AddrMgrUtilities::JoinIds(ids);
     std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
@@ -95,7 +94,7 @@ bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const st
     return ret;
 }
 
-bool MailGroupDao::RemoveByEmailRid(uint32_t email_rid)
+bool EmailGroupDao::RemoveByEmailRid(uint32_t email_rid)
 {
     StmtParam param(email_rid);
     return AbstractDao::OnExecuteSql(SQL_REMOVE_BY_EMAIL_RID, {param});

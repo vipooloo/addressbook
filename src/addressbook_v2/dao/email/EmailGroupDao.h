@@ -1,20 +1,19 @@
-#ifndef MAILGROUPDAO_H
-#define MAILGROUPDAO_H
+#ifndef EMAILGROUPDAO_H
+#define EMAILGROUPDAO_H
 
 #include "AbstractDao.h"
-#include "MailGroupRelation.h"
+#include "EmailGroupEntity.h"
 
 namespace addrbook {
-class MailGroupDao : public AbstractDao
+class EmailGroupDao : public AbstractDao
 {
   public:
-    MailGroupDao();
-    ~MailGroupDao() override = default;
+    EmailGroupDao();
+    ~EmailGroupDao() override = default;
     bool Create() override;
-    bool InsertBatch(const std::vector<MailGroupRelation>& items);
+    bool InsertBatch(const std::vector<EmailGroupEntity>& items);
     bool HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const;
     bool HasMemberOverEMailLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const;
-
     bool RemoveByEmailRid(uint32_t email_rid);
 
   private:
@@ -22,4 +21,4 @@ class MailGroupDao : public AbstractDao
 };
 }  // namespace addrbook
 
-#endif  // MAILGROUPDAO_H
+#endif  // EMAILGROUPDAO_H

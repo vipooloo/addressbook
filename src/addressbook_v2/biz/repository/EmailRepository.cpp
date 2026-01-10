@@ -1,7 +1,7 @@
 #include "EmailDao.h"
+#include "EmailGroupDao.h"
 #include "EmailRepository.h"
 #include "GroupDao.h"
-#include "MailGroupDao.h"
 #include <algorithm>
 
 namespace addrbook {
@@ -22,14 +22,14 @@ uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<
     if (result.first)
     {
         uint32_t email_rid = result.second.GetRid();
-        std::vector<MailGroupRelation> relations;
+        std::vector<EmailGroupEntity> relations;
         relations.reserve(rids.size());
         std::transform(
             rids.cbegin(),
             rids.cend(),
             std::back_inserter(relations),
             [email_rid](uint32_t group_rid) {
-                return MailGroupRelation(email_rid, group_rid);
+                return EmailGroupEntity(email_rid, group_rid);
             });
         if (m_mail_group_dao.InsertBatch(relations))
         {
@@ -47,14 +47,14 @@ uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<
     if (result.first)
     {
         uint32_t group_rid = result.second.GetRid();
-        std::vector<MailGroupRelation> relations;
+        std::vector<EmailGroupEntity> relations;
         relations.reserve(rids.size());
         std::transform(
             rids.cbegin(),
             rids.cend(),
             std::back_inserter(relations),
             [group_rid](uint32_t email_rid) {
-                return MailGroupRelation(email_rid, group_rid);
+                return EmailGroupEntity(email_rid, group_rid);
             });
         if (m_mail_group_dao.InsertBatch(relations))
         {
@@ -136,14 +136,14 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
         // 映射表中增加信息
         uint32_t email_rid = entity.GetRid();
         // 添加邮件到组的映射关系
-        std::vector<MailGroupRelation> relations;
+        std::vector<EmailGroupEntity> relations;
         relations.reserve(new_group_rids.size());
         std::transform(
             new_group_rids.cbegin(),
             new_group_rids.cend(),
             std::back_inserter(relations),
             [email_rid](uint32_t group_rid) {
-                return MailGroupRelation(email_rid, group_rid);
+                return EmailGroupEntity(email_rid, group_rid);
             });
         if (!m_mail_group_dao.InsertBatch(relations))
         {
