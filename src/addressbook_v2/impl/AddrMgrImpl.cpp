@@ -2,6 +2,7 @@
 #include "AddrMgrImpl.h"
 #include "AddrMgrLog.h"
 #include "AddrMgrUtilities.h"
+#include "CheckerProvider.h"
 #include "CsvProcessor.h"
 #include <algorithm>
 
@@ -77,8 +78,15 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
 
 std::pair<ResultCode, EmailDto> AddrMgrImpl::AddEmail(const EmailDto& dto)
 {
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.AddEmail(dto);
+    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        return m_email_srv.AddEmail(dto);
+    }
+    else
+    {
+        return std::make_pair(ResultCode::kInvalidParam, dto);
+    }
 }
 
 std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)

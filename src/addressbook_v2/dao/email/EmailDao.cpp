@@ -43,7 +43,7 @@ std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
     }
     else
     {
-        AB_LOG_E("Insert email failed, code: %d", code);
+        AB_LOG_E("%s failed, code:%d", SQL_INSERT, code);
     }
 
     return result;

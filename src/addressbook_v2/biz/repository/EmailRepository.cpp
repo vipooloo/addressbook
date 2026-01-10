@@ -18,13 +18,11 @@ EmailRepository::EmailRepository()
 uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<uint32_t>& rids)
 {
     uint32_t rid = 0;
-
     std::pair<bool, EmailEntity> result = m_mail_dao.Insert(entity);
     if (result.first)
     {
         uint32_t email_rid = result.second.GetRid();
         std::vector<MailGroupRelation> relations;
-
         relations.reserve(rids.size());
         std::transform(
             rids.cbegin(),
@@ -33,12 +31,11 @@ uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<
             [email_rid](uint32_t group_rid) {
                 return MailGroupRelation(email_rid, group_rid);
             });
-        if (AddEmailToGroupRelation(relations))
+        if (m_mail_group_dao.InsertBatch(relations))
         {
             rid = email_rid;
         }
     }
-
     return rid;
 }
 
@@ -59,7 +56,7 @@ uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<
             [group_rid](uint32_t email_rid) {
                 return MailGroupRelation(email_rid, group_rid);
             });
-        if (AddEmailToGroupRelation(relations))
+        if (m_mail_group_dao.InsertBatch(relations))
         {
             rid = group_rid;
         }
@@ -86,12 +83,6 @@ bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32
 bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
     return m_mail_group_dao.HasMemberOverEMailLimit(group_ids, count_limit);
-}
-
-bool EmailRepository::AddEmailToGroupRelation(const std::vector<MailGroupRelation>& items)
-{
-    return m_mail_group_dao.InsertBatch(items);
-    ;
 }
 
 bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
@@ -154,7 +145,7 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
             [email_rid](uint32_t group_rid) {
                 return MailGroupRelation(email_rid, group_rid);
             });
-        if (!AddEmailToGroupRelation(relations))
+        if (!m_mail_group_dao.InsertBatch(relations))
         {
             result = false;
         }

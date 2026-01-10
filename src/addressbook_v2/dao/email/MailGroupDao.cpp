@@ -89,7 +89,7 @@ bool MailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const st
     int32_t code = stmt.tryExecuteStep();
     if (SQLITE_ROW == code)
     {
-        AB_LOG_E("HasMemberOverGroupLimit failed, code:%d %s", code, str_ids.c_str());
+        AB_LOG_E("%s failed code:%d", str_ids.c_str(), code);
         ret = false;
     }
     return ret;

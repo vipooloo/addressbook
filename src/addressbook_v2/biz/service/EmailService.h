@@ -3,6 +3,7 @@
 
 #include "AddressMgrDefs.h"
 #include "EmailDto.h"
+#include "EmailRepository.h"
 #include "EventDispatcher.h"
 #include "GroupDto.h"
 #include "SearchEmailResult.h"
@@ -10,7 +11,6 @@
 #include <vector>
 
 namespace addrbook {
-class EmailRepository;
 
 class EmailService
 {
@@ -34,7 +34,7 @@ class EmailService
 
   private:
     EventDispatcher& m_env_dispatcher;
-    std::shared_ptr<EmailRepository> m_mail_rep_sptr;
+    EmailRepository m_mail_rep;
 };
 }  // namespace addrbook
 

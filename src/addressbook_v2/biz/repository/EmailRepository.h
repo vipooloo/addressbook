@@ -40,9 +40,6 @@ class EmailRepository
     PageResult GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size);
 
   private:
-    bool AddEmailToGroupRelation(const std::vector<MailGroupRelation>& items);
-
-  private:
     EmailDao m_mail_dao;
     GroupDao m_group_dao;
     MailGroupDao m_mail_group_dao;

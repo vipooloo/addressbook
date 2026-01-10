@@ -28,7 +28,7 @@ uint32_t AbstractDao::GetCount() const
     }
     else
     {
-        AB_LOG_E("GetCount failed, code: %d %s", code, m_sql_count.c_str());
+        AB_LOG_E("%s failed code:%d ", m_sql_count.c_str(), code);
     }
     return ret;
 }
@@ -56,7 +56,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
         }
         else
         {
-            AB_LOG_E("IsExist failed, code: %d", code);
+            AB_LOG_E("%s failed code:%d", sql.c_str(), code);
         }
     }
     return ret;
@@ -88,7 +88,7 @@ bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtPar
         if (code != SQLITE_DONE)
         {
             ret = false;
-            AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+            AB_LOG_E("%s failed code:%d", sql.c_str(), code);
         }
     }
     return ret;
@@ -107,7 +107,7 @@ bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::ve
             if (code != SQLITE_DONE)
             {
                 ret = false;
-                AB_LOG_E("failed to execute sql, code:%d sql:%s", code, sql.c_str());
+                AB_LOG_E("%s failed code:%d", sql.c_str(), code);
             }
             stmt.tryReset();
             stmt.clearBindings();
@@ -184,7 +184,7 @@ uint32_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere
     }
     else
     {
-        AB_LOG_E("GetCount failed, code: %d %s", code, sql_buffer.data());
+        AB_LOG_E("%s failed code:%d", sql_buffer.data(), code);
     }
     return total;
 }
@@ -214,7 +214,7 @@ std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std
     }
     if (code != SQLITE_DONE)
     {
-        AB_LOG_E("Query email failed, code: %d %s", code, sql_buffer.data());
+        AB_LOG_E("%s failed code:%d", sql_buffer.data(), code);
     }
     return records;
 }
