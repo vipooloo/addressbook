@@ -133,3 +133,22 @@ std::string AddrMgrUtilities::GenerateTimestampedFileName(const std::string& pre
 
     return ss.str();
 }
+
+std::string AddrMgrUtilities::ReplaceFirst(const std::string& str, const std::string& replacement)
+{
+    return AddrMgrUtilities::ReplaceFirst(str, "%s", replacement);
+}
+
+std::string AddrMgrUtilities::ReplaceFirst(const std::string& str, const std::string& needle, const std::string& replacement)
+{
+    std::string ret = str;
+    // 1. 查找第一个出现的位置
+    size_t pos = ret.find(needle);
+
+    // 2. 如果找到了，就替换它
+    if (pos != std::string::npos)
+    {
+        ret.replace(pos, needle.length(), replacement);
+    }
+    return ret;
+}

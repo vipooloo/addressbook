@@ -20,6 +20,8 @@ class AddrMgrUtilities
      * @return 格式化后的文件名 (例如 "emails_2026.01.05_143005.csv")
      */
     static std::string GenerateTimestampedFileName(const std::string& prefix, const std::string& suffix);
+    static std::string ReplaceFirst(const std::string& str, const std::string& replacement);
+    static std::string ReplaceFirst(const std::string& str, const std::string& needle, const std::string& replacement);
 };
 
 #endif  // ADDRMGRUTILITIES_H

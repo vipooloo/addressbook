@@ -5,15 +5,14 @@
 #include <array>
 #include <sqlite3.h>
 
-static constexpr uint32_t SQL_BUFFER_SIZE = 512;
 static constexpr const char* SQL_TABLE_NAME = "GROUPMAPPING";
 static constexpr const char* SQL_CREATE_TABLE = R"(
 CREATE TABLE IF NOT EXISTS GROUPMAPPING (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     m_rid INTEGER,  
     g_rid INTEGER,  
-    FOREIGN KEY (g_rid) REFERENCES MAILGROUP (rid) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY (m_rid) REFERENCES MAIL      (rid) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (g_rid) REFERENCES MAILGROUP (rid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (m_rid) REFERENCES MAIL      (rid) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE (m_rid, g_rid)
     );
 )";
@@ -66,29 +65,33 @@ bool EmailGroupDao::InsertBatch(const std::vector<EmailGroupEntity>& items)
 
 bool EmailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
 {
-    return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
+    return CheckMemberLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
 }
 
 bool EmailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& email_ids, uint32_t limit) const
 {
-    return HasMemberOverLimit(email_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
+    return CheckMemberLimit(email_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
 }
 
-bool EmailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
+bool EmailGroupDao::CheckMemberLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
 {
+    bool ret = false;
     std::string str_ids = AddrMgrUtilities::JoinIds(ids);
-    std::array<char, SQL_BUFFER_SIZE> sql_buffer = {0};
-    snprintf(sql_buffer.data(), sql_buffer.size(), content.c_str(), str_ids.c_str());
+    std::string str_sql = AddrMgrUtilities::ReplaceFirst(content, str_ids);
 
-    bool ret = true;
-    SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer.data());
+    SQLite::Statement stmt(AbstractDao::GetDb(), str_sql);
     stmt.bind(1, limit);
+
     int32_t code = stmt.tryExecuteStep();
-    if (SQLITE_ROW == code)
+    if (SQLITE_DONE == code)
     {
-        AB_LOG_E("%s failed code:%d", str_ids.c_str(), code);
-        ret = false;
+        ret = true;
     }
+    else
+    {
+        AB_LOG_E("%s failed code:%d", str_sql.c_str(), code);
+    }
+
     return ret;
 }
 
