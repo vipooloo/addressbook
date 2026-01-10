@@ -97,8 +97,25 @@ std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
 
 ResultCode AddrMgrImpl::RemoveEmail(const std::vector<uint32_t>& rids)
 {
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.RemoveEmail(rids);
+    ResultCode result = ResultCode::kInvalidParam;
+
+    if (rids.empty())
+    {
+        AB_LOG_E("empty rid list");
+    }
+    else if (std::any_of(rids.cbegin(), rids.cend(), [](uint32_t rid) {
+                 return rid == 0;
+             }))
+    {
+        AB_LOG_E("invalid rid");
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        result = m_email_srv.RemoveEmail(rids);
+    }
+
+    return result;
 }
 
 ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& rids)

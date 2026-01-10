@@ -18,15 +18,15 @@ class AddrMgrImpl
     }
 
     std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
-    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
     ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
-    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
     ResultCode UpdateEmail(const EmailDto& dto);
-    ResultCode UpdateGroup(const GroupDto& dto);
     std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
-
     ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
+    /*---------------------------------------------------*/
+    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
+    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
+    ResultCode UpdateGroup(const GroupDto& dto);
 
     void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
     void Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);

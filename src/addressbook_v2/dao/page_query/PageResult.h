@@ -13,7 +13,7 @@ class PageResult
     PageResult()
       : PageResult(0, 0)
     {}
-    PageResult(uint32_t current_page, uint32_t page_size)
+    PageResult(size_t current_page, size_t page_size)
       : m_total_records{0}
       , m_current_page{current_page}
       , m_page_size{page_size}
@@ -22,24 +22,24 @@ class PageResult
 
     ~PageResult() = default;
 
-    uint32_t GetTotalRecords() const
+    size_t GetTotalRecords() const
     {
         return m_total_records;
     }
 
-    uint32_t GetCurrentPage() const
+    size_t GetCurrentPage() const
     {
         return m_current_page;
     }
 
-    uint32_t GetPageSize() const
+    size_t GetPageSize() const
     {
         return m_page_size;
     }
 
-    uint32_t GetTotalPages() const
+    size_t GetTotalPages() const
     {
-        uint32_t total_pages = 0;
+        size_t total_pages = 0;
         if (m_page_size != 0)
         {
             total_pages = (m_total_records + m_page_size - 1) / m_page_size;
@@ -52,17 +52,17 @@ class PageResult
         return m_records;
     }
 
-    void SetTotalRecords(uint32_t total_records)
+    void SetTotalRecords(size_t total_records)
     {
         m_total_records = total_records;
     }
 
-    void SetCurrentPage(uint32_t current_page)
+    void SetCurrentPage(size_t current_page)
     {
         m_current_page = current_page;
     }
 
-    void SetPageSize(uint32_t page_size)
+    void SetPageSize(size_t page_size)
     {
         m_page_size = page_size;
     }
@@ -102,9 +102,9 @@ class PageResult
     PageResult& operator=(const PageResult&) = delete;
 
   private:
-    uint32_t m_total_records;                                ///< 总记录条数 (Total number of records)
-    uint32_t m_current_page;                                 ///< 当前页码 (Current page number, 1-based)
-    uint32_t m_page_size;                                    ///< 每页容量 (Items per page)
+    size_t m_total_records;                                  ///< 总记录条数 (Total number of records)
+    size_t m_current_page;                                   ///< 当前页码 (Current page number, 1-based)
+    size_t m_page_size;                                      ///< 每页容量 (Items per page)
     std::vector<std::shared_ptr<AbstractEntity>> m_records;  ///< 当前页的具体数据列表 (List of records)
 };
 

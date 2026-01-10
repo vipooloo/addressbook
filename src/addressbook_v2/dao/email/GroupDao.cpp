@@ -1,35 +1,27 @@
 #include "AddrMgrLog.h"
+#include "AddrMgrSqlDefs.h"
 #include "GroupDao.h"
 #include "GroupEntity.h"
-#include <array>
 #include <sqlite3.h>
-
-static constexpr const char* SQL_TABLE_NAME = "mail_group";
-static constexpr const char* SQL_CREATE_TABLE = R"(
-CREATE TABLE IF NOT EXISTS mail_group (
-    rid INTEGER PRIMARY KEY AUTOINCREMENT, 
-    group_name TEXT
-    );
-)";
-static constexpr const char* SQL_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
 namespace addrbook {
 GroupDao::GroupDao()
-  : AbstractDao(SQL_TABLE_NAME)
+  : AbstractDao(GROUP_SQL_TABLE_NAME)
 {
 }
 
 bool GroupDao::Create()
 {
-    return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(GROUP_SQL_CREATE_TABLE);
 }
 
 std::pair<bool, GroupEntity> GroupDao::Insert(const GroupEntity& entity)
 {
     std::pair<bool, GroupEntity> result = {false, entity};
 
-    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+    SQLite::Statement stmt(AbstractDao::GetDb(), GROUP_SQL_INSERT);
     stmt.bind(1, entity.GetGroupName());
+
     int32_t code = stmt.tryExecuteStep();
     if (SQLITE_DONE == code)
     {
@@ -39,7 +31,7 @@ std::pair<bool, GroupEntity> GroupDao::Insert(const GroupEntity& entity)
     }
     else
     {
-        AB_LOG_E("%s failed code:%d", SQL_INSERT, code);
+        AB_LOG_E("%s failed code:%d", GROUP_SQL_INSERT, code);
     }
 
     return result;

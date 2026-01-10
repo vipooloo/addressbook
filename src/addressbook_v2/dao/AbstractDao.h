@@ -52,7 +52,7 @@ class AbstractDao
     {
         return true;
     }
-    virtual uint32_t GetCount() const;
+    virtual size_t GetCount() const;
     virtual bool IsExist(const std::vector<uint32_t>& rids) const;
     virtual bool Remove(const std::vector<uint32_t>& rids);
     virtual bool RemoveAll()
@@ -61,11 +61,7 @@ class AbstractDao
     }
 
   protected:
-    bool OnExecuteSql(const std::string& sql) const
-    {
-        std::vector<StmtParam> stmt_params;
-        return OnExecuteSql(sql, std::move(stmt_params));
-    }
+    bool OnExecuteSql(const std::string& sql) const;
     bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
     bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;
 
@@ -83,7 +79,7 @@ class AbstractDao
 
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);
-    uint32_t QueryCount(const std::string& where_sql, const CustomWhere& conditions);
+    size_t QueryCount(const std::string& where_sql, const CustomWhere& conditions);
     std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParams& params);
 
   private:
@@ -91,6 +87,7 @@ class AbstractDao
     std::string m_sql_count;
     std::string m_sql_delete_by_rid;
     std::string m_sql_delete_all;
+    std::string m_sql_exist;
 };
 }  // namespace addrbook
 

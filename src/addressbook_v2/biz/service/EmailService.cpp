@@ -130,23 +130,17 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
 ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
 {
     ResultCode result = ResultCode::kSuccess;
-    do
+
+    TransactionGuard trans_guard;
+    if (m_mail_rep.RemoveEmail(rids))
     {
-        if (rids.empty())
-        {
-            AB_LOG_E("Email rids is empty");
-            result = ResultCode::kInvalidParam;
-            break;
-        }
-        TransactionGuard trans_guard;
-        if (!m_mail_rep.RemoveEmail(rids))
-        {
-            AB_LOG_E("Failed to remove email from database");
-            result = ResultCode::kDbError;
-            break;
-        }
         trans_guard.Commit();
-    } while (false);
+    }
+    else
+    {
+        AB_LOG_E("Failed %s", __FUNCTION__);
+        result = ResultCode::kDbError;
+    }
 
     return result;
 }
@@ -154,23 +148,17 @@ ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
 ResultCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
 {
     ResultCode result = ResultCode::kSuccess;
-    do
+
+    TransactionGuard trans_guard;
+    if (m_mail_rep.RemoveGroup(rids))
     {
-        if (rids.empty())
-        {
-            AB_LOG_E("Group rids is empty");
-            result = ResultCode::kInvalidParam;
-            break;
-        }
-        TransactionGuard trans_guard;
-        if (!m_mail_rep.RemoveGroup(rids))
-        {
-            AB_LOG_E("Failed to remove group from database");
-            result = ResultCode::kDbError;
-            break;
-        }
         trans_guard.Commit();
-    } while (false);
+    }
+    else
+    {
+        AB_LOG_E("Failed %s", __FUNCTION__);
+        result = ResultCode::kDbError;
+    }
 
     return result;
 }
