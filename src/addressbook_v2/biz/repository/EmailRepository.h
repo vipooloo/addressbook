@@ -25,7 +25,7 @@ class EmailRepository
     bool CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit);
     std::vector<uint32_t> GetGroupRidsByMailRid(uint32_t mail_rid);
 
-    uint32_t AddGroup(const std::shared_ptr<GroupEntity>& entity_sptr, const std::vector<uint32_t>& rids);
+    uint32_t AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& rids);
     bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
     size_t GetGroupCount() const;
     bool CanAddEmail(const std::vector<uint32_t>& mail_ids, uint32_t count_limit);

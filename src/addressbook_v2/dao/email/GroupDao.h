@@ -2,6 +2,7 @@
 #define GROUPDAO_H
 
 #include "AbstractDao.h"
+#include "GroupEntity.h"
 
 namespace addrbook {
 class GroupDao : public AbstractDao
@@ -10,7 +11,7 @@ class GroupDao : public AbstractDao
     GroupDao();
     ~GroupDao() override = default;
     bool Create() override;
-    bool Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr);
+    std::pair<bool, GroupEntity> Insert(const GroupEntity& entity);
 };
 }  // namespace addrbook
 

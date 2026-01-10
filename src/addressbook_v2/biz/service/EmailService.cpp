@@ -128,8 +128,8 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
             break;
         }
         // 添加邮件组
-        std::shared_ptr<GroupEntity> group_entity_sptr = std::make_shared<GroupEntity>(dto.GetGroupName());
-        uint32_t group_rid = m_mail_rep_sptr->AddGroup(group_entity_sptr, mail_rids);
+        GroupEntity entity(dto.GetGroupName());
+        uint32_t group_rid = m_mail_rep_sptr->AddGroup(entity, mail_rids);
         if (0 == group_rid)
         {
             AB_LOG_E("Failed to add email to database");

@@ -24,32 +24,25 @@ bool GroupDao::Create()
     return AbstractDao::OnExecuteSql(SQL_CREATE_TABLE);
 }
 
-bool GroupDao::Insert(const std::shared_ptr<AbstractEntity>& in_entity_sptr, const std::shared_ptr<AbstractEntity>& out_entity_sptr)
+std::pair<bool, GroupEntity> GroupDao::Insert(const GroupEntity& entity)
 {
-    bool ret = false;
-    std::shared_ptr<GroupEntity> group_entity_sptr = std::static_pointer_cast<GroupEntity>(in_entity_sptr);
-    if (group_entity_sptr)
+    std::pair<bool, GroupEntity> result = {false, entity};
+
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
+    stmt.bind(1, entity.GetGroupName());
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_DONE == code)
     {
-        SQLite::Statement stmt(AbstractDao::GetDb(), SQL_INSERT);
-        stmt.bind(1, group_entity_sptr->GetGroupName());
-        int32_t code = stmt.tryExecuteStep();
-        if (SQLITE_DONE == code)
-        {
-            std::shared_ptr<GroupEntity> new_entity_sptr = std::static_pointer_cast<GroupEntity>(out_entity_sptr);
-            if (new_entity_sptr)
-            {
-                new_entity_sptr->SetGroupName(group_entity_sptr->GetGroupName());
-                int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
-                new_entity_sptr->SetRid(rid);
-                ret = true;
-            }
-        }
-        else
-        {
-            AB_LOG_E("Insert group failed, code: %d", code);
-        }
+        int32_t rid = static_cast<int32_t>(AbstractDao::GetDb().getLastInsertRowid());
+        result.first = true;
+        result.second.SetRid(rid);
     }
-    return ret;
+    else
+    {
+        AB_LOG_E("Insert group failed, code: %d", code);
+    }
+
+    return result;
 }
 
 }  // namespace addrbook

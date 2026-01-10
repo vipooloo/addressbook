@@ -12,7 +12,7 @@ class EmailDao : public AbstractDao
     ~EmailDao() override = default;
     bool Create() override;
     std::pair<bool, EmailEntity> Insert(const EmailEntity& entity);
-    bool Update(const EmailEntity& entity_sptr);
+    bool Update(const EmailEntity& entity);
     PageResult FindAll(uint32_t page_num, uint32_t page_size);
     PageResult FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size);
 

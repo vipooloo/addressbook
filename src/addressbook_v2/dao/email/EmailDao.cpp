@@ -41,6 +41,11 @@ std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
         result.first = true;
         result.second.SetRid(rid);
     }
+    else
+    {
+        AB_LOG_E("Insert email failed, code: %d", code);
+    }
+
     return result;
 }
 
