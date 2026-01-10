@@ -28,6 +28,12 @@ class SQLiteConn
     }
 
   private:
+    SQLiteConn(const SQLiteConn&) = delete;
+    SQLiteConn& operator=(const SQLiteConn&) = delete;
+    SQLiteConn(SQLiteConn&&) noexcept = delete;
+    SQLiteConn& operator=(SQLiteConn&&) noexcept = delete;
+
+  private:
     SQLite::Database m_db;
 };
 
@@ -47,7 +53,7 @@ class AbstractDao
         return true;
     }
     virtual uint32_t GetCount() const;
-    virtual bool IsExist(const std::vector<uint32_t>& rids)const;
+    virtual bool IsExist(const std::vector<uint32_t>& rids) const;
     virtual bool Remove(const std::vector<uint32_t>& rids);
     virtual bool RemoveAll()
     {

@@ -11,8 +11,8 @@ class TransactionGuard
 
     TransactionGuard(const TransactionGuard&) = delete;
     TransactionGuard& operator=(const TransactionGuard&) = delete;
-    TransactionGuard(TransactionGuard&&) = delete;
-    TransactionGuard& operator=(TransactionGuard&&) = delete;
+    TransactionGuard(TransactionGuard&&) noexcept = delete;
+    TransactionGuard& operator=(TransactionGuard&&) noexcept = delete;
 
   private:
     bool Execute(const char* sql);

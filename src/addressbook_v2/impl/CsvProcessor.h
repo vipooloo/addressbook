@@ -57,9 +57,9 @@ class CsvBase
   private:
     // 禁止拷贝和赋值
     CsvBase(const CsvBase&) = delete;
-    CsvBase(CsvBase&&) = delete;
+    CsvBase(CsvBase&&) noexcept = delete;
     CsvBase& operator=(const CsvBase&) = delete;
-    CsvBase& operator=(CsvBase&&) = delete;
+    CsvBase& operator=(CsvBase&&) noexcept = delete;
 
   private:
     std::string m_file_name;

@@ -21,9 +21,9 @@ class EventDispatcher
 
   private:
     EventDispatcher(const EventDispatcher&) = delete;
-    EventDispatcher(EventDispatcher&&) = delete;
+    EventDispatcher(EventDispatcher&&) noexcept = delete;
     EventDispatcher& operator=(const EventDispatcher&) = delete;
-    EventDispatcher& operator=(EventDispatcher&&) = delete;
+    EventDispatcher& operator=(EventDispatcher&&) noexcept = delete;
 
   private:
     std::list<std::shared_ptr<IAddressMgrDataObserver>> m_observers;

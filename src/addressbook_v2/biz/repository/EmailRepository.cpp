@@ -96,12 +96,8 @@ bool EmailRepository::AddEmailToGroupRelation(const std::vector<MailGroupRelatio
 
 bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
 {
-    bool result = false;
-    if (group_ids.empty())
-    {
-        result = true;
-    }
-    else
+    bool result = true;
+    if (!group_ids.empty())
     {
         result = m_group_dao.IsExist(group_ids);
     }
@@ -110,12 +106,8 @@ bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
 
 bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
 {
-    bool result = false;
-    if (mail_ids.empty())
-    {
-        result = true;
-    }
-    else
+    bool result = true;
+    if (!mail_ids.empty())
     {
         result = m_mail_dao.IsExist(mail_ids);
     }
@@ -124,12 +116,8 @@ bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
 
 bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
 {
-    bool result = false;
-    if (mail_ids.empty())
-    {
-        result = true;
-    }
-    else
+    bool result = true;
+    if (!mail_ids.empty())
     {
         result = m_mail_dao.Remove(mail_ids);
     }
@@ -138,12 +126,8 @@ bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
 
 bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
 {
-    bool result = false;
-    if (group_ids.empty())
-    {
-        result = true;
-    }
-    else
+    bool result = true;
+    if (!group_ids.empty())
     {
         result = m_group_dao.Remove(group_ids);
     }
@@ -189,6 +173,7 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
     bool ret = false;
     if (mail_rid != 0)
     {
+        // TBD 这个判断是不是应该在输入的地方检查呢
         ret = m_mail_group_dao.RemoveByEmailRid(mail_rid);
     }
     return ret;

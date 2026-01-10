@@ -36,8 +36,8 @@ class AddrMgrImpl
     ~AddrMgrImpl();
     AddrMgrImpl(const AddrMgrImpl&) = delete;
     AddrMgrImpl& operator=(const AddrMgrImpl&) = delete;
-    AddrMgrImpl(AddrMgrImpl&&) = delete;
-    AddrMgrImpl& operator=(AddrMgrImpl&&) = delete;
+    AddrMgrImpl(AddrMgrImpl&&) noexcept = delete;
+    AddrMgrImpl& operator=(AddrMgrImpl&&) noexcept = delete;
 
     void EventHandler(const std::shared_ptr<IEvent>& evt_sptr);
 

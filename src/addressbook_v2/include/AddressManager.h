@@ -28,8 +28,8 @@ class AddressManager
     ~AddressManager() = delete;
     AddressManager(const AddressManager&) = delete;
     AddressManager& operator=(const AddressManager&) = delete;
-    AddressManager(AddressManager&&) = delete;
-    AddressManager& operator=(AddressManager&&) = delete;
+    AddressManager(AddressManager&&) noexcept = delete;
+    AddressManager& operator=(AddressManager&&) noexcept = delete;
 };
 
 #endif  // ADDRESSMANAGER_H

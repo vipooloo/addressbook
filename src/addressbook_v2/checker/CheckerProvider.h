@@ -23,8 +23,8 @@ class CheckerProvider
     ~CheckerProvider() {}
     CheckerProvider(const CheckerProvider&) = delete;
     CheckerProvider& operator=(const CheckerProvider&) = delete;
-    CheckerProvider(CheckerProvider&&) = delete;
-    CheckerProvider& operator=(CheckerProvider&&) = delete;
+    CheckerProvider(CheckerProvider&&) noexcept = delete;
+    CheckerProvider& operator=(CheckerProvider&&) noexcept = delete;
 
   private:
     EmailDtoChecker m_email_checker;
