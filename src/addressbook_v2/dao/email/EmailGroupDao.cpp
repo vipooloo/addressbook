@@ -19,8 +19,6 @@ CREATE TABLE IF NOT EXISTS GROUPMAPPING (
 )";
 
 static constexpr const char* SQL_INSERT = "INSERT INTO GROUPMAPPING (m_rid, g_rid) VALUES (?, ?);";
-static constexpr const char* SQL_QUERY_GRID_BY_RID = "SELECT g_rid FROM GROUPMAPPING WHERE rid = ?;";
-static constexpr const char* SQL_QUERY_MAIL_BY_RID = "SELECT m_rid FROM GROUPMAPPING WHERE rid = ?;";
 static constexpr const char* SQL_CHECK_OVER_GROUP_LIMIT = R"(
     SELECT 1
     FROM GROUPMAPPING
@@ -71,9 +69,9 @@ bool EmailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_i
     return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_GROUP_LIMIT, limit);
 }
 
-bool EmailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
+bool EmailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& email_ids, uint32_t limit) const
 {
-    return HasMemberOverLimit(group_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
+    return HasMemberOverLimit(email_ids, SQL_CHECK_OVER_EMAIL_LIMIT, limit);
 }
 
 bool EmailGroupDao::HasMemberOverLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const

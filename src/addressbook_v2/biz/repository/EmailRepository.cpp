@@ -95,22 +95,22 @@ bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
     return result;
 }
 
-bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
+bool EmailRepository::IsMailExist(const std::vector<uint32_t>& email_ids) const
 {
     bool result = true;
-    if (!mail_ids.empty())
+    if (!email_ids.empty())
     {
-        result = m_mail_dao.IsExist(mail_ids);
+        result = m_mail_dao.IsExist(email_ids);
     }
     return result;
 }
 
-bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
+bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& email_ids)
 {
     bool result = true;
-    if (!mail_ids.empty())
+    if (!email_ids.empty())
     {
-        result = m_mail_dao.Remove(mail_ids);
+        result = m_mail_dao.Remove(email_ids);
     }
     return result;
 }

@@ -1,5 +1,5 @@
-#ifndef EmailGroupEntity_H
-#define EmailGroupEntity_H
+#ifndef EMAILGROUPENTITY_H
+#define EMAILGROUPENTITY_H
 
 #include "AbstractEntity.h"
 #include <cstdint>
@@ -41,4 +41,4 @@ class EmailGroupEntity : public AbstractEntity
     uint32_t m_group_rid;
 };
 
-#endif  // EmailGroupEntity_H
+#endif  // EMAILGROUPENTITY_H
