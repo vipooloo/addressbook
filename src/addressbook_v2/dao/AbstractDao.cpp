@@ -33,7 +33,7 @@ uint32_t AbstractDao::GetCount() const
     return ret;
 }
 
-bool AbstractDao::IsExist(const std::vector<uint32_t>& rids)
+bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
 {
     bool ret = false;
     if (!rids.empty())

@@ -47,7 +47,7 @@ class AbstractDao
         return true;
     }
     virtual uint32_t GetCount() const;
-    virtual bool IsExist(const std::vector<uint32_t>& rids);
+    virtual bool IsExist(const std::vector<uint32_t>& rids)const;
     virtual bool Remove(const std::vector<uint32_t>& rids);
     virtual bool RemoveAll()
     {

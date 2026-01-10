@@ -6,127 +6,92 @@
 
 namespace addrbook {
 EmailRepository::EmailRepository()
-  : m_mail_dao_sptr{std::make_shared<EmailDao>()}
-  , m_group_dao_sptr{std::make_shared<GroupDao>()}
-  , m_mail_group_dao_sptr{std::make_shared<MailGroupDao>()}
+  : m_mail_dao{}
+  , m_group_dao{}
+  , m_mail_group_dao{}
 {
-    if (m_mail_dao_sptr)
-    {
-        m_mail_dao_sptr->Create();
-    }
-    if (m_group_dao_sptr)
-    {
-        m_group_dao_sptr->Create();
-    }
-    if (m_mail_group_dao_sptr)
-    {
-        m_mail_group_dao_sptr->Create();
-    }
+    m_mail_dao.Create();
+    m_group_dao.Create();
+    m_mail_group_dao.Create();
 }
 
 uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<uint32_t>& rids)
 {
     uint32_t rid = 0;
-    if (m_mail_dao_sptr)
-    {
-        std::pair<bool, EmailEntity> result = m_mail_dao_sptr->Insert(entity);
-        if (result.first)
-        {
-            uint32_t email_rid = result.second.GetRid();
-            std::vector<MailGroupRelation> relations;
 
-            relations.reserve(rids.size());
-            std::transform(
-                rids.cbegin(),
-                rids.cend(),
-                std::back_inserter(relations),
-                [email_rid](uint32_t group_rid) {
-                    return MailGroupRelation(email_rid, group_rid);
-                });
-            if (AddEmailToGroupRelation(relations))
-            {
-                rid = email_rid;
-            }
+    std::pair<bool, EmailEntity> result = m_mail_dao.Insert(entity);
+    if (result.first)
+    {
+        uint32_t email_rid = result.second.GetRid();
+        std::vector<MailGroupRelation> relations;
+
+        relations.reserve(rids.size());
+        std::transform(
+            rids.cbegin(),
+            rids.cend(),
+            std::back_inserter(relations),
+            [email_rid](uint32_t group_rid) {
+                return MailGroupRelation(email_rid, group_rid);
+            });
+        if (AddEmailToGroupRelation(relations))
+        {
+            rid = email_rid;
         }
     }
+
     return rid;
 }
 
 uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& rids)
 {
     uint32_t rid = 0;
-    if (m_mail_dao_sptr)
+
+    std::pair<bool, GroupEntity> result = m_group_dao.Insert(entity);
+    if (result.first)
     {
-        std::pair<bool, GroupEntity> result = m_group_dao_sptr->Insert(entity);
-        if (result.first)
+        uint32_t group_rid = result.second.GetRid();
+        std::vector<MailGroupRelation> relations;
+        relations.reserve(rids.size());
+        std::transform(
+            rids.cbegin(),
+            rids.cend(),
+            std::back_inserter(relations),
+            [group_rid](uint32_t email_rid) {
+                return MailGroupRelation(email_rid, group_rid);
+            });
+        if (AddEmailToGroupRelation(relations))
         {
-            uint32_t group_rid = result.second.GetRid();
-            std::vector<MailGroupRelation> relations;
-            relations.reserve(rids.size());
-            std::transform(
-                rids.cbegin(),
-                rids.cend(),
-                std::back_inserter(relations),
-                [group_rid](uint32_t email_rid) {
-                    return MailGroupRelation(email_rid, group_rid);
-                });
-            if (AddEmailToGroupRelation(relations))
-            {
-                rid = group_rid;
-            }
+            rid = group_rid;
         }
     }
+
     return rid;
 }
 
 size_t EmailRepository::GetGroupCount() const
 {
-    size_t count = 0;
-    if (m_group_dao_sptr)
-    {
-        count = m_group_dao_sptr->GetCount();
-    }
-    return count;
+    return m_group_dao.GetCount();
 }
 
 uint32_t EmailRepository::GetEmailCount() const
 {
-    uint32_t count = 0;
-    if (m_mail_dao_sptr)
-    {
-        count = m_mail_dao_sptr->GetCount();
-    }
-    return count;
+    return m_mail_dao.GetCount();
 }
 
 bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
-    bool result = false;
-    if (m_mail_group_dao_sptr)
-    {
-        result = m_mail_group_dao_sptr->HasMemberOverGroupLimit(group_ids, count_limit);
-    }
-    return result;
+    return m_mail_group_dao.HasMemberOverGroupLimit(group_ids, count_limit);
 }
 
 bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
-    bool result = false;
-    if (m_mail_group_dao_sptr)
-    {
-        result = m_mail_group_dao_sptr->HasMemberOverEMailLimit(group_ids, count_limit);
-    }
-    return result;
+    return m_mail_group_dao.HasMemberOverEMailLimit(group_ids, count_limit);
 }
 
 bool EmailRepository::AddEmailToGroupRelation(const std::vector<MailGroupRelation>& items)
 {
-    bool result = false;
-    if (m_mail_dao_sptr)
-    {
-        result = m_mail_group_dao_sptr->InsertBatch(items);
-    }
-    return result;
+    return m_mail_group_dao.InsertBatch(items);
+    ;
 }
 
 bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
@@ -138,10 +103,7 @@ bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
     }
     else
     {
-        if (m_group_dao_sptr)
-        {
-            result = m_group_dao_sptr->IsExist(group_ids);
-        }
+        result = m_group_dao.IsExist(group_ids);
     }
     return result;
 }
@@ -155,10 +117,7 @@ bool EmailRepository::IsMailExist(const std::vector<uint32_t>& mail_ids) const
     }
     else
     {
-        if (m_mail_dao_sptr)
-        {
-            result = m_mail_dao_sptr->IsExist(mail_ids);
-        }
+        result = m_mail_dao.IsExist(mail_ids);
     }
     return result;
 }
@@ -172,10 +131,7 @@ bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& mail_ids)
     }
     else
     {
-        if (m_mail_dao_sptr)
-        {
-            result = m_mail_dao_sptr->Remove(mail_ids);
-        }
+        result = m_mail_dao.Remove(mail_ids);
     }
     return result;
 }
@@ -189,10 +145,7 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
     }
     else
     {
-        if (m_group_dao_sptr)
-        {
-            result = m_group_dao_sptr->Remove(group_ids);
-        }
+        result = m_group_dao.Remove(group_ids);
     }
     return result;
 }
@@ -200,28 +153,26 @@ bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
 bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids)
 {
     bool result = true;
-    if (m_mail_dao_sptr)
+
+    // 更新邮件表信息
+    result = m_mail_dao.Update(entity);
+    if (result && !new_group_rids.empty())
     {
-        // 更新邮件表信息
-        result = m_mail_dao_sptr->Update(entity);
-        if (result && !new_group_rids.empty())
+        // 映射表中增加信息
+        uint32_t email_rid = entity.GetRid();
+        // 添加邮件到组的映射关系
+        std::vector<MailGroupRelation> relations;
+        relations.reserve(new_group_rids.size());
+        std::transform(
+            new_group_rids.cbegin(),
+            new_group_rids.cend(),
+            std::back_inserter(relations),
+            [email_rid](uint32_t group_rid) {
+                return MailGroupRelation(email_rid, group_rid);
+            });
+        if (!AddEmailToGroupRelation(relations))
         {
-            // 映射表中增加信息
-            uint32_t email_rid = entity.GetRid();
-            // 添加邮件到组的映射关系
-            std::vector<MailGroupRelation> relations;
-            relations.reserve(new_group_rids.size());
-            std::transform(
-                new_group_rids.cbegin(),
-                new_group_rids.cend(),
-                std::back_inserter(relations),
-                [email_rid](uint32_t group_rid) {
-                    return MailGroupRelation(email_rid, group_rid);
-                });
-            if (!AddEmailToGroupRelation(relations))
-            {
-                result = false;
-            }
+            result = false;
         }
     }
     return result;
@@ -236,9 +187,9 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
 bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
 {
     bool ret = false;
-    if (m_mail_group_dao_sptr && mail_rid != 0)
+    if (mail_rid != 0)
     {
-        ret = m_mail_group_dao_sptr->RemoveByEmailRid(mail_rid);
+        ret = m_mail_group_dao.RemoveByEmailRid(mail_rid);
     }
     return ret;
 }
@@ -246,17 +197,16 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
 PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size)
 {
     PageResult result(page_num, page_size);
-    if (m_mail_group_dao_sptr)
+
+    if (keyword.empty())
     {
-        if (keyword.empty())
-        {
-            result = m_mail_dao_sptr->FindAll(page_num, page_size);
-        }
-        else
-        {
-            result = m_mail_dao_sptr->FindByPage(keyword, page_num, page_size);
-        }
+        result = m_mail_dao.FindAll(page_num, page_size);
     }
+    else
+    {
+        result = m_mail_dao.FindByPage(keyword, page_num, page_size);
+    }
+
     return result;
 }
 }  // namespace addrbook
