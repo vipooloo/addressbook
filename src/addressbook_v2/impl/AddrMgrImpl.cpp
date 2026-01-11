@@ -5,6 +5,7 @@
 #include "CheckerProvider.h"
 #include "CsvProcessor.h"
 #include <algorithm>
+#include <sys/stat.h>
 
 namespace addrbook {
 AddrMgrImpl::AddrMgrImpl()
@@ -26,10 +27,10 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
     std::shared_ptr<ImportExportEvent> event_sptr = std::static_pointer_cast<ImportExportEvent>(evt_sptr);
     if (event_sptr)
     {
-        std::lock_guard<std::mutex> lock(m_mtx);
         EventType event_type = event_sptr->GetType();
         if (EventType::EMail_Import == event_type)
         {
+            ImportEmailsSync(event_sptr->GetFilePath(), event_sptr->GetCallback());
         }
         else if (EventType::EMail_Export == event_type)
         {
@@ -118,8 +119,18 @@ std::pair<ResultCode, SearchEmailResult> AddrMgrImpl::SearchEmail(const std::str
 
 ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
 {
-    m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, cb));
-    return ResultCode::kSuccess;
+    ResultCode rsult = ResultCode::kInvalidParam;
+
+    struct stat stat_buf = {};
+    if (stat(file_path.c_str(), &stat_buf) == 0)
+    {
+        if (S_ISREG(stat_buf.st_mode) && stat_buf.st_size > 0)
+        {
+            m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, cb));
+            rsult = ResultCode::kSuccess;
+        }
+    }
+    return rsult;
 }
 
 ResultCode AddrMgrImpl::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
@@ -138,6 +149,33 @@ void AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& obs
     m_evt_dispatcher.Unregister(observer);
 }
 
+void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExportCallback& cb)
+{
+    addrbook::CsvReader csv_reader(file_path, {"邮件名字", "邮件地址", "邮件组名字"});
+    std::vector<std::string> row;
+    addrbook::CsvStatus status = CSV_ERROR_INIT_FAILED;
+    while (true)
+    {
+        // 逐行读取
+        status = csv_reader.ReadNextRow(row);
+        if (status == addrbook::CSV_SUCCESS)
+        {
+            AB_LOG_E("CYP %s", AddrMgrUtilities::Join(row).c_str());
+        }
+        else if (status == addrbook::CSV_EOF)
+        {
+            break;
+        }
+        else
+        {
+            break;
+        }
+        // 转换为DTO
+        // 添加 && 回调
+        // 变更通知
+    }
+}
+
 void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExportCallback& cb)
 {
     uint32_t cur_page = 0;
@@ -145,6 +183,7 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     uint32_t total_pages = 1;
     bool is_success = true;
 
+    std::lock_guard<std::mutex> lock(m_mtx);
     while (cur_page < total_pages)
     {
         ++cur_page;

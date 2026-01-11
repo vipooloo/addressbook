@@ -40,6 +40,7 @@ class AddrMgrImpl
     AddrMgrImpl& operator=(AddrMgrImpl&&) noexcept = delete;
 
     void EventHandler(const std::shared_ptr<IEvent>& evt_sptr);
+    void ImportEmailsSync(const std::string& file_path, const ImportExportCallback& cb);
     void ExportEmailsSync(const std::string& file_path, const ImportExportCallback& cb);
 
   private:

@@ -34,9 +34,12 @@ void Add()
         }
         std::cout << std::endl;
     }
+    
     ImportExportCallback callback = [](const std::string& file_name, bool) {
         std::cout << "文件名:" << file_name << std::endl;
     };
     AddressManager::ExportEmails("emails.csv", callback);
     AddressManager::ExportEmails(callback);
+
+    AddressManager::ImportEmails("1.csv", callback);
 }

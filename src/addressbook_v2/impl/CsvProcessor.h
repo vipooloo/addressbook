@@ -11,12 +11,13 @@ namespace addrbook {
 enum CsvStatus : uint8_t
 {
     CSV_SUCCESS = 0,
-    CSV_ERROR_FILE_OPEN = 1,
-    CSV_ERROR_HEADER_MISMATCH = 2,
-    CSV_ERROR_PARSE = 3,
-    CSV_ERROR_WRITE = 4,
-    CSV_EOF = 5,
-    CSV_ERROR_INIT_FAILED = 6
+    CSV_ERROR_FILE_OPEN,
+    CSV_ERROR_HEADER_MISMATCH,
+    CSV_ERROR_READ,
+    CSV_ERROR_PARSE,
+    CSV_ERROR_WRITE,
+    CSV_EOF,
+    CSV_ERROR_INIT_FAILED
 };
 
 class CsvBase
@@ -73,7 +74,7 @@ class CsvReader : public CsvBase
     CsvReader(const std::string& file_name, const std::vector<std::string>& header_list);
     ~CsvReader() override;
 
-    CsvStatus ReadBatch(uint32_t max_rows, std::vector<std::vector<std::string>>& batch_out);
+    CsvStatus ReadNextRow(std::vector<std::string>& row_out);
 
   private:
     std::ifstream m_ifs;

@@ -173,66 +173,71 @@ CsvReader::~CsvReader()
     }
 }
 
-CsvStatus CsvReader::ReadBatch(uint32_t max_rows, std::vector<std::vector<std::string>>& batch_out)
+CsvStatus CsvReader::ReadNextRow(std::vector<std::string>& row_out)
 {
     CsvStatus current_status = CSV_SUCCESS;
 
-    do
+    // 1. 基础状态检查
+    if (GetInitStatusVal() != CSV_SUCCESS)
     {
-        if (GetInitStatusVal() != CSV_SUCCESS)
-        {
-            current_status = CSV_ERROR_INIT_FAILED;
-            break;
-        }
-
-        if (!m_ifs.is_open())
-        {
-            current_status = CSV_ERROR_FILE_OPEN;
-            break;
-        }
-
-        batch_out.clear();
+        current_status = CSV_ERROR_INIT_FAILED;
+    }
+    else if (!m_ifs.is_open())
+    {
+        current_status = CSV_ERROR_FILE_OPEN;
+    }
+    else
+    {
+        // 2. 准备读取变量
         std::string line_str = "";
-        uint32_t count = 0;
         const std::vector<std::string>& fixed_headers = GetFixedHeaders();
+        size_t header_count = fixed_headers.size();
+        bool found_valid_row = false;
 
-        while (count < max_rows && std::getline(m_ifs, line_str))
+        // 默认状态设为读取错误，只有成功解析或正常EOF时才修改
+        current_status = CSV_ERROR_READ;
+
+        // 3. 循环读取
+        while (std::getline(m_ifs, line_str))
         {
             if (line_str.empty())
             {
                 continue;
             }
-            if (line_str[line_str.size() - 1] == '\r')
+            // 处理 Windows 换行符
+            if (line_str.back() == '\r')
             {
-                line_str.erase(line_str.size() - 1);
+                line_str.pop_back();
             }
             if (line_str.empty())
             {
                 continue;
             }
-
-            std::vector<std::string> row;
-            ParseLine(line_str, row);
-
-            if (row.size() == fixed_headers.size())
+            ParseLine(line_str, row_out);
+            // 校验列数
+            if (row_out.size() == header_count)
             {
-                batch_out.push_back(row);
-                count = count + 1;
+                current_status = CSV_SUCCESS;
+                found_valid_row = true;
+                // 找到有效行，跳出循环
+                break;
+            }
+            // 如果列数不匹配，视为脏数据，继续下一次循环
+        }
+
+        // 4. 循环结束后的状态修正
+        // 如果没找到有效行，且并未发生错误（仅仅是读完了），则修正为 EOF
+        if (!found_valid_row)
+        {
+            if (m_ifs.eof())
+            {
+                current_status = CSV_EOF;
             }
         }
-
-        // 检查 EOF 状态
-        if (batch_out.empty() && m_ifs.eof())
-        {
-            current_status = CSV_EOF;
-            break;
-        }
-
-    } while (false);
+    }
 
     return current_status;
 }
-
 // ==========================================
 // CsvWriter 实现
 // ==========================================
