@@ -37,16 +37,6 @@ class PageResult
         return m_page_size;
     }
 
-    size_t GetTotalPages() const
-    {
-        size_t total_pages = 0;
-        if (m_page_size != 0)
-        {
-            total_pages = (m_total_records + m_page_size - 1) / m_page_size;
-        }
-        return total_pages;
-    }
-
     const std::vector<std::shared_ptr<AbstractEntity>>& GetRecords() const
     {
         return m_records;

@@ -91,8 +91,15 @@ std::pair<ResultCode, EmailDto> AddrMgrImpl::AddEmail(const EmailDto& dto)
 
 std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
 {
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.AddGroup(dto);
+    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        return m_email_srv.AddGroup(dto);
+    }
+    else
+    {
+        return std::make_pair(ResultCode::kInvalidParam, dto);
+    }
 }
 
 ResultCode AddrMgrImpl::RemoveEmail(const std::vector<uint32_t>& rids)

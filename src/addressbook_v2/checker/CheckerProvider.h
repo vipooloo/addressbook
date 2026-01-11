@@ -2,6 +2,7 @@
 #define CHECKERPROVIDER_H
 
 #include "EmailDtoChecker.h"
+#include "GroupDtoChecker.h"
 
 namespace addrbook {
 class CheckerProvider
@@ -17,6 +18,10 @@ class CheckerProvider
     {
         return m_email_checker.Verify(dto);
     }
+    bool Verify(const GroupDto& dto) const
+    {
+        return m_group_checker.Verify(dto);
+    }
 
   private:
     CheckerProvider();
@@ -28,6 +33,7 @@ class CheckerProvider
 
   private:
     EmailDtoChecker m_email_checker;
+    GroupDtoChecker m_group_checker;
 };
 }  // namespace addrbook
 
