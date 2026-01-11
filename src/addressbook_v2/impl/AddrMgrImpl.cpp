@@ -33,45 +33,7 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
         }
         else if (EventType::EMail_Export == event_type)
         {
-            uint32_t cur_page = 0;
-            uint32_t page_size = 10;
-            uint32_t total_pages = 1;
-            bool is_success = true;
-            std::string file_name = event_sptr->GetFilePath();
-            std::string out_file_name = file_name.empty() ? AddrMgrUtilities::GenerateTimestampedFileName(EMAIL_EXPORT_PREFIX, EXPORT_FILE_SUFFIX) : file_name;
-            while (cur_page < total_pages)
-            {
-                ++cur_page;
-                std::pair<ResultCode, SearchEmailResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
-                if (result.first == ResultCode::kSuccess)
-                {
-                    SearchEmailResult& export_res = result.second;
-                    const std::vector<EmailDto>& records = export_res.GetRecords();
-                    std::vector<std::vector<std::string>> items;
-                    std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
-                        std::vector<std::string> item;
-                        const std::string& name = dto.GetName();
-                        const std::string& email = dto.GetAddress();
-                        item.emplace_back(name);
-                        item.emplace_back(email);
-                        return item;
-                    });
-                    addrbook::CsvWriter csv_writer(out_file_name, {"列A", "列B"});
-                    csv_writer.WriteBatch(items);
-                    total_pages = export_res.GetTotalPages();
-                }
-                else
-                {
-                    is_success = false;
-                    AB_LOG_E("export email failed, code: %u", static_cast<uint32_t>(result.first));
-                    break;
-                }
-            }
-            ImportExportCallback cb = event_sptr->GetCallback();
-            if (cb)
-            {
-                cb(out_file_name, is_success);
-            }
+            ExportEmailsSync(event_sptr->GetFilePath(), event_sptr->GetCallback());
         }
     }
 }
@@ -174,6 +136,47 @@ void AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& obser
 void AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
     m_evt_dispatcher.Unregister(observer);
+}
+
+void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExportCallback& cb)
+{
+    uint32_t cur_page = 0;
+    uint32_t page_size = 10;
+    uint32_t total_pages = 1;
+    bool is_success = true;
+
+    while (cur_page < total_pages)
+    {
+        ++cur_page;
+        std::pair<ResultCode, SearchEmailResult> result = m_email_srv.SearchEmail("", cur_page, page_size);
+        if (result.first == ResultCode::kSuccess)
+        {
+            SearchEmailResult& export_res = result.second;
+            const std::vector<EmailDto>& records = export_res.GetRecords();
+            std::vector<std::vector<std::string>> items;
+            std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
+                std::vector<std::string> item;
+                const std::string& name = dto.GetName();
+                const std::string& email = dto.GetAddress();
+                item.emplace_back(name);
+                item.emplace_back(email);
+                return item;
+            });
+            addrbook::CsvWriter csv_writer(file_path, {"列A", "列B"});
+            csv_writer.WriteBatch(items);
+            total_pages = export_res.GetTotalPages();
+        }
+        else
+        {
+            is_success = false;
+            AB_LOG_E("export email failed, code: %u", static_cast<uint32_t>(result.first));
+            break;
+        }
+    }
+    if (cb)
+    {
+        cb(file_path, is_success);
+    }
 }
 
 }  // namespace addrbook

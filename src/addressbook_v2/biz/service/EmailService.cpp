@@ -213,8 +213,7 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
 
 std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
 {
-    std::pair<ResultCode, SearchEmailResult> ret = std::make_pair(ResultCode::kSuccess, SearchEmailResult(current_page, page_size));
-    SearchEmailResult& result = ret.second;
+    std::pair<ResultCode, SearchEmailResult> result = std::make_pair(ResultCode::kSuccess, SearchEmailResult(current_page, page_size));
 
     TransactionGuard trans_guard;
     PageResult page_result = m_mail_rep.GetEmailsByKeyword(keyword, current_page, page_size);
@@ -235,10 +234,10 @@ std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::st
         return EmailDto();
     });
     trans_guard.Commit();
-    result.SetTotalRecords(page_result.GetTotalRecords());
-    result.SetRecords(dtos);
+    result.second.SetTotalRecords(page_result.GetTotalRecords());
+    result.second.SetRecords(dtos);
 
-    return ret;
+    return result;
 }
 
 void EmailService::DataChanged(ResultCode res, ChangeType type)

@@ -4,7 +4,7 @@
 
 std::pair<ResultCode, EmailDto> AddressManager::AddEmail(const EmailDto& dto)
 {
-   return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
+    return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
 }
 
 std::pair<ResultCode, GroupDto> AddressManager::AddGroup(const GroupDto& dto)
@@ -44,7 +44,8 @@ ResultCode AddressManager::ImportEmails(const std::string& file_path, const Impo
 
 ResultCode AddressManager::ExportEmails(const ImportExportCallback& cb)
 {
-    return addrbook::AddrMgrImpl::GetInstance().ExportEmails("", cb);
+    std::string file_path = AddrMgrUtilities::GenerateTimestampedFileName(EMAIL_EXPORT_PREFIX, EXPORT_FILE_SUFFIX);
+    return AddressManager::ExportEmails(file_path, cb);
 }
 
 ResultCode AddressManager::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
