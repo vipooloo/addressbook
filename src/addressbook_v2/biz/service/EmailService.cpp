@@ -168,30 +168,16 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
     ResultCode result = ResultCode::kSuccess;
     do
     {
-        // 输入合法验证
-        if (dto.GetName().empty() || dto.GetAddress().empty())
-        {
-            AB_LOG_E("Invalid email name or address");
-            result = ResultCode::kInvalidParam;
-            break;
-        }
-        // 检查邮件组数量是否超了规格上限
-        std::vector<uint32_t> new_group_rids = dto.GetGroupRids();
-        if (new_group_rids.size() > kMaxGroupsPerEmail)
-        {
-            AB_LOG_E("Exceed max group count");
-            result = ResultCode::kExceedMaxCount;
-            break;
-        }
         TransactionGuard trans_guard;
         // 删除旧关系
         if (!m_mail_rep.RemoveGroupByMailRid(dto.GetRid()))
         {
-            AB_LOG_E("Failed to remove group from database");
+            AB_LOG_E("Failed to remove group by mail rid");
             result = ResultCode::kDbError;
             break;
         }
         // 检查邮件组是否存在
+        std::vector<uint32_t> new_group_rids = dto.GetGroupRids();
         bool group_exist = m_mail_rep.IsGroupExist(new_group_rids);
         if (!group_exist)
         {

@@ -7,20 +7,20 @@
 
 namespace addrbook {
 EmailDao::EmailDao()
-  : AbstractDao(EMAIL_SQL_TABLE_NAME)
+  : AbstractDao(SQL_EMAIL_TABLE_NAME)
 {
 }
 
 bool EmailDao::Create()
 {
-    return AbstractDao::OnExecuteSql(EMAIL_SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(SQL_EMAIL_CREATE_TABLE);
 }
 
 std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
 {
     std::pair<bool, EmailEntity> result = {false, entity};
 
-    SQLite::Statement stmt(AbstractDao::GetDb(), EMAIL_SQL_INSERT);
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_EMAIL_INSERT);
     stmt.bind(1, entity.GetEmailAddress());
     stmt.bind(2, entity.GetEmailName());
 
@@ -33,7 +33,7 @@ std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
     }
     else
     {
-        AB_LOG_E("%s failed code:%d", EMAIL_SQL_INSERT, code);
+        AB_LOG_E("%s failed code:%d", SQL_EMAIL_INSERT, code);
     }
 
     return result;
@@ -46,7 +46,7 @@ bool EmailDao::Update(const EmailEntity& entity)
     stmt_params.emplace_back(entity.GetEmailName());
     stmt_params.emplace_back(entity.GetRid());
 
-    return OnExecuteSql(EMAIL_SQL_UPDATE, stmt_params);
+    return OnExecuteSql(SQL_EMAIL_UPDATE, stmt_params);
 }
 
 std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement& stmt)
@@ -62,7 +62,7 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
 
 PageResult EmailDao::FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size)
 {
-    CustomWhere conditions(EMAIL_SQL_SELECT_WITH_GROUPS_BY_PAGE, EMAIL_SQL_WHERE_SEARCH_KEYWORD);
+    CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_SEARCH_KEYWORD);
     conditions.AddWhereArg("%" + keyword + "%");
     conditions.AddWhereArg("%" + keyword + "%");
     QueryParams params(page_num, page_size, conditions);
@@ -72,7 +72,7 @@ PageResult EmailDao::FindByPage(const std::string& keyword, uint32_t page_num, u
 
 PageResult EmailDao::FindAll(uint32_t page_num, uint32_t page_size)
 {
-    CustomWhere conditions(EMAIL_SQL_SELECT_WITH_GROUPS_BY_PAGE, EMAIL_SQL_WHERE_NO_FILTER);
+    CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER);
     QueryParams params(page_num, page_size, conditions);
 
     return AbstractDao::DoFindByPage(params);

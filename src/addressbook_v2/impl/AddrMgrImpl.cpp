@@ -133,8 +133,13 @@ ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& rids)
 
 ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
 {
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.UpdateEmail(dto);
+    ResultCode rsult = ResultCode::kInvalidParam;
+    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        rsult = m_email_srv.UpdateEmail(dto);
+    }
+    return rsult;
 }
 
 ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)

@@ -84,7 +84,7 @@ PageResult AbstractDao::DoFindByPage(const QueryParams& params)
 
 size_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere& conditions)
 {
-    std::string sql = AddrMgrUtilities::ReplaceFirst(COMMON_SQL_QUERY_COUNT, m_table_name);
+    std::string sql = AddrMgrUtilities::ReplaceFirst(SQL_COMMON_QUERY_COUNT, m_table_name);
     sql = AddrMgrUtilities::ReplaceFirst(sql, where_sql);
 
     SQLite::Statement stmt(AbstractDao::GetDb(), sql);

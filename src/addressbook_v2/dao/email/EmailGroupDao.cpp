@@ -7,13 +7,13 @@
 
 namespace addrbook {
 EmailGroupDao::EmailGroupDao()
-  : AbstractDao(EMAILGROUP_SQL_TABLE_NAME)
+  : AbstractDao(SQL_EMAILGROUP_TABLE_NAME)
 {
 }
 
 bool EmailGroupDao::Create()
 {
-    return AbstractDao::OnExecuteSql(EMAILGROUP_SQL_CREATE_TABLE);
+    return AbstractDao::OnExecuteSql(SQL_EMAILGROUP_CREATE_TABLE);
 }
 
 bool EmailGroupDao::InsertBatch(const std::vector<EmailGroupEntity>& items)
@@ -30,17 +30,17 @@ bool EmailGroupDao::InsertBatch(const std::vector<EmailGroupEntity>& items)
             return stmt_params;
         });
 
-    return AbstractDao::OnExecuteSql(EMAILGROUP_SQL_INSERT, stmt_paramss);
+    return AbstractDao::OnExecuteSql(SQL_EMAILGROUP_INSERT, stmt_paramss);
 }
 
 bool EmailGroupDao::HasMemberOverGroupLimit(const std::vector<uint32_t>& group_ids, uint32_t limit) const
 {
-    return CheckMemberLimit(group_ids, EMAILGROUP_SQL_CHECK_OVER_GROUP_LIMIT, limit);
+    return CheckMemberLimit(group_ids, SQL_EMAILGROUP_CHECK_OVER_GROUP_LIMIT, limit);
 }
 
 bool EmailGroupDao::HasMemberOverEMailLimit(const std::vector<uint32_t>& email_ids, uint32_t limit) const
 {
-    return CheckMemberLimit(email_ids, EMAILGROUP_SQL_CHECK_OVER_EMAIL_LIMIT, limit);
+    return CheckMemberLimit(email_ids, SQL_EMAILGROUP_CHECK_OVER_EMAIL_LIMIT, limit);
 }
 
 bool EmailGroupDao::CheckMemberLimit(const std::vector<uint32_t>& ids, const std::string& content, uint32_t limit) const
@@ -69,6 +69,6 @@ bool EmailGroupDao::RemoveByEmailRid(uint32_t email_rid)
 {
     StmtParam param(email_rid);
 
-    return AbstractDao::OnExecuteSql(EMAILGROUP_SQL_REMOVE_BY_EMAIL_RID, {param});
+    return AbstractDao::OnExecuteSql(SQL_EMAILGROUP_REMOVE_BY_EMAIL_RID, {param});
 }
 }  // namespace addrbook

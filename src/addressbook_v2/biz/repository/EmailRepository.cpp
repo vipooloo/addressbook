@@ -75,14 +75,14 @@ uint32_t EmailRepository::GetEmailCount() const
     return m_mail_dao.GetCount();
 }
 
+bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& email_ids, uint32_t count_limit)
+{
+    return m_mail_group_dao.HasMemberOverEMailLimit(email_ids, count_limit);
+}
+
 bool EmailRepository::CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
 {
     return m_mail_group_dao.HasMemberOverGroupLimit(group_ids, count_limit);
-}
-
-bool EmailRepository::CanAddEmail(const std::vector<uint32_t>& group_ids, uint32_t count_limit)
-{
-    return m_mail_group_dao.HasMemberOverEMailLimit(group_ids, count_limit);
 }
 
 bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
@@ -131,11 +131,10 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
 
     // 更新邮件表信息
     result = m_mail_dao.Update(entity);
+    // 更新关联邮件组信息
     if (result && !new_group_rids.empty())
     {
-        // 映射表中增加信息
         uint32_t email_rid = entity.GetRid();
-        // 添加邮件到组的映射关系
         std::vector<EmailGroupEntity> relations;
         relations.reserve(new_group_rids.size());
         std::transform(
@@ -150,6 +149,7 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
             result = false;
         }
     }
+
     return result;
 }
 

@@ -2,17 +2,17 @@
 #define ADDRMGRSQLDEFS_H
 
 //###########################################################################################################################################
-static constexpr const char* COMMON_SQL_QUERY_COUNT = "SELECT COUNT(*) FROM %s WHERE %s;";
+static constexpr const char* SQL_COMMON_QUERY_COUNT = "SELECT COUNT(*) FROM %s WHERE %s;";
 //###########################################################################################################################################
 /// @brief 电子邮件数据库表名
-static constexpr const char* EMAIL_SQL_TABLE_NAME = "email";
+static constexpr const char* SQL_EMAIL_TABLE_NAME = "email";
 
 /// @brief 创建电子邮件表的 SQL 语句
 /// @details 定义了表结构：
 /// - rid: 主键，自增整数
 /// - email_address: 邮箱地址
 /// - email_name: 邮箱显示名称
-static constexpr const char* EMAIL_SQL_CREATE_TABLE = R"(
+static constexpr const char* SQL_EMAIL_CREATE_TABLE = R"(
     CREATE TABLE IF NOT EXISTS email (
         rid INTEGER PRIMARY KEY AUTOINCREMENT, 
         email_address TEXT, 
@@ -24,14 +24,14 @@ static constexpr const char* EMAIL_SQL_CREATE_TABLE = R"(
 /// @note 绑定参数顺序:
 /// 1. email_address (TEXT)
 /// 2. email_name (TEXT)
-static constexpr const char* EMAIL_SQL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
+static constexpr const char* SQL_EMAIL_INSERT = "INSERT INTO email (email_address, email_name) VALUES (?, ?);";
 
 /// @brief 更新邮件记录的 SQL 语句
 /// @note 绑定参数顺序:
 /// 1. email_address (TEXT)
 /// 2. email_name (TEXT)
 /// 3. rid (INTEGER) - 用于指定要更新的记录 ID
-static constexpr const char* EMAIL_SQL_UPDATE = "UPDATE email SET email_address = ?, email_name = ? WHERE rid = ?;";
+static constexpr const char* SQL_EMAIL_UPDATE = "UPDATE email SET email_address = ?, email_name = ? WHERE rid = ?;";
 
 /// @brief 分页查询邮件列表及其关联群组信息的 SQL 语句
 /// @details
@@ -48,7 +48,7 @@ static constexpr const char* EMAIL_SQL_UPDATE = "UPDATE email SET email_address 
 /// 绑定参数 (?):
 /// - Param 1: LIMIT (每页数量)
 /// - Param 2: OFFSET (分页偏移量)
-static constexpr const char* EMAIL_SQL_SELECT_WITH_GROUPS_BY_PAGE = R"(
+static constexpr const char* SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE = R"(
     SELECT  m.rid
         ,m.email_address
         ,m.email_name
@@ -68,21 +68,21 @@ static constexpr const char* EMAIL_SQL_SELECT_WITH_GROUPS_BY_PAGE = R"(
 /// @brief 基于关键字模糊搜索的 WHERE 子句片段
 /// @details 用于在 email_address 或 email_name 中进行模糊匹配。
 /// 需要绑定两个相同的参数（搜索关键字）。
-static constexpr const char* EMAIL_SQL_WHERE_SEARCH_KEYWORD = "email_address LIKE ? OR email_name LIKE ?";
+static constexpr const char* SQL_EMAIL_WHERE_SEARCH_KEYWORD = "email_address LIKE ? OR email_name LIKE ?";
 
 /// @brief 默认无过滤条件的 WHERE 子句片段
 /// @details "1 = 1" 恒为真，用于在没有搜索条件时占位，保证 SQL 语法的完整性。
-static constexpr const char* EMAIL_SQL_WHERE_NO_FILTER = "1 = 1";
+static constexpr const char* SQL_EMAIL_WHERE_NO_FILTER = "1 = 1";
 
 //###########################################################################################################################################
 /// @brief 邮件组数据库表名
-static constexpr const char* GROUP_SQL_TABLE_NAME = "mail_group";
+static constexpr const char* SQL_GROUP_TABLE_NAME = "mail_group";
 
 /// @brief 创建邮件组表的 SQL 语句
 /// @details 定义了表结构：
 /// - rid: 主键，自增整数
 /// - group_name: 邮件组显示名称
-static constexpr const char* GROUP_SQL_CREATE_TABLE = R"(
+static constexpr const char* SQL_GROUP_CREATE_TABLE = R"(
 CREATE TABLE IF NOT EXISTS mail_group (
     rid INTEGER PRIMARY KEY AUTOINCREMENT, 
     group_name TEXT
@@ -92,11 +92,11 @@ CREATE TABLE IF NOT EXISTS mail_group (
 /// @brief 插入新邮件组记录的 SQL 语句
 /// @note 绑定参数顺序:
 /// 1. group_name (TEXT)
-static constexpr const char* GROUP_SQL_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
+static constexpr const char* SQL_GROUP_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
 //###########################################################################################################################################
 /// @brief 邮件与群组关联映射表的表名
-static constexpr const char* EMAILGROUP_SQL_TABLE_NAME = "GROUPMAPPING";
+static constexpr const char* SQL_EMAILGROUP_TABLE_NAME = "GROUPMAPPING";
 
 /// @brief 创建关联映射表的 SQL 语句
 /// @details 定义了邮件 (m_rid) 和群组 (g_rid) 的多对多关系。
@@ -108,7 +108,7 @@ static constexpr const char* EMAILGROUP_SQL_TABLE_NAME = "GROUPMAPPING";
 /// 约束特性：
 /// - 外键约束: 启用级联删除 (ON DELETE CASCADE)，当邮件或群组被删时，关联关系自动移除。
 /// - 唯一约束: (m_rid, g_rid) 联合唯一，防止重复添加相同的关联。
-static constexpr const char* EMAILGROUP_SQL_CREATE_TABLE = R"(
+static constexpr const char* SQL_EMAILGROUP_CREATE_TABLE = R"(
     CREATE TABLE IF NOT EXISTS GROUPMAPPING (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         m_rid INTEGER,  
@@ -123,7 +123,7 @@ static constexpr const char* EMAILGROUP_SQL_CREATE_TABLE = R"(
 /// @note 绑定参数顺序:
 /// 1. m_rid (邮件 RID)
 /// 2. g_rid (群组 RID)
-static constexpr const char* EMAILGROUP_SQL_INSERT = "INSERT INTO GROUPMAPPING (m_rid, g_rid) VALUES (?, ?);";
+static constexpr const char* SQL_EMAILGROUP_INSERT = "INSERT INTO GROUPMAPPING (m_rid, g_rid) VALUES (?, ?);";
 
 /// @brief 检查邮件所属的群组数量是否超过限制
 /// @details
@@ -136,7 +136,7 @@ static constexpr const char* EMAILGROUP_SQL_INSERT = "INSERT INTO GROUPMAPPING (
 /// - Param 1: 允许的最大群组数量 (limit)
 ///
 /// @return 如果查询返回 1，表示存在超限情况。
-static constexpr const char* EMAILGROUP_SQL_CHECK_OVER_GROUP_LIMIT = R"(
+static constexpr const char* SQL_EMAILGROUP_CHECK_OVER_GROUP_LIMIT = R"(
     SELECT  1
     FROM GROUPMAPPING
     WHERE g_rid IN (%s)
@@ -156,7 +156,7 @@ static constexpr const char* EMAILGROUP_SQL_CHECK_OVER_GROUP_LIMIT = R"(
 /// - Param 1: 允许的最大成员数量 (limit)
 ///
 /// @return 如果查询返回 1，表示存在超限情况。
-static constexpr const char* EMAILGROUP_SQL_CHECK_OVER_EMAIL_LIMIT = R"(
+static constexpr const char* SQL_EMAILGROUP_CHECK_OVER_EMAIL_LIMIT = R"(
     SELECT 1
     FROM GROUPMAPPING
     WHERE m_rid IN (%s)
@@ -169,7 +169,7 @@ static constexpr const char* EMAILGROUP_SQL_CHECK_OVER_EMAIL_LIMIT = R"(
 /// @details 通常用于在彻底删除邮件前清理关联，或重置某邮件的群组关系。
 /// @note 绑定参数:
 /// 1. m_rid (邮件 RID)
-static constexpr const char* EMAILGROUP_SQL_REMOVE_BY_EMAIL_RID = R"(DELETE FROM GROUPMAPPING WHERE m_rid = ?;)";
+static constexpr const char* SQL_EMAILGROUP_REMOVE_BY_EMAIL_RID = R"(DELETE FROM GROUPMAPPING WHERE m_rid = ?;)";
 
 //###########################################################################################################################################
 #endif  // ADDRMGRSQLDEFS_H
