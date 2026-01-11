@@ -19,7 +19,7 @@ std::vector<uint32_t> AddrMgrUtilities::GetSortedUniqueRids(const std::vector<ui
     return unique_rids;
 }
 
-std::string AddrMgrUtilities::JoinIds(const std::vector<uint32_t>& rids)
+std::string AddrMgrUtilities::Join(const std::vector<uint32_t>& rids, const char* delimiter)
 {
     std::string result;
     if (!rids.empty())
@@ -29,8 +29,25 @@ std::string AddrMgrUtilities::JoinIds(const std::vector<uint32_t>& rids)
         result += std::to_string(rids[0]);
         for (size_t i = 1; i < rids.size(); ++i)
         {
-            result += ",";
+            result += delimiter;
             result += std::to_string(rids[i]);
+        }
+    }
+    return result;
+}
+
+std::string AddrMgrUtilities::Join(const std::vector<std::string>& vec, const char* delimiter)
+{
+    std::string result;
+    if (!vec.empty())
+    {
+        // 预估大小，避免多次内存分配
+        result.reserve(vec.size() * 10);
+        result += vec[0];
+        for (size_t i = 1; i < vec.size(); ++i)
+        {
+            result += delimiter;
+            result += vec[i];
         }
     }
     return result;

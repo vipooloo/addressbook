@@ -47,7 +47,7 @@ bool EmailGroupDao::CheckMemberLimit(const std::vector<uint32_t>& ids, const std
 {
     bool ret = false;
 
-    std::string str_sql = AddrMgrUtilities::ReplaceFirst(content, AddrMgrUtilities::JoinIds(ids));
+    std::string str_sql = AddrMgrUtilities::ReplaceFirst(content, AddrMgrUtilities::Join(ids));
 
     SQLite::Statement stmt(AbstractDao::GetDb(), str_sql);
     stmt.bind(1, limit);

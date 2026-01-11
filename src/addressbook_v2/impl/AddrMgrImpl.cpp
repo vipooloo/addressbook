@@ -156,13 +156,12 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
             std::vector<std::vector<std::string>> items;
             std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
                 std::vector<std::string> item;
-                const std::string& name = dto.GetName();
-                const std::string& email = dto.GetAddress();
-                item.emplace_back(name);
-                item.emplace_back(email);
+                item.emplace_back(dto.GetName());
+                item.emplace_back(dto.GetAddress());
+                item.emplace_back(AddrMgrUtilities::Join(dto.GetGroupNames(), ","));
                 return item;
             });
-            addrbook::CsvWriter csv_writer(file_path, {"列A", "列B"});
+            addrbook::CsvWriter csv_writer(file_path, {"邮件名字", "邮件地址", "邮件组名字"});
             csv_writer.WriteBatch(items);
             total_pages = export_res.GetTotalPages();
         }

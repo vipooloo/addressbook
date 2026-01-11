@@ -82,7 +82,6 @@ class CsvReader : public CsvBase
 class CsvWriter : public CsvBase
 {
   public:
-    // is_append: true为追加，false为覆盖
     CsvWriter(const std::string& file_name, const std::vector<std::string>& header_list);
     ~CsvWriter() override;
 

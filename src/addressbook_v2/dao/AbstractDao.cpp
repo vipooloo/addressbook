@@ -36,7 +36,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
     bool ret = false;
     if (!rids.empty())
     {
-        std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_exist, AddrMgrUtilities::JoinIds(rids));
+        std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_exist, AddrMgrUtilities::Join(rids));
 
         SQLite::Statement stmt(GetDb(), sql);
         int32_t code = stmt.tryExecuteStep();
@@ -62,7 +62,7 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
 
 bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
 {
-    std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_delete_by_rid, AddrMgrUtilities::JoinIds(rids));
+    std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_delete_by_rid, AddrMgrUtilities::Join(rids));
     return OnExecuteSql(sql);
 }
 
