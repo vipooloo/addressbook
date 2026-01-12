@@ -160,7 +160,13 @@ void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExp
         status = csv_reader.ReadNextRow(row);
         if (status == addrbook::CSV_SUCCESS)
         {
-            AB_LOG_E("CYP %s", AddrMgrUtilities::Join(row).c_str());
+            std::string group_names = row[2];
+            std::vector<std::string> group_names_vec = AddrMgrUtilities::Split(group_names, ",");
+            EmailDto dto(row[0], row[1], group_names_vec);
+            if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+            {
+                m_email_srv.AddEmailAndGroup(dto);
+            }
         }
         else if (status == addrbook::CSV_EOF)
         {

@@ -50,6 +50,11 @@ bool EmailDtoChecker::BasickInfoCheck(const EmailDto& dto) const
             AB_LOG_E("Too many groups");
             break;
         }
+        if (dto.GetGroupNames().size() > kMaxGroupsPerEmail)
+        {
+            AB_LOG_E("Too many groups");
+            break;
+        }
         std::set<uint32_t> rid_set(rids.cbegin(), rids.cend());
         if (rid_set.size() != rids.size())
         {

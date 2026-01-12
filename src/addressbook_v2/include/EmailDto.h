@@ -12,6 +12,10 @@ class EmailDto
       : EmailDto(0, "", "", {})
     {
     }
+    EmailDto(const std::string& address, const std::string& name)
+      : EmailDto(0, address, name, {}, {})
+    {
+    }
     EmailDto(const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids)
       : EmailDto(0, address, name, group_rids)
     {
@@ -22,6 +26,9 @@ class EmailDto
     }
     EmailDto(uint32_t rid, const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids)
       : EmailDto(rid, address, name, group_rids, {})
+    {}
+    EmailDto(const std::string& address, const std::string& name, const std::vector<std::string>& group_names)
+      : EmailDto(0, address, name, {}, group_names)
     {}
     EmailDto(uint32_t rid, const std::string& address, const std::string& name, const std::vector<uint32_t>& group_rids, const std::vector<std::string>& group_names)
       : m_rid{rid}

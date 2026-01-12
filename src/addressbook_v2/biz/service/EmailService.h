@@ -20,6 +20,7 @@ class EmailService
 
     std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
     std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
+    ResultCode AddEmailAndGroup(const EmailDto& dto);
 
     ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
     ResultCode RemoveGroup(const std::vector<uint32_t>& rids);

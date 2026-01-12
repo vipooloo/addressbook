@@ -6,7 +6,7 @@ void Add()
 {
     AddressManager::AddGroup(GroupDto{"group1", {}});
     AddressManager::AddGroup(GroupDto{"group2", {}});
-    AddressManager::AddEmail(EmailDto{"email1", "email1", {}});
+    AddressManager::AddEmail(EmailDto{"email1", "email1"});
     AddressManager::AddEmail(EmailDto{"email2", "email12", {1, 2}});
     AddressManager::UpdateEmail(EmailDto{1, "XXXXX", "YYY", {3, 4}});
     AddressManager::RemoveEmail({12, 333332, 33});
@@ -34,7 +34,7 @@ void Add()
         }
         std::cout << std::endl;
     }
-    
+
     ImportExportCallback callback = [](const std::string& file_name, bool) {
         std::cout << "文件名:" << file_name << std::endl;
     };
