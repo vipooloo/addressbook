@@ -74,6 +74,7 @@ static constexpr const char* SQL_EMAIL_WHERE_SEARCH_KEYWORD = "email_address LIK
 /// @details "1 = 1" 恒为真，用于在没有搜索条件时占位，保证 SQL 语法的完整性。
 static constexpr const char* SQL_EMAIL_WHERE_NO_FILTER = "1 = 1";
 
+static constexpr const char* SQL_SELECT_EMAIL_BY_ADDRESS_AND_NAME = "SELECT rid FROM email WHERE email_address = ? AND email_name= ?;";
 //###########################################################################################################################################
 /// @brief 邮件组数据库表名
 static constexpr const char* SQL_GROUP_TABLE_NAME = "mail_group";
@@ -94,6 +95,7 @@ CREATE TABLE IF NOT EXISTS mail_group (
 /// 1. group_name (TEXT)
 static constexpr const char* SQL_GROUP_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
+static constexpr const char* SQL_SELECT_GROUP_BY_NAME = "SELECT rid FROM mail_group WHERE group_name = ?;";
 //###########################################################################################################################################
 /// @brief 邮件与群组关联映射表的表名
 static constexpr const char* SQL_EMAILGROUP_TABLE_NAME = "GROUPMAPPING";

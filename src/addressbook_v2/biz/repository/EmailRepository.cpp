@@ -39,6 +39,16 @@ uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<
     return rid;
 }
 
+uint32_t EmailRepository::GetOrCreateEmail(const EmailEntity& entity)
+{
+    uint32_t rid = m_mail_dao.GetEmailRid(entity);
+    if (0 == rid)
+    {
+        rid = AddEmail(entity, {});
+    }
+    return rid;
+}
+
 uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& rids)
 {
     uint32_t rid = 0;
@@ -62,6 +72,31 @@ uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<
         }
     }
 
+    return rid;
+}
+
+uint32_t EmailRepository::GetOrCreateGroup(const GroupEntity& entity, uint32_t email_rid)
+{
+    uint32_t rid = 0;
+    do
+    {
+        rid = m_group_dao.GetGroupRid(entity);
+        if (0 == rid)
+        {
+            rid = AddGroup(entity, {email_rid});
+        }
+        if (0 == rid)
+        {
+            // 添加组失败
+            break;
+        }
+        if (!m_mail_group_dao.InsertBatch({EmailGroupEntity(email_rid, rid)}))
+        {
+            // 添加映射关系失败
+            rid = 0;
+            break;
+        }
+    } while (false);
     return rid;
 }
 
@@ -159,13 +194,13 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
     return false;
 }
 
-bool EmailRepository::RemoveGroupByMailRid(uint32_t mail_rid)
+bool EmailRepository::RemoveGroupByMailRid(uint32_t email_rid)
 {
     bool ret = false;
-    if (mail_rid != 0)
+    if (email_rid != 0)
     {
         // TBD 这个判断是不是应该在输入的地方检查呢
-        ret = m_mail_group_dao.RemoveByEmailRid(mail_rid);
+        ret = m_mail_group_dao.RemoveByEmailRid(email_rid);
     }
     return ret;
 }

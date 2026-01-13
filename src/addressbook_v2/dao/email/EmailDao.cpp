@@ -39,6 +39,31 @@ std::pair<bool, EmailEntity> EmailDao::Insert(const EmailEntity& entity)
     return result;
 }
 
+uint32_t EmailDao::GetEmailRid(const EmailEntity& entity)
+{
+    uint32_t rid = 0;
+
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_SELECT_EMAIL_BY_ADDRESS_AND_NAME);
+    stmt.bind(1, entity.GetEmailAddress());
+    stmt.bind(2, entity.GetEmailName());
+
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_ROW == code)
+    {
+        rid = stmt.getColumn(0).getUInt();
+    }
+    else if (SQLITE_DONE == code)
+    {
+        rid = 0;
+    }
+    else
+    {
+        AB_LOG_E("%s failed code:%d", SQL_SELECT_EMAIL_BY_ADDRESS_AND_NAME, code);
+    }
+
+    return rid;
+}
+
 bool EmailDao::Update(const EmailEntity& entity)
 {
     std::vector<StmtParam> stmt_params;

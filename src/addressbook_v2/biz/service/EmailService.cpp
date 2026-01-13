@@ -106,8 +106,52 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
 
 ResultCode EmailService::AddEmailAndGroup(const EmailDto& dto)
 {
-    TransactionGuard trans_guard;
-    return ResultCode::kSuccess;
+    ResultCode result = ResultCode::kSuccess;
+    do
+    {
+        TransactionGuard trans_guard;
+        // 检查邮件是否超过最大数量限制
+        if (m_mail_rep.GetEmailCount() >= kMaxMailCount)
+        {
+            AB_LOG_E("Exceed max email count");
+            result = ResultCode::kExceedMaxCount;
+            break;
+        }
+        // 添加邮件
+        EmailEntity entity = EmailEntity(dto.GetName(), dto.GetAddress());
+        uint32_t email_rid = m_mail_rep.GetOrCreateEmail(entity);
+        if (0 == email_rid)
+        {
+            AB_LOG_E("Failed to add email to database");
+            result = ResultCode::kDbError;
+            break;
+        }
+        // 添加邮件组
+        const std::vector<std::string>& group_names = dto.GetGroupNames();
+        for (const std::string& group_name : group_names)
+        {
+            // 检查邮件组是否超过最大数量限制
+            if (m_mail_rep.GetGroupCount() >= kMaxGroupCount)
+            {
+                AB_LOG_E("Exceed max group count");
+                result = ResultCode::kExceedMaxCount;
+                break;
+            }
+            GroupEntity group_entity(group_name);
+            uint32_t group_rid = m_mail_rep.GetOrCreateGroup(group_entity, email_rid);
+            if (0 == group_rid)
+            {
+                AB_LOG_E("Failed to add group to database");
+                result = ResultCode::kDbError;
+                break;
+            }
+        }
+        if (ResultCode::kSuccess == result)
+        {
+            trans_guard.Commit();
+        }
+    } while (false);
+    return result;
 }
 
 ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)

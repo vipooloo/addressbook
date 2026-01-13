@@ -37,4 +37,28 @@ std::pair<bool, GroupEntity> GroupDao::Insert(const GroupEntity& entity)
     return result;
 }
 
+uint32_t GroupDao::GetGroupRid(const GroupEntity& entity)
+{
+    uint32_t rid = 0;
+
+    SQLite::Statement stmt(AbstractDao::GetDb(), SQL_SELECT_GROUP_BY_NAME);
+    stmt.bind(1, entity.GetGroupName());
+
+    int32_t code = stmt.tryExecuteStep();
+    if (SQLITE_ROW == code)
+    {
+        rid = stmt.getColumn(0).getUInt();
+    }
+    else if (SQLITE_DONE == code)
+    {
+        rid = 0;
+    }
+    else
+    {
+        AB_LOG_E("%s failed code:%d", SQL_SELECT_GROUP_BY_NAME, code);
+    }
+
+    return rid;
+}
+
 }  // namespace addrbook
