@@ -14,29 +14,6 @@
 #include <vector>
 
 namespace addrbook {
-class SQLiteConn
-{
-  public:
-    explicit SQLiteConn(const std::string& db_path)
-      : m_db(db_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE)
-    {
-      m_db.exec("PRAGMA foreign_keys = ON");
-    }
-
-    SQLite::Database& GetDb()
-    {
-        return m_db;
-    }
-
-  private:
-    SQLiteConn(const SQLiteConn&) = delete;
-    SQLiteConn& operator=(const SQLiteConn&) = delete;
-    SQLiteConn(SQLiteConn&&) noexcept = delete;
-    SQLiteConn& operator=(SQLiteConn&&) noexcept = delete;
-
-  private:
-    SQLite::Database m_db;
-};
 
 class AbstractDao
 {
@@ -44,11 +21,7 @@ class AbstractDao
     explicit AbstractDao(const std::string& table_name);
 
     virtual ~AbstractDao() = default;
-    static SQLite::Database& GetDb()
-    {
-        static SQLiteConn db(DB_NAME);
-        return db.GetDb();
-    }
+    static SQLite::Database& GetDb();
     virtual bool Create()
     {
         return true;

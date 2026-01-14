@@ -7,6 +7,40 @@
 
 namespace addrbook {
 
+class SQLiteConn
+{
+  public:
+    explicit SQLiteConn(const std::string& db_path)
+      : m_db(db_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE)
+    {
+        int32_t code = m_db.exec(SQL_COMMON_ENABLE_FOREIGN_KEYS);
+        if (code != SQLITE_OK)
+        {
+            AB_LOG_E("%s failed code:%d", SQL_COMMON_ENABLE_FOREIGN_KEYS, code);
+        }
+    }
+
+    SQLite::Database& GetDb()
+    {
+        return m_db;
+    }
+
+  private:
+    SQLiteConn(const SQLiteConn&) = delete;
+    SQLiteConn& operator=(const SQLiteConn&) = delete;
+    SQLiteConn(SQLiteConn&&) noexcept = delete;
+    SQLiteConn& operator=(SQLiteConn&&) noexcept = delete;
+
+  private:
+    SQLite::Database m_db;
+};
+
+SQLite::Database& AbstractDao::GetDb()
+{
+    static SQLiteConn db(DB_NAME);
+    return db.GetDb();
+}
+
 AbstractDao::AbstractDao(const std::string& table_name)
   : m_table_name{table_name}
   , m_sql_count{"SELECT COUNT(*) FROM " + table_name + ";"}
