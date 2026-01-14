@@ -275,4 +275,12 @@ void EmailService::DataChanged(ResultCode res, ChangeType type)
     }
 }
 
+void EmailService::ClearAllEmails()
+{
+    TransactionGuard trans_guard;
+    if (m_mail_rep.ClearAllEmails())
+    {
+        trans_guard.Commit();
+    }
+}
 }  // namespace addrbook

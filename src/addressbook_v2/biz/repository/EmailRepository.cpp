@@ -220,4 +220,9 @@ PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint3
 
     return result;
 }
+
+bool EmailRepository::ClearAllEmails()
+{
+    return m_mail_dao.RemoveAll();
+}
 }  // namespace addrbook

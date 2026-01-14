@@ -12,7 +12,7 @@ add_compile_options(-O0 -g)
 
 option(ENABLE_COVERAGE "Enable coverage" ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" ON)
-option(ENABLE_GTEST "Enable GTest" OFF)
+option(ENABLE_GTEST "Enable GTest" ON)
 
 if(ENABLE_COVERAGE)
     message(STATUS "Building with coverage flags")

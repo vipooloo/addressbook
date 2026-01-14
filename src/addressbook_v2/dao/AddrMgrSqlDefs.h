@@ -115,8 +115,8 @@ static constexpr const char* SQL_EMAILGROUP_CREATE_TABLE = R"(
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         m_rid INTEGER,  
         g_rid INTEGER,  
-        FOREIGN KEY (g_rid) REFERENCES MAILGROUP (rid) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (m_rid) REFERENCES MAIL      (rid) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (g_rid) REFERENCES mail_group (rid) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (m_rid) REFERENCES email      (rid) ON DELETE CASCADE ON UPDATE CASCADE,
         UNIQUE (m_rid, g_rid)
         );
 )";

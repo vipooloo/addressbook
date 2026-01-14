@@ -20,6 +20,7 @@ class SQLiteConn
     explicit SQLiteConn(const std::string& db_path)
       : m_db(db_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE)
     {
+      m_db.exec("PRAGMA foreign_keys = ON");
     }
 
     SQLite::Database& GetDb()

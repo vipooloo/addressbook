@@ -2,6 +2,8 @@
 #include "api.h"
 #include <iostream>
 
+
+
 void Add()
 {
     AddressManager::AddGroup(GroupDto{"group1", {}});

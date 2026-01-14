@@ -19,6 +19,8 @@ class EmailService
     ~EmailService() = default;
 
     std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
+    void ClearAllEmails();
+
     std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
     ResultCode AddEmailAndGroup(const EmailDto& dto);
 

@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     static_cast<void>(argv);
     LOG_INIT();
 
-    change_workpath();
+    // change_workpath();
 
     Add();
     return 0;

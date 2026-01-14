@@ -27,6 +27,11 @@ ResultCode AddressManager::UpdateEmail(const EmailDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().UpdateEmail(dto);
 }
 
+void AddressManager::ClearAllEmails()
+{
+    return addrbook::AddrMgrImpl::GetInstance().ClearAllEmails();
+}
+
 ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
 {
     return addrbook::AddrMgrImpl::GetInstance().UpdateGroup(dto);

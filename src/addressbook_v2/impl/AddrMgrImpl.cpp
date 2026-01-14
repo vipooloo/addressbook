@@ -223,4 +223,8 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     }
 }
 
+void AddrMgrImpl::ClearAllEmails()
+{
+    return m_email_srv.ClearAllEmails();
+}
 }  // namespace addrbook
