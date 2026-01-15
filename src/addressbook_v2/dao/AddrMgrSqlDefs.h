@@ -4,6 +4,8 @@
 //###########################################################################################################################################
 static constexpr const char* SQL_COMMON_QUERY_COUNT = "SELECT COUNT(*) FROM %s WHERE %s;";
 static constexpr const char* SQL_COMMON_ENABLE_FOREIGN_KEYS = "PRAGMA foreign_keys = ON;";
+static constexpr const char* SQL_DCOMMON_INTEGRITY_CHECK = "PRAGMA integrity_check;";
+static constexpr const char* SQL_DCOMMON_VACUUM = "PRAGMA VACUUM;";
 //###########################################################################################################################################
 /// @brief 电子邮件数据库表名
 static constexpr const char* SQL_EMAIL_TABLE_NAME = "email";

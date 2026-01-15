@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
          {
             "name": "Test",
             "type": "cppdbg",
@@ -8,7 +9,7 @@
             "program": "${workspaceFolder}/build/bin/main",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/build/bin/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

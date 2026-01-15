@@ -2,38 +2,11 @@
 #include "AddrMgrLog.h"
 #include "AddrMgrSqlDefs.h"
 #include "AddrMgrUtilities.h"
+#include "SQLiteConn.h"
 #include <algorithm>
 #include <sqlite3.h>
 
 namespace addrbook {
-
-class SQLiteConn
-{
-  public:
-    explicit SQLiteConn(const std::string& db_path)
-      : m_db(db_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE)
-    {
-        int32_t code = m_db.exec(SQL_COMMON_ENABLE_FOREIGN_KEYS);
-        if (code != SQLITE_OK)
-        {
-            AB_LOG_E("%s failed code:%d", SQL_COMMON_ENABLE_FOREIGN_KEYS, code);
-        }
-    }
-
-    SQLite::Database& GetDb()
-    {
-        return m_db;
-    }
-
-  private:
-    SQLiteConn(const SQLiteConn&) = delete;
-    SQLiteConn& operator=(const SQLiteConn&) = delete;
-    SQLiteConn(SQLiteConn&&) noexcept = delete;
-    SQLiteConn& operator=(SQLiteConn&&) noexcept = delete;
-
-  private:
-    SQLite::Database m_db;
-};
 
 SQLite::Database& AbstractDao::GetDb()
 {
