@@ -7,12 +7,12 @@
 class SearchResult
 {
   public:
-    SearchResult(uint32_t current_page, uint32_t page_size)
-      : SearchResult(0, current_page, page_size)
+    SearchResult(uint32_t cur_page, uint32_t page_size)
+      : SearchResult(0, cur_page, page_size)
     {}
-    SearchResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
+    SearchResult(uint32_t total_records, uint32_t cur_page, uint32_t page_size)
       : m_total_records{total_records}
-      , m_current_page{current_page}
+      , m_cur_page{cur_page}
       , m_page_size{page_size}
     {}
 
@@ -25,7 +25,7 @@ class SearchResult
 
     uint32_t GetCurrentPage() const
     {
-        return m_current_page;
+        return m_cur_page;
     }
 
     uint32_t GetPageSize() const
@@ -48,9 +48,9 @@ class SearchResult
         m_total_records = total_records;
     }
 
-    void SetCurrentPage(uint32_t current_page)
+    void SetCurrentPage(uint32_t cur_page)
     {
-        m_current_page = current_page;
+        m_cur_page = cur_page;
     }
 
     void SetPageSize(uint32_t page_size)
@@ -61,7 +61,7 @@ class SearchResult
     SearchResult(SearchResult&& other) noexcept
     {
         m_total_records = other.m_total_records;
-        m_current_page = other.m_current_page;
+        m_cur_page = other.m_cur_page;
         m_page_size = other.m_page_size;
     }
 
@@ -70,7 +70,7 @@ class SearchResult
         if (this != &other)
         {
             m_total_records = other.m_total_records;
-            m_current_page = other.m_current_page;
+            m_cur_page = other.m_cur_page;
             m_page_size = other.m_page_size;
         }
         return *this;
@@ -81,7 +81,7 @@ class SearchResult
 
   private:
     uint32_t m_total_records;  ///< 总记录条数 (Total number of records)
-    uint32_t m_current_page;   ///< 当前页码 (Current page number, 1-based)
+    uint32_t m_cur_page;   ///< 当前页码 (Current page number, 1-based)
     uint32_t m_page_size;      ///< 每页容量 (Items per page)
 };
 

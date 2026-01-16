@@ -196,13 +196,7 @@ bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_spt
 
 bool EmailRepository::RemoveGroupByMailRid(uint32_t email_rid)
 {
-    bool ret = false;
-    if (email_rid != 0)
-    {
-        // TBD 这个判断是不是应该在输入的地方检查呢
-        ret = m_mail_group_dao.RemoveByEmailRid(email_rid);
-    }
-    return ret;
+    return m_mail_group_dao.RemoveByEmailRid(email_rid);
 }
 
 PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size)

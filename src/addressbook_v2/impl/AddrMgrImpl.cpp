@@ -69,22 +69,28 @@ ResultCode AddrMgrImpl::RemoveEmail(const std::vector<uint32_t>& rids)
 {
     ResultCode result = ResultCode::kInvalidParam;
 
-    if (rids.empty())
+    do
     {
-        AB_LOG_E("empty rid list");
-    }
-    else if (std::any_of(rids.cbegin(), rids.cend(), [](uint32_t rid) {
-                 return rid == 0;
-             }))
-    {
-        AB_LOG_E("invalid rid");
-    }
-    else
-    {
+        if (rids.empty())
+        {
+            AB_LOG_E("empty rid list");
+            break;
+        }
+        if (std::any_of(rids.cbegin(), rids.cend(), [](uint32_t rid) {
+                return rid == 0;
+            }))
+        {
+            AB_LOG_E("invalid rid");
+            break;
+        }
+        if (AddrMgrUtilities::GetSortedUniqueRids(rids).size() != rids.size())
+        {
+            AB_LOG_E("duplicated rid");
+            break;
+        }
         std::lock_guard<std::mutex> lock(m_mtx);
         result = m_email_srv.RemoveEmail(rids);
-    }
-
+    } while (false);
     return result;
 }
 
@@ -111,10 +117,10 @@ ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
     return m_email_srv.UpdateGroup(dto);
 }
 
-std::pair<ResultCode, SearchEmailResult> AddrMgrImpl::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, SearchEmailResult> AddrMgrImpl::SearchEmail(const std::string& keyword, uint32_t cur_page, uint32_t page_size)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.SearchEmail(keyword, current_page, page_size);
+    return m_email_srv.SearchEmail(keyword, cur_page, page_size);
 }
 
 ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
@@ -130,6 +136,7 @@ ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportE
             rsult = ResultCode::kSuccess;
         }
     }
+
     return rsult;
 }
 
@@ -154,7 +161,8 @@ void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExp
     addrbook::CsvReader csv_reader(file_path, {"邮件名字", "邮件地址", "邮件组名字"});
     std::vector<std::string> row;
     addrbook::CsvStatus status = CSV_ERROR_INIT_FAILED;
-    while (true)
+    bool result = true;
+    while (result)
     {
         // 逐行读取
         status = csv_reader.ReadNextRow(row);
@@ -165,7 +173,12 @@ void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExp
             EmailDto dto(row[0], row[1], group_names_vec);
             if (addrbook::CheckerProvider::GetInstance().Verify(dto))
             {
-                m_email_srv.AddEmailAndGroup(dto);
+                ResultCode code = m_email_srv.AddEmailAndGroup(dto);
+                if (code != ResultCode::kSuccess)
+                {
+                    result = false;
+                    break;
+                }
             }
         }
         else if (status == addrbook::CSV_EOF)
@@ -174,11 +187,14 @@ void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExp
         }
         else
         {
+            result = false;
             break;
         }
-        // 转换为DTO
-        // 添加 && 回调
-        // 变更通知
+        if (cb)
+        {
+            cb(file_path, result);
+            m_evt_dispatcher.Notify(ChangeType::kImportEmail);
+        }
     }
 }
 
@@ -225,6 +241,7 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
 
 void AddrMgrImpl::ClearAllEmails()
 {
+    std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.ClearAllEmails();
 }
 }  // namespace addrbook

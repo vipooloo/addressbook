@@ -30,7 +30,7 @@ class EmailService
     ResultCode UpdateEmail(const EmailDto& dto);
     ResultCode UpdateGroup(const GroupDto& dto);
 
-    std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size);
+    std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t cur_page, uint32_t page_size);
 
   private:
     void DataChanged(ResultCode res, ChangeType type);

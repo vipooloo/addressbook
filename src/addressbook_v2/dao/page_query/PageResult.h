@@ -13,9 +13,9 @@ class PageResult
     PageResult()
       : PageResult(0, 0)
     {}
-    PageResult(size_t current_page, size_t page_size)
+    PageResult(size_t cur_page, size_t page_size)
       : m_total_records{0}
-      , m_current_page{current_page}
+      , m_cur_page{cur_page}
       , m_page_size{page_size}
       , m_records{}
     {}
@@ -29,7 +29,7 @@ class PageResult
 
     size_t GetCurrentPage() const
     {
-        return m_current_page;
+        return m_cur_page;
     }
 
     size_t GetPageSize() const
@@ -47,9 +47,9 @@ class PageResult
         m_total_records = total_records;
     }
 
-    void SetCurrentPage(size_t current_page)
+    void SetCurrentPage(size_t cur_page)
     {
-        m_current_page = current_page;
+        m_cur_page = cur_page;
     }
 
     void SetPageSize(size_t page_size)
@@ -71,7 +71,7 @@ class PageResult
         if (this != &other)
         {
             m_total_records = other.m_total_records;
-            m_current_page = other.m_current_page;
+            m_cur_page = other.m_cur_page;
             m_page_size = other.m_page_size;
             m_records = std::move(other.m_records);
         }
@@ -83,7 +83,7 @@ class PageResult
         if (this != &other)
         {
             m_total_records = other.m_total_records;
-            m_current_page = other.m_current_page;
+            m_cur_page = other.m_cur_page;
             m_page_size = other.m_page_size;
             m_records = std::move(other.m_records);
         }
@@ -93,7 +93,7 @@ class PageResult
 
   private:
     size_t m_total_records;                                  ///< 总记录条数 (Total number of records)
-    size_t m_current_page;                                   ///< 当前页码 (Current page number, 1-based)
+    size_t m_cur_page;                                   ///< 当前页码 (Current page number, 1-based)
     size_t m_page_size;                                      ///< 每页容量 (Items per page)
     std::vector<std::shared_ptr<AbstractEntity>> m_records;  ///< 当前页的具体数据列表 (List of records)
 };

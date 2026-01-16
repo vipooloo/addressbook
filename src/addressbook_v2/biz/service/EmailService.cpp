@@ -238,12 +238,12 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::string& keyword, uint32_t current_page, uint32_t page_size)
+std::pair<ResultCode, SearchEmailResult> EmailService::SearchEmail(const std::string& keyword, uint32_t cur_page, uint32_t page_size)
 {
-    std::pair<ResultCode, SearchEmailResult> result = std::make_pair(ResultCode::kSuccess, SearchEmailResult(current_page, page_size));
+    std::pair<ResultCode, SearchEmailResult> result = std::make_pair(ResultCode::kSuccess, SearchEmailResult(cur_page, page_size));
 
     TransactionGuard trans_guard;
-    PageResult page_result = m_mail_rep.GetEmailsByKeyword(keyword, current_page, page_size);
+    PageResult page_result = m_mail_rep.GetEmailsByKeyword(keyword, cur_page, page_size);
     std::vector<EmailDto> dtos;
     const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
     std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {

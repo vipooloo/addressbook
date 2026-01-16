@@ -7,11 +7,11 @@
 class SearchEmailResult : public SearchResult
 {
   public:
-    SearchEmailResult(uint32_t current_page, uint32_t page_size)
-      : SearchEmailResult(0, current_page, page_size)
+    SearchEmailResult(uint32_t cur_page, uint32_t page_size)
+      : SearchEmailResult(0, cur_page, page_size)
     {}
-    SearchEmailResult(uint32_t total_records, uint32_t current_page, uint32_t page_size)
-      : SearchResult(total_records, current_page, page_size)
+    SearchEmailResult(uint32_t total_records, uint32_t cur_page, uint32_t page_size)
+      : SearchResult(total_records, cur_page, page_size)
       , m_emails{}
     {}
     ~SearchEmailResult() override = default;

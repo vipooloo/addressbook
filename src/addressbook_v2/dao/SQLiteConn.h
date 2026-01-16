@@ -13,7 +13,7 @@ class SQLiteConn
     ~SQLiteConn() = default;
     SQLite::Database& GetDb()
     {
-        return *m_db_sptr;
+        return m_db;
     }
 
   private:
@@ -31,7 +31,7 @@ class SQLiteConn
 
   private:
     std::string m_path;
-    std::shared_ptr<SQLite::Database> m_db_sptr;
+    SQLite::Database m_db;
 };
 }  // namespace addrbook
 

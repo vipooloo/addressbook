@@ -6,16 +6,15 @@
 namespace addrbook {
 SQLiteConn::SQLiteConn(const std::string& path)
   : m_path{path}
-  , m_db_sptr{nullptr}
+  , m_db{m_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE}
 {
-    Open();
     CheckIntegrity();
     EnableForeignKeys();
 }
 
 void SQLiteConn::Open()
 {
-    m_db_sptr = std::make_shared<SQLite::Database>(m_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+    m_db = SQLite::Database(m_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 }
 
 void SQLiteConn::CheckIntegrity()
