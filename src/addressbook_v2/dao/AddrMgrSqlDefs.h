@@ -63,8 +63,8 @@ static constexpr const char* SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE = R"(
     LEFT JOIN mail_group g
     ON r.g_rid = g.rid
     WHERE %s
-    GROUP BY  m.rid
-    ORDER BY  m.rid %s
+    GROUP BY m.rid
+    ORDER BY m.rid %s
     LIMIT ? OFFSET ?;
 )";
 

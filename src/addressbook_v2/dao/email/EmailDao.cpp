@@ -77,8 +77,8 @@ bool EmailDao::Update(const EmailEntity& entity)
 std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement& stmt)
 {
     uint32_t rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());  // rid
-    std::string email_address = stmt.getColumn(1).getString();          // email_address
-    std::string email_name = stmt.getColumn(2).getString();             // email_name
+    std::string email_name = stmt.getColumn(1).getString();             // email_address
+    std::string email_address = stmt.getColumn(2).getString();          // email_name
     std::string group_rids = stmt.getColumn(3).getString();             // group_rids
     std::string group_names = stmt.getColumn(4).getString();            // group_names
 

@@ -6,8 +6,8 @@
 #include <string>
 
 using ImportExportCallback = std::function<void(
-    const std::string& file_name,  ///< 导出文件名字
-    bool result                    ///< 导出是否成功
+    const std::string& file_name,  ///< 文件名字
+    bool result                    ///< 是否成功
     )>;
 
 enum class ResultCode : uint8_t

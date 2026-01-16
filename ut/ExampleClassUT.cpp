@@ -1,4 +1,3 @@
-#include "AddressManager.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -14,6 +13,5 @@ class ExampleClassUT : public ::testing::Test
 
 TEST_F(ExampleClassUT, case1)
 {
-    AddressManager::ClearAllEmails();
 }
 }  // namespace
