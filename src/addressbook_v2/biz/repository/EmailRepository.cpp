@@ -199,17 +199,17 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t email_rid)
     return m_mail_group_dao.RemoveByEmailRid(email_rid);
 }
 
-PageResult EmailRepository::GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size)
+PageResult EmailRepository::GetEmailsByKeyword(const QueryParam& query_param)
 {
-    PageResult result(page_num, page_size);
+    PageResult result(query_param.GetCurPage(), query_param.GetPageSize());
 
-    if (keyword.empty())
+    if (query_param.GetKeyword().empty())
     {
-        result = m_mail_dao.FindAll(page_num, page_size);
+        result = m_mail_dao.FindAll(query_param);
     }
     else
     {
-        result = m_mail_dao.FindByPage(keyword, page_num, page_size);
+        result = m_mail_dao.FindByPage(query_param);
     }
 
     return result;

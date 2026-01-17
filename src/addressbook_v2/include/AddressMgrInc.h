@@ -2,9 +2,10 @@
 #define ADDRESSMGRINC_H
 
 #include "AddressMgrDefs.h"
-#include "IAddressMgrDataObserver.h"
-#include "GroupDto.h"
 #include "EmailDto.h"
+#include "GroupDto.h"
+#include "IAddressMgrDataObserver.h"
+#include "QueryParam.h"
 #include "SearchEmailResult.h"
 #include <memory>
 

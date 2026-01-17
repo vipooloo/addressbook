@@ -5,7 +5,7 @@
 #include "AddrMgrConfigDefs.h"
 #include "CustomWhere.h"
 #include "PageResult.h"
-#include "QueryParams.h"
+#include "QueryParam.h"
 #include "StmtParam.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <cstdint>
@@ -39,12 +39,12 @@ class AbstractDao
     bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
     bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;
 
-    uint32_t CalcPageOffset(const QueryParams& params) const
+    uint32_t CalcPageOffset(const QueryParam& params) const
     {
-        return (params.GetPage() - 1) * params.GetPageSize();
+        return (params.GetCurPage() - 1) * params.GetPageSize();
     }
     void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const;
-    PageResult DoFindByPage(const QueryParams& params);
+    PageResult DoFindByPage(const QueryParam& params, const CustomWhere& conditions);
     virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
     {
         static_cast<void>(&stmt);
@@ -54,7 +54,7 @@ class AbstractDao
   private:
     static bool BindStmtParams(SQLite::Statement& stmt, const std::vector<StmtParam>& stmt_params);
     size_t QueryCount(const std::string& where_sql, const CustomWhere& conditions);
-    std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParams& params);
+    std::vector<std::shared_ptr<AbstractEntity>> QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParam& params, const CustomWhere& conditions);
 
   private:
     std::string m_table_name;

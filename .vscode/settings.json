@@ -74,6 +74,7 @@
         "climits": "cpp",
         "cerrno": "cpp",
         "queue": "cpp",
-        "icheckerh": "cpp"
+        "icheckerh": "cpp",
+        "shared_mutex": "cpp"
     }
 }

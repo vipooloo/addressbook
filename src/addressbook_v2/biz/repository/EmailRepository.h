@@ -38,7 +38,7 @@ class EmailRepository
     bool UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids);
     bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
 
-    PageResult GetEmailsByKeyword(const std::string& keyword, uint32_t page_num, uint32_t page_size);
+    PageResult GetEmailsByKeyword(const QueryParam& query_param);
 
   private:
     EmailDao m_mail_dao;

@@ -10,7 +10,7 @@ class AddressManager
     static ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
     static ResultCode UpdateEmail(const EmailDto& dto);
     static void ClearAllEmails();
-    static std::pair<ResultCode, SearchEmailResult> SearchEmail(const std::string& keyword, uint32_t cur_page, uint32_t page_size);
+    static std::pair<ResultCode, SearchEmailResult> QueryEmail(const QueryParam& query_param);
     static ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ResultCode ExportEmails(const ImportExportCallback& cb);
     static ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);

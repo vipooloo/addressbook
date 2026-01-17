@@ -73,16 +73,15 @@ bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
     return OnExecuteSql(sql);
 }
 
-PageResult AbstractDao::DoFindByPage(const QueryParams& params)
+PageResult AbstractDao::DoFindByPage(const QueryParam& params, const CustomWhere& conditions)
 {
-    PageResult page_result(params.GetPage(), params.GetPageSize());
-    const CustomWhere& conditions = params.GetConditions();
+    PageResult page_result(params.GetCurPage(), params.GetPageSize());
     const std::string& sql = conditions.GetSql();
     const std::string& where_sql = conditions.GetWhereSql();
     size_t total_records = QueryCount(where_sql, conditions);
     if (total_records != 0)
     {
-        std::vector<std::shared_ptr<AbstractEntity>> records = QueryRecords(sql, where_sql, params);
+        std::vector<std::shared_ptr<AbstractEntity>> records = QueryRecords(sql, where_sql, params, conditions);
         page_result.SetRecords(records);
         page_result.SetTotalRecords(total_records);
     }
@@ -111,14 +110,13 @@ size_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere& 
     return total;
 }
 
-std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParams& params)
+std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParam& params, const CustomWhere& conditions)
 {
     std::string sql_buffer = AddrMgrUtilities::ReplaceFirst(sql, m_table_name);
     sql_buffer = AddrMgrUtilities::ReplaceFirst(sql_buffer, where_sql);
     sql_buffer = AddrMgrUtilities::ReplaceFirst(sql_buffer, OrderType::ASC == params.GetOrderBy() ? "ASC" : "DESC");
 
     SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer);
-    const CustomWhere& conditions = params.GetConditions();
     const std::vector<std::string>& args = conditions.GetWhereSqlArgs();
     BindWhereParams(stmt, args, 1);
     uint32_t limit_idx = args.size();

@@ -85,21 +85,19 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
     return std::make_shared<EmailEntity>(rid, email_address, email_name, group_rids, group_names);
 }
 
-PageResult EmailDao::FindByPage(const std::string& keyword, uint32_t page_num, uint32_t page_size)
+PageResult EmailDao::FindByPage(const QueryParam& query_param)
 {
     CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_SEARCH_KEYWORD);
-    conditions.AddWhereArg("%" + keyword + "%");
-    conditions.AddWhereArg("%" + keyword + "%");
-    QueryParams params(page_num, page_size, conditions);
+    conditions.AddWhereArg("%" + query_param.GetKeyword() + "%");
+    conditions.AddWhereArg("%" + query_param.GetKeyword() + "%");
 
-    return AbstractDao::DoFindByPage(params);
+    return AbstractDao::DoFindByPage(query_param, conditions);
 }
 
-PageResult EmailDao::FindAll(uint32_t page_num, uint32_t page_size)
+PageResult EmailDao::FindAll(const QueryParam& query_param)
 {
     CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER);
-    QueryParams params(page_num, page_size, conditions);
 
-    return AbstractDao::DoFindByPage(params);
+    return AbstractDao::DoFindByPage(query_param, conditions);
 }
 }  // namespace addrbook
