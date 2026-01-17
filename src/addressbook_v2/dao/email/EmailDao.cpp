@@ -85,7 +85,7 @@ std::shared_ptr<AbstractEntity> EmailDao::OnCreateEntity(const SQLite::Statement
     return std::make_shared<EmailEntity>(rid, email_address, email_name, group_rids, group_names);
 }
 
-PageResult EmailDao::FindByPage(const QueryParam& query_param)
+PageResult EmailDao::FindByPage(const PageQueryParam& query_param)
 {
     CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_SEARCH_KEYWORD);
     conditions.AddWhereArg("%" + query_param.GetKeyword() + "%");
@@ -94,7 +94,7 @@ PageResult EmailDao::FindByPage(const QueryParam& query_param)
     return AbstractDao::DoFindByPage(query_param, conditions);
 }
 
-PageResult EmailDao::FindAll(const QueryParam& query_param)
+PageResult EmailDao::FindAll(const PageQueryParam& query_param)
 {
     CustomWhere conditions(SQL_EMAIL_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER);
 

@@ -38,19 +38,19 @@ size_t AbstractDao::GetCount() const
     return ret;
 }
 
-bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
+bool AbstractDao::IsExist(const std::vector<uint32_t>& ids) const
 {
     bool ret = false;
-    if (!rids.empty())
+    if (!ids.empty())
     {
-        std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_exist, AddrMgrUtilities::Join(rids));
+        std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_exist, AddrMgrUtilities::Join(ids));
 
         SQLite::Statement stmt(GetDb(), sql);
         int32_t code = stmt.tryExecuteStep();
         if (SQLITE_ROW == code)
         {
             size_t count = stmt.getColumn(0).getUInt();
-            if (count == rids.size())
+            if (count == ids.size())
             {
                 ret = true;
             }
@@ -67,13 +67,13 @@ bool AbstractDao::IsExist(const std::vector<uint32_t>& rids) const
     return ret;
 }
 
-bool AbstractDao::Remove(const std::vector<uint32_t>& rids)
+bool AbstractDao::Remove(const std::vector<uint32_t>& ids)
 {
-    std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_delete_by_rid, AddrMgrUtilities::Join(rids));
+    std::string sql = AddrMgrUtilities::ReplaceFirst(m_sql_delete_by_rid, AddrMgrUtilities::Join(ids));
     return OnExecuteSql(sql);
 }
 
-PageResult AbstractDao::DoFindByPage(const QueryParam& params, const CustomWhere& conditions)
+PageResult AbstractDao::DoFindByPage(const PageQueryParam& params, const CustomWhere& conditions)
 {
     PageResult page_result(params.GetCurPage(), params.GetPageSize());
     const std::string& sql = conditions.GetSql();
@@ -110,7 +110,7 @@ size_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere& 
     return total;
 }
 
-std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& sql, const std::string& where_sql, const QueryParam& params, const CustomWhere& conditions)
+std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std::string& sql, const std::string& where_sql, const PageQueryParam& params, const CustomWhere& conditions)
 {
     std::string sql_buffer = AddrMgrUtilities::ReplaceFirst(sql, m_table_name);
     sql_buffer = AddrMgrUtilities::ReplaceFirst(sql_buffer, where_sql);

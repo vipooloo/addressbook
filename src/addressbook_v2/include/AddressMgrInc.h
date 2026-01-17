@@ -3,10 +3,10 @@
 
 #include "AddressMgrDefs.h"
 #include "EmailDto.h"
+#include "EmailPageResult.h"
 #include "GroupDto.h"
 #include "IAddressMgrDataObserver.h"
-#include "QueryParam.h"
-#include "SearchEmailResult.h"
+#include "PageQueryParam.h"
 #include <memory>
 
 #endif  // ADDRESSMGRINC_H

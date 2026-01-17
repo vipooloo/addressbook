@@ -10,27 +10,27 @@
 #include <sstream>  // std::stringstream
 #include <string>
 
-std::vector<uint32_t> AddrMgrUtilities::GetSortedUniqueRids(const std::vector<uint32_t>& rids)
+std::vector<uint32_t> AddrMgrUtilities::GetSortedUniqueRids(const std::vector<uint32_t>& ids)
 {
-    std::vector<uint32_t> unique_rids = rids;
+    std::vector<uint32_t> unique_rids = ids;
     std::sort(unique_rids.begin(), unique_rids.end());
     std::vector<uint32_t>::iterator last = std::unique(unique_rids.begin(), unique_rids.end());
     unique_rids.erase(last, unique_rids.end());
     return unique_rids;
 }
 
-std::string AddrMgrUtilities::Join(const std::vector<uint32_t>& rids, const char* delimiter)
+std::string AddrMgrUtilities::Join(const std::vector<uint32_t>& ids, const char* delimiter)
 {
     std::string result;
-    if (!rids.empty())
+    if (!ids.empty())
     {
         // 预估大小，避免多次内存分配
-        result.reserve(rids.size() * 10);
-        result += std::to_string(rids[0]);
-        for (size_t i = 1; i < rids.size(); ++i)
+        result.reserve(ids.size() * 10);
+        result += std::to_string(ids[0]);
+        for (size_t i = 1; i < ids.size(); ++i)
         {
             result += delimiter;
-            result += std::to_string(rids[i]);
+            result += std::to_string(ids[i]);
         }
     }
     return result;

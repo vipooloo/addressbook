@@ -14,7 +14,7 @@ EmailService::EmailService(EventDispatcher& dispatcher)
 {
 }
 
-std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
+std::pair<ResultCode, EmailDto> EmailService::CreateEmail(const EmailDto& dto)
 {
     std::pair<ResultCode, EmailDto> result = std::make_pair(ResultCode::kSuccess, dto);
     do
@@ -45,7 +45,7 @@ std::pair<ResultCode, EmailDto> EmailService::AddEmail(const EmailDto& dto)
         }
         // 添加邮件
         EmailEntity entity = EmailEntity(dto.GetName(), dto.GetAddress());
-        uint32_t rid = m_mail_rep.AddEmail(entity, group_rids);
+        uint32_t rid = m_mail_rep.CreateEmail(entity, group_rids);
         if (0 == rid)
         {
             AB_LOG_E("Failed to add email to database");
@@ -154,12 +154,12 @@ ResultCode EmailService::AddEmailAndGroup(const EmailDto& dto)
     return result;
 }
 
-ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
+ResultCode EmailService::DeleteEmails(const std::vector<uint32_t>& ids)
 {
     ResultCode result = ResultCode::kSuccess;
 
     TransactionGuard trans_guard;
-    if (m_mail_rep.RemoveEmail(rids))
+    if (m_mail_rep.DeleteEmails(ids))
     {
         trans_guard.Commit();
     }
@@ -172,12 +172,12 @@ ResultCode EmailService::RemoveEmail(const std::vector<uint32_t>& rids)
     return result;
 }
 
-ResultCode EmailService::RemoveGroup(const std::vector<uint32_t>& rids)
+ResultCode EmailService::RemoveGroup(const std::vector<uint32_t>& ids)
 {
     ResultCode result = ResultCode::kSuccess;
 
     TransactionGuard trans_guard;
-    if (m_mail_rep.RemoveGroup(rids))
+    if (m_mail_rep.RemoveGroup(ids))
     {
         trans_guard.Commit();
     }
@@ -238,9 +238,9 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-std::pair<ResultCode, SearchEmailResult> EmailService::QueryEmail(const QueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> EmailService::QueryEmail(const PageQueryParam& query_param)
 {
-    std::pair<ResultCode, SearchEmailResult> result = std::make_pair(ResultCode::kSuccess, SearchEmailResult(query_param.GetCurPage(), query_param.GetPageSize()));
+    std::pair<ResultCode, EmailPageResult> result = std::make_pair(ResultCode::kSuccess, EmailPageResult(query_param.GetCurPage(), query_param.GetPageSize()));
 
     TransactionGuard trans_guard;
     PageResult page_result = m_mail_rep.GetEmailsByKeyword(query_param);
@@ -254,9 +254,9 @@ std::pair<ResultCode, SearchEmailResult> EmailService::QueryEmail(const QueryPar
             const std::string& email_address = mail_entity_sptr->GetEmailAddress();
             const std::string& email_name = mail_entity_sptr->GetEmailName();
             const std::string& group_rids = mail_entity_sptr->GetGroupRids();
-            std::vector<uint32_t> rids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(group_rids, ","));
+            std::vector<uint32_t> ids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(group_rids, ","));
             std::vector<std::string> group_names = AddrMgrUtilities::Split(mail_entity_sptr->GetGroupNames(), "|##|");
-            return EmailDto(rid, email_address, email_name, rids, group_names);
+            return EmailDto(rid, email_address, email_name, ids, group_names);
         }
         return EmailDto();
     });
@@ -275,12 +275,15 @@ void EmailService::DataChanged(ResultCode res, ChangeType type)
     }
 }
 
-void EmailService::ClearAllEmails()
+ResultCode EmailService::DeleteAllEmails()
 {
+    ResultCode result = ResultCode::kNotable;
     TransactionGuard trans_guard;
-    if (m_mail_rep.ClearAllEmails())
+    if (m_mail_rep.DeleteAllEmails())
     {
         trans_guard.Commit();
+        result = ResultCode::kSuccess;
     }
+    return result;
 }
 }  // namespace addrbook

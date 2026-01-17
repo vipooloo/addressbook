@@ -1,22 +1,22 @@
-#ifndef SEARCHRESULT_H
-#define SEARCHRESULT_H
+#ifndef PAGEQUERYRESULT_H
+#define PAGEQUERYRESULT_H
 
 #include <cstdint>
 #include <vector>
 
-class SearchResult
+class PageQueryResult
 {
   public:
-    SearchResult(uint32_t cur_page, uint32_t page_size)
-      : SearchResult(0, cur_page, page_size)
+    PageQueryResult(uint32_t cur_page, uint32_t page_size)
+      : PageQueryResult(0, cur_page, page_size)
     {}
-    SearchResult(uint32_t total_records, uint32_t cur_page, uint32_t page_size)
+    PageQueryResult(uint32_t total_records, uint32_t cur_page, uint32_t page_size)
       : m_total_records{total_records}
       , m_cur_page{cur_page}
       , m_page_size{page_size}
     {}
 
-    virtual ~SearchResult() = default;
+    virtual ~PageQueryResult() = default;
 
     uint32_t GetTotalRecords() const
     {
@@ -58,14 +58,14 @@ class SearchResult
         m_page_size = page_size;
     }
 
-    SearchResult(SearchResult&& other) noexcept
+    PageQueryResult(PageQueryResult&& other) noexcept
     {
         m_total_records = other.m_total_records;
         m_cur_page = other.m_cur_page;
         m_page_size = other.m_page_size;
     }
 
-    SearchResult& operator=(SearchResult&& other) noexcept
+    PageQueryResult& operator=(PageQueryResult&& other) noexcept
     {
         if (this != &other)
         {
@@ -76,13 +76,13 @@ class SearchResult
         return *this;
     }
 
-    SearchResult(const SearchResult&) = delete;
-    SearchResult& operator=(const SearchResult&) = delete;
+    PageQueryResult(const PageQueryResult&) = delete;
+    PageQueryResult& operator=(const PageQueryResult&) = delete;
 
   private:
     uint32_t m_total_records;  ///< 总记录条数 (Total number of records)
-    uint32_t m_cur_page;   ///< 当前页码 (Current page number, 1-based)
+    uint32_t m_cur_page;       ///< 当前页码 (Current page number, 1-based)
     uint32_t m_page_size;      ///< 每页容量 (Items per page)
 };
 
-#endif  // SEARCHRESULT_H
+#endif  // PAGEQUERYRESULT_H

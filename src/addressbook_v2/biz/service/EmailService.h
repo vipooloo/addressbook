@@ -3,10 +3,10 @@
 
 #include "AddressMgrDefs.h"
 #include "EmailDto.h"
+#include "EmailPageResult.h"
 #include "EmailRepository.h"
 #include "EventDispatcher.h"
 #include "GroupDto.h"
-#include "SearchEmailResult.h"
 #include <memory>
 #include <vector>
 
@@ -18,19 +18,19 @@ class EmailService
     explicit EmailService(EventDispatcher& dispatcher);
     ~EmailService() = default;
 
-    std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
-    void ClearAllEmails();
+    std::pair<ResultCode, EmailDto> CreateEmail(const EmailDto& dto);
+    ResultCode DeleteAllEmails();
 
     std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
     ResultCode AddEmailAndGroup(const EmailDto& dto);
 
-    ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
-    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
+    ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
+    ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
 
     ResultCode UpdateEmail(const EmailDto& dto);
     ResultCode UpdateGroup(const GroupDto& dto);
 
-    std::pair<ResultCode, SearchEmailResult> QueryEmail(const QueryParam& query_param);
+    std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
 
   private:
     void DataChanged(ResultCode res, ChangeType type);

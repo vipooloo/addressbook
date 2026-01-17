@@ -39,12 +39,12 @@ void AddrMgrImpl::EventHandler(const std::shared_ptr<IEvent>& evt_sptr)
     }
 }
 
-std::pair<ResultCode, EmailDto> AddrMgrImpl::AddEmail(const EmailDto& dto)
+std::pair<ResultCode, EmailDto> AddrMgrImpl::CreateEmail(const EmailDto& dto)
 {
     if (addrbook::CheckerProvider::GetInstance().Verify(dto))
     {
         std::lock_guard<std::mutex> lock(m_mtx);
-        return m_email_srv.AddEmail(dto);
+        return m_email_srv.CreateEmail(dto);
     }
     else
     {
@@ -65,39 +65,39 @@ std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
     }
 }
 
-ResultCode AddrMgrImpl::RemoveEmail(const std::vector<uint32_t>& rids)
+ResultCode AddrMgrImpl::DeleteEmails(const std::vector<uint32_t>& ids)
 {
     ResultCode result = ResultCode::kInvalidParam;
 
     do
     {
-        if (rids.empty())
+        if (ids.empty())
         {
             AB_LOG_E("empty rid list");
             break;
         }
-        if (std::any_of(rids.cbegin(), rids.cend(), [](uint32_t rid) {
+        if (std::any_of(ids.cbegin(), ids.cend(), [](uint32_t rid) {
                 return rid == 0;
             }))
         {
             AB_LOG_E("invalid rid");
             break;
         }
-        if (AddrMgrUtilities::GetSortedUniqueRids(rids).size() != rids.size())
+        if (AddrMgrUtilities::GetSortedUniqueRids(ids).size() != ids.size())
         {
             AB_LOG_E("duplicated rid");
             break;
         }
         std::lock_guard<std::mutex> lock(m_mtx);
-        result = m_email_srv.RemoveEmail(rids);
+        result = m_email_srv.DeleteEmails(ids);
     } while (false);
     return result;
 }
 
-ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& rids)
+ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& ids)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.RemoveGroup(rids);
+    return m_email_srv.RemoveGroup(ids);
 }
 
 ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
@@ -117,7 +117,7 @@ ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
     return m_email_srv.UpdateGroup(dto);
 }
 
-std::pair<ResultCode, SearchEmailResult> AddrMgrImpl::QueryEmail(const QueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> AddrMgrImpl::QueryEmail(const PageQueryParam& query_param)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.QueryEmail(query_param);
@@ -209,10 +209,10 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     while (cur_page < total_pages)
     {
         ++cur_page;
-        std::pair<ResultCode, SearchEmailResult> result = m_email_srv.QueryEmail(QueryParam("", cur_page, page_size));
+        std::pair<ResultCode, EmailPageResult> result = m_email_srv.QueryEmail(PageQueryParam("", cur_page, page_size));
         if (result.first == ResultCode::kSuccess)
         {
-            SearchEmailResult& export_res = result.second;
+            EmailPageResult& export_res = result.second;
             const std::vector<EmailDto>& records = export_res.GetRecords();
             std::vector<std::vector<std::string>> items;
             std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
@@ -239,9 +239,9 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     }
 }
 
-void AddrMgrImpl::ClearAllEmails()
+ResultCode AddrMgrImpl::DeleteAllEmails()
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.ClearAllEmails();
+    return m_email_srv.DeleteAllEmails();
 }
 }  // namespace addrbook

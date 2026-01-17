@@ -6,12 +6,12 @@ void Add()
 {
     AddressManager::AddGroup(GroupDto{"group1", {}});
     AddressManager::AddGroup(GroupDto{"group2", {}});
-    AddressManager::AddEmail(EmailDto{"email1", "email1"});
-    AddressManager::AddEmail(EmailDto{"email2", "email12", {1, 2}});
+    AddressManager::CreateEmail(EmailDto{"email1", "email1"});
+    AddressManager::CreateEmail(EmailDto{"email2", "email12", {1, 2}});
     AddressManager::UpdateEmail(EmailDto{1, "XXXXX", "YYY", {3, 4}});
-    AddressManager::RemoveEmail({12, 333332, 33});
-    std::pair<ResultCode, SearchEmailResult> search_result = AddressManager::QueryEmail(QueryParam("ai", 1, 2));
-    SearchEmailResult& result = search_result.second;
+    AddressManager::DeleteEmails({12, 333332, 33});
+    std::pair<ResultCode, EmailPageResult> search_result = AddressManager::QueryEmail(PageQueryParam("ai", 1, 2));
+    EmailPageResult& result = search_result.second;
     std::cout << "总记录条数:" << result.GetTotalRecords() << std::endl;
     std::cout << "总页码数:" << result.GetTotalPages() << std::endl;
     std::cout << "当前页码:" << result.GetCurrentPage() << std::endl;

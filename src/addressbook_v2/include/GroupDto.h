@@ -45,9 +45,9 @@ class GroupDto
     {
         return m_mail_rids;
     }
-    void SetMailRids(const std::vector<uint32_t>& rids)
+    void SetMailRids(const std::vector<uint32_t>& ids)
     {
-        m_mail_rids = rids;
+        m_mail_rids = ids;
     }
 
   private:

@@ -1,5 +1,5 @@
-#ifndef QUERYPARAM_H
-#define QUERYPARAM_H
+#ifndef PAGEQUERYPARAM_H
+#define PAGEQUERYPARAM_H
 
 #include <cstdint>
 #include <string>
@@ -10,26 +10,26 @@ enum class OrderType : uint8_t
     DESC
 };
 
-class QueryParam
+class PageQueryParam
 {
   public:
-    QueryParam(uint32_t cur_page, uint32_t page_size)
-      : QueryParam("", cur_page, page_size)
+    PageQueryParam(uint32_t cur_page, uint32_t page_size)
+      : PageQueryParam("", cur_page, page_size)
     {}
-    QueryParam(const std::string& keyword, uint32_t cur_page, uint32_t page_size)
-      : QueryParam(keyword, cur_page, page_size, OrderType::ASC)
+    PageQueryParam(const std::string& keyword, uint32_t cur_page, uint32_t page_size)
+      : PageQueryParam(keyword, cur_page, page_size, OrderType::ASC)
     {}
-    QueryParam(uint32_t cur_page, uint32_t page_size, OrderType order_by)
-      : QueryParam("", cur_page, page_size, order_by)
+    PageQueryParam(uint32_t cur_page, uint32_t page_size, OrderType order_by)
+      : PageQueryParam("", cur_page, page_size, order_by)
     {}
-    QueryParam(const std::string& keyword, uint32_t cur_page, uint32_t page_size, OrderType order_by)
+    PageQueryParam(const std::string& keyword, uint32_t cur_page, uint32_t page_size, OrderType order_by)
       : m_keyword{keyword}
       , m_cur_page{cur_page}
       , m_page_size{page_size}
       , m_order_by{order_by}
     {}
 
-    ~QueryParam() = default;
+    ~PageQueryParam() = default;
     const std::string& GetKeyword() const
     {
         return m_keyword;
@@ -54,4 +54,4 @@ class QueryParam
     OrderType m_order_by;
 };
 
-#endif  // QUERYPARAM_H
+#endif  // PAGEQUERYPARAM_H

@@ -15,7 +15,7 @@ EmailRepository::EmailRepository()
     m_mail_group_dao.Create();
 }
 
-uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<uint32_t>& rids)
+uint32_t EmailRepository::CreateEmail(const EmailEntity& entity, const std::vector<uint32_t>& ids)
 {
     uint32_t rid = 0;
     std::pair<bool, EmailEntity> result = m_mail_dao.Insert(entity);
@@ -23,10 +23,10 @@ uint32_t EmailRepository::AddEmail(const EmailEntity& entity, const std::vector<
     {
         uint32_t email_rid = result.second.GetRid();
         std::vector<EmailGroupEntity> relations;
-        relations.reserve(rids.size());
+        relations.reserve(ids.size());
         std::transform(
-            rids.cbegin(),
-            rids.cend(),
+            ids.cbegin(),
+            ids.cend(),
             std::back_inserter(relations),
             [email_rid](uint32_t group_rid) {
                 return EmailGroupEntity(email_rid, group_rid);
@@ -44,12 +44,12 @@ uint32_t EmailRepository::GetOrCreateEmail(const EmailEntity& entity)
     uint32_t rid = m_mail_dao.GetEmailRid(entity);
     if (0 == rid)
     {
-        rid = AddEmail(entity, {});
+        rid = CreateEmail(entity, {});
     }
     return rid;
 }
 
-uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& rids)
+uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& ids)
 {
     uint32_t rid = 0;
 
@@ -58,10 +58,10 @@ uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<
     {
         uint32_t group_rid = result.second.GetRid();
         std::vector<EmailGroupEntity> relations;
-        relations.reserve(rids.size());
+        relations.reserve(ids.size());
         std::transform(
-            rids.cbegin(),
-            rids.cend(),
+            ids.cbegin(),
+            ids.cend(),
             std::back_inserter(relations),
             [group_rid](uint32_t email_rid) {
                 return EmailGroupEntity(email_rid, group_rid);
@@ -140,7 +140,7 @@ bool EmailRepository::IsMailExist(const std::vector<uint32_t>& email_ids) const
     return result;
 }
 
-bool EmailRepository::RemoveEmail(const std::vector<uint32_t>& email_ids)
+bool EmailRepository::DeleteEmails(const std::vector<uint32_t>& email_ids)
 {
     bool result = true;
     if (!email_ids.empty())
@@ -199,7 +199,7 @@ bool EmailRepository::RemoveGroupByMailRid(uint32_t email_rid)
     return m_mail_group_dao.RemoveByEmailRid(email_rid);
 }
 
-PageResult EmailRepository::GetEmailsByKeyword(const QueryParam& query_param)
+PageResult EmailRepository::GetEmailsByKeyword(const PageQueryParam& query_param)
 {
     PageResult result(query_param.GetCurPage(), query_param.GetPageSize());
 
@@ -215,7 +215,7 @@ PageResult EmailRepository::GetEmailsByKeyword(const QueryParam& query_param)
     return result;
 }
 
-bool EmailRepository::ClearAllEmails()
+bool EmailRepository::DeleteAllEmails()
 {
     return m_mail_dao.RemoveAll();
 }

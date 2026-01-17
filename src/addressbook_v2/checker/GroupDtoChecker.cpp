@@ -32,21 +32,21 @@ bool GroupDtoChecker::BasickInfoCheck(const GroupDto& dto) const
             AB_LOG_E("Name is empty");
             break;
         }
-        std::vector<uint32_t> rids = dto.GetMailRids();
-        if (std::any_of(rids.cbegin(), rids.cend(), [](uint32_t rid) {
+        std::vector<uint32_t> ids = dto.GetMailRids();
+        if (std::any_of(ids.cbegin(), ids.cend(), [](uint32_t rid) {
                 return rid == 0;
             }))
         {
             AB_LOG_E("Invalid email rid");
             break;
         }
-        if (rids.size() > kMaxEmailsPerGroup)
+        if (ids.size() > kMaxEmailsPerGroup)
         {
             AB_LOG_E("Too many emails");
             break;
         }
-        std::set<uint32_t> rid_set(rids.cbegin(), rids.cend());
-        if (rid_set.size() != rids.size())
+        std::set<uint32_t> rid_set(ids.cbegin(), ids.cend());
+        if (rid_set.size() != ids.size())
         {
             AB_LOG_E("Duplicate email rid");
             break;

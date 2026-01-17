@@ -6,17 +6,17 @@
 class AddressManager
 {
   public:
-    static std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
-    static ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
+    static std::pair<ResultCode, EmailDto> CreateEmail(const EmailDto& dto);
+    static ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
     static ResultCode UpdateEmail(const EmailDto& dto);
-    static void ClearAllEmails();
-    static std::pair<ResultCode, SearchEmailResult> QueryEmail(const QueryParam& query_param);
+    static ResultCode DeleteAllEmails();
+    static std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
     static ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ResultCode ExportEmails(const ImportExportCallback& cb);
     static ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
     /*---------------------------------------------------*/
     static std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
-    static ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
+    static ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
     static ResultCode UpdateGroup(const GroupDto& dto);
     /*---------------------------------------------------*/
     void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);

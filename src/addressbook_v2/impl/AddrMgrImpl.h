@@ -17,16 +17,16 @@ class AddrMgrImpl
         return instance;
     }
 
-    std::pair<ResultCode, EmailDto> AddEmail(const EmailDto& dto);
-    ResultCode RemoveEmail(const std::vector<uint32_t>& rids);
-    void ClearAllEmails();
+    std::pair<ResultCode, EmailDto> CreateEmail(const EmailDto& dto);
+    ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
+    ResultCode DeleteAllEmails();
     ResultCode UpdateEmail(const EmailDto& dto);
-    std::pair<ResultCode, SearchEmailResult> QueryEmail(const QueryParam& query_param);
+    std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
     ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
     /*---------------------------------------------------*/
     std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
-    ResultCode RemoveGroup(const std::vector<uint32_t>& rids);
+    ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
     ResultCode UpdateGroup(const GroupDto& dto);
 
     void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);

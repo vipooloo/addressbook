@@ -2,9 +2,9 @@
 #include "AddrMgrUtilities.h"
 #include "AddressManager.h"
 
-std::pair<ResultCode, EmailDto> AddressManager::AddEmail(const EmailDto& dto)
+std::pair<ResultCode, EmailDto> AddressManager::CreateEmail(const EmailDto& dto)
 {
-    return addrbook::AddrMgrImpl::GetInstance().AddEmail(dto);
+    return addrbook::AddrMgrImpl::GetInstance().CreateEmail(dto);
 }
 
 std::pair<ResultCode, GroupDto> AddressManager::AddGroup(const GroupDto& dto)
@@ -12,14 +12,14 @@ std::pair<ResultCode, GroupDto> AddressManager::AddGroup(const GroupDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().AddGroup(dto);
 }
 
-ResultCode AddressManager::RemoveEmail(const std::vector<uint32_t>& rids)
+ResultCode AddressManager::DeleteEmails(const std::vector<uint32_t>& ids)
 {
-    return addrbook::AddrMgrImpl::GetInstance().RemoveEmail(rids);
+    return addrbook::AddrMgrImpl::GetInstance().DeleteEmails(ids);
 }
 
-ResultCode AddressManager::RemoveGroup(const std::vector<uint32_t>& rids)
+ResultCode AddressManager::RemoveGroup(const std::vector<uint32_t>& ids)
 {
-    return addrbook::AddrMgrImpl::GetInstance().RemoveGroup(rids);
+    return addrbook::AddrMgrImpl::GetInstance().RemoveGroup(ids);
 }
 
 ResultCode AddressManager::UpdateEmail(const EmailDto& dto)
@@ -27,9 +27,9 @@ ResultCode AddressManager::UpdateEmail(const EmailDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().UpdateEmail(dto);
 }
 
-void AddressManager::ClearAllEmails()
+ResultCode AddressManager::DeleteAllEmails()
 {
-    return addrbook::AddrMgrImpl::GetInstance().ClearAllEmails();
+    return addrbook::AddrMgrImpl::GetInstance().DeleteAllEmails();
 }
 
 ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
@@ -37,7 +37,7 @@ ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().UpdateGroup(dto);
 }
 
-std::pair<ResultCode, SearchEmailResult> AddressManager::QueryEmail(const QueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> AddressManager::QueryEmail(const PageQueryParam& query_param)
 {
     return addrbook::AddrMgrImpl::GetInstance().QueryEmail(query_param);
 }
