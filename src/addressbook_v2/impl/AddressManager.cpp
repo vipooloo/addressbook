@@ -37,9 +37,9 @@ ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().UpdateGroup(dto);
 }
 
-std::pair<ResultCode, EmailPageResult> AddressManager::QueryEmail(const PageQueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> AddressManager::PageQueryEmail(const PageQueryParam& query_param)
 {
-    return addrbook::AddrMgrImpl::GetInstance().QueryEmail(query_param);
+    return addrbook::AddrMgrImpl::GetInstance().PageQueryEmail(query_param);
 }
 
 ResultCode AddressManager::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)

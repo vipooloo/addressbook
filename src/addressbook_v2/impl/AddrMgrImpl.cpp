@@ -117,10 +117,10 @@ ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
     return m_email_srv.UpdateGroup(dto);
 }
 
-std::pair<ResultCode, EmailPageResult> AddrMgrImpl::QueryEmail(const PageQueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> AddrMgrImpl::PageQueryEmail(const PageQueryParam& query_param)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.QueryEmail(query_param);
+    return m_email_srv.PageQueryEmail(query_param);
 }
 
 ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
@@ -209,7 +209,7 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     while (cur_page < total_pages)
     {
         ++cur_page;
-        std::pair<ResultCode, EmailPageResult> result = m_email_srv.QueryEmail(PageQueryParam("", cur_page, page_size));
+        std::pair<ResultCode, EmailPageResult> result = m_email_srv.PageQueryEmail(PageQueryParam("", cur_page, page_size));
         if (result.first == ResultCode::kSuccess)
         {
             EmailPageResult& export_res = result.second;

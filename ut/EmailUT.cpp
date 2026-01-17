@@ -25,7 +25,7 @@ class EmailUT : public ::testing::Test
         AddressManager::DeleteAllEmails();
         uint32_t cur_page = 1;
         uint32_t page_size = 10;
-        auto result = AddressManager::QueryEmail(PageQueryParam("", cur_page, page_size));
+        auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
         ASSERT_EQ(result.first, ResultCode::kSuccess);
         ASSERT_EQ(result.second.GetTotalRecords(), 0u);
         ASSERT_EQ(result.second.GetTotalPages(), 0u);
@@ -53,7 +53,7 @@ TEST_F(EmailUT, AddEmail_case1)
     }
     uint32_t cur_page = 1;
     uint32_t page_size = 10;
-    auto result = AddressManager::QueryEmail(PageQueryParam("", cur_page, page_size));
+    auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     const std::vector<EmailDto>& search_results = result.second.GetRecords();
     EXPECT_EQ(result.second.GetTotalRecords(), add_email_cases.size());
@@ -84,7 +84,7 @@ TEST_F(EmailUT, RemoveEmail_case1)
     }
     uint32_t cur_page = 1;
     uint32_t page_size = 10;
-    auto result = AddressManager::QueryEmail(PageQueryParam("", cur_page, page_size));
+    auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     const std::vector<EmailDto>& search_results = result.second.GetRecords();
     EXPECT_EQ(result.second.GetTotalRecords(), add_email_cases.size());
@@ -96,7 +96,7 @@ TEST_F(EmailUT, RemoveEmail_case1)
     }
     ResultCode remove_result = AddressManager::DeleteEmails(rids_to_remove);
     EXPECT_EQ(remove_result, ResultCode::kSuccess);
-    result = AddressManager::QueryEmail(PageQueryParam("", cur_page, page_size));
+    result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     EXPECT_EQ(result.second.GetTotalRecords(), 0u);
 }

@@ -10,7 +10,7 @@ class AddressManager
     static ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
     static ResultCode UpdateEmail(const EmailDto& dto);
     static ResultCode DeleteAllEmails();
-    static std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
+    static std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
     static ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ResultCode ExportEmails(const ImportExportCallback& cb);
     static ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);

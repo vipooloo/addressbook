@@ -21,7 +21,7 @@ class AddrMgrImpl
     ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
     ResultCode DeleteAllEmails();
     ResultCode UpdateEmail(const EmailDto& dto);
-    std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
+    std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
     ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
     /*---------------------------------------------------*/

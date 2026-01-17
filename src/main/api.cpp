@@ -10,7 +10,7 @@ void Add()
     AddressManager::CreateEmail(EmailDto{"email2", "email12", {1, 2}});
     AddressManager::UpdateEmail(EmailDto{1, "XXXXX", "YYY", {3, 4}});
     AddressManager::DeleteEmails({12, 333332, 33});
-    std::pair<ResultCode, EmailPageResult> search_result = AddressManager::QueryEmail(PageQueryParam("ai", 1, 2));
+    std::pair<ResultCode, EmailPageResult> search_result = AddressManager::PageQueryEmail(PageQueryParam("ai", 1, 2));
     EmailPageResult& result = search_result.second;
     std::cout << "总记录条数:" << result.GetTotalRecords() << std::endl;
     std::cout << "总页码数:" << result.GetTotalPages() << std::endl;

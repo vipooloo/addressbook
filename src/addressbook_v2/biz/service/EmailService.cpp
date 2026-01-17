@@ -238,7 +238,7 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
     return {};
 }
 
-std::pair<ResultCode, EmailPageResult> EmailService::QueryEmail(const PageQueryParam& query_param)
+std::pair<ResultCode, EmailPageResult> EmailService::PageQueryEmail(const PageQueryParam& query_param)
 {
     std::pair<ResultCode, EmailPageResult> result = std::make_pair(ResultCode::kSuccess, EmailPageResult(query_param.GetCurPage(), query_param.GetPageSize()));
 

@@ -30,7 +30,7 @@ class EmailService
     ResultCode UpdateEmail(const EmailDto& dto);
     ResultCode UpdateGroup(const GroupDto& dto);
 
-    std::pair<ResultCode, EmailPageResult> QueryEmail(const PageQueryParam& query_param);
+    std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
 
   private:
     void DataChanged(ResultCode res, ChangeType type);
