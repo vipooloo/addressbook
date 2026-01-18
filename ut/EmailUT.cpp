@@ -10,10 +10,19 @@ class ConcreteAddressMgrDataObserver : public IAddressMgrDataObserver
     explicit ConcreteAddressMgrDataObserver(const std::function<bool(ChangeType)>& callback)
       : m_callback(callback)
     {}
+    ~ConcreteAddressMgrDataObserver()
+    {
+        EXPECT_GT(m_change_count, 0u);
+    }
     void OnChanged(ChangeType type) override
     {
-        bool result = m_callback(type);
-        EXPECT_TRUE(result) << "事件为:" << static_cast<int>(type);
+        ++m_change_count;
+        EXPECT_TRUE(m_callback != nullptr);
+        if (m_callback)
+        {
+            bool result = m_callback(type);
+            EXPECT_TRUE(result) << "事件为:" << static_cast<int>(type);
+        }
     }
     void SetCallback(const std::function<bool(ChangeType)>& callback)
     {
@@ -22,6 +31,7 @@ class ConcreteAddressMgrDataObserver : public IAddressMgrDataObserver
 
   private:
     std::function<bool(ChangeType)> m_callback;
+    uint32_t m_change_count{0};
 };
 class EmailUT : public ::testing::Test
 {
@@ -42,6 +52,12 @@ class EmailUT : public ::testing::Test
     }
     void ClearAllData()
     {
+        std::function<bool(ChangeType)> callback = [](ChangeType type) {
+            return type == ChangeType::DeleteAllEmails;
+        };
+        auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+        AddressManager::Register(observer);
+
         AddressManager::DeleteAllEmails();
         uint32_t cur_page = 1;
         uint32_t page_size = 10;
@@ -51,13 +67,15 @@ class EmailUT : public ::testing::Test
         ASSERT_EQ(result.second.GetTotalPages(), 0u);
         ASSERT_EQ(result.second.GetCurrentPage(), cur_page);
         ASSERT_EQ(result.second.GetPageSize(), page_size);
+
+        AddressManager::Unregister(observer);
     }
 };
 
 TEST_F(EmailUT, AddEmail_case1)
 {
     std::function<bool(ChangeType)> callback = [](ChangeType type) {
-        return type == ChangeType::kAddEmail;
+        return type == ChangeType::CreateEmail;
     };
     auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
     AddressManager::Register(observer);
@@ -123,7 +141,7 @@ TEST_F(EmailUT, RemoveEmail_case1)
     }
 
     std::function<bool(ChangeType)> callback = [](ChangeType type) {
-        return type == ChangeType::kRemoveEmail;
+        return type == ChangeType::DeleteEmails;
     };
     auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
     AddressManager::Register(observer);

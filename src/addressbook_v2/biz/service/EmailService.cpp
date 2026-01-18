@@ -55,7 +55,7 @@ std::pair<ResultCode, EmailDto> EmailService::CreateEmail(const EmailDto& dto)
         result.second.SetRid(rid);
         trans_guard.Commit();
     } while (false);
-    DataChanged(result.first, ChangeType::kAddEmail);
+    DataChanged(result.first, ChangeType::CreateEmail);
     return result;
 }
 
@@ -168,7 +168,7 @@ ResultCode EmailService::DeleteEmails(const std::vector<uint32_t>& ids)
         AB_LOG_E("Failed %s", __FUNCTION__);
         result = ResultCode::kDbError;
     }
-    DataChanged(result, ChangeType::kRemoveEmail);
+    DataChanged(result, ChangeType::DeleteEmails);
 
     return result;
 }
@@ -285,6 +285,7 @@ ResultCode EmailService::DeleteAllEmails()
         trans_guard.Commit();
         result = ResultCode::kSuccess;
     }
+    DataChanged(result, ChangeType::DeleteAllEmails);
     return result;
 }
 }  // namespace addrbook

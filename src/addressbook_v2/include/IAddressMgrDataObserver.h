@@ -6,11 +6,11 @@
 
 enum class ChangeType : uint8_t
 {
-    kAddEmail = 0,
-    kRemoveEmail,
-    kUpdateEmail,
-    kAddGroup,
-    kImportEmail,
+    CreateEmail = 0,
+    DeleteEmails,
+    DeleteAllEmails,
+    UpdateEmail,
+    ImportEmails,
 };
 
 class IAddressMgrDataObserver

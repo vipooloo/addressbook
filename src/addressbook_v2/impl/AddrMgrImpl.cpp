@@ -193,7 +193,7 @@ void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExp
         if (cb)
         {
             cb(file_path, result);
-            m_evt_dispatcher.Notify(ChangeType::kImportEmail);
+            m_evt_dispatcher.Notify(ChangeType::ImportEmails);
         }
     }
 }
