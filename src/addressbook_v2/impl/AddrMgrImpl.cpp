@@ -52,19 +52,6 @@ std::pair<ResultCode, EmailDto> AddrMgrImpl::CreateEmail(const EmailDto& dto)
     }
 }
 
-std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
-{
-    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
-    {
-        std::lock_guard<std::mutex> lock(m_mtx);
-        return m_email_srv.AddGroup(dto);
-    }
-    else
-    {
-        return std::make_pair(ResultCode::kInvalidParam, dto);
-    }
-}
-
 ResultCode AddrMgrImpl::DeleteEmails(const std::vector<uint32_t>& ids)
 {
     ResultCode result = ResultCode::kInvalidParam;
@@ -94,10 +81,10 @@ ResultCode AddrMgrImpl::DeleteEmails(const std::vector<uint32_t>& ids)
     return result;
 }
 
-ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& ids)
+ResultCode AddrMgrImpl::DeleteAllEmails()
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.RemoveGroup(ids);
+    return m_email_srv.DeleteAllEmails();
 }
 
 ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
@@ -116,6 +103,25 @@ ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
     {
     }
     return rsult;
+}
+
+std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
+{
+    if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        return m_email_srv.AddGroup(dto);
+    }
+    else
+    {
+        return std::make_pair(ResultCode::kInvalidParam, dto);
+    }
+}
+
+ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& ids)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    return m_email_srv.RemoveGroup(ids);
 }
 
 ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
@@ -153,14 +159,28 @@ ResultCode AddrMgrImpl::ExportEmails(const std::string& file_path, const ImportE
     return ResultCode::kSuccess;
 }
 
-void AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+ResultCode AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
-    m_evt_dispatcher.Register(observer);
+    ResultCode result = ResultCode::kInvalidParam;
+    if (observer)
+    {
+        result = m_evt_dispatcher.Register(observer) ? ResultCode::kSuccess : ResultCode::kAlreadyExist;
+    }
+    else
+    {
+        result = ResultCode::kInvalidParam;
+    }
+    return result;
 }
 
-void AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+ResultCode AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
-    m_evt_dispatcher.Unregister(observer);
+    ResultCode result = ResultCode::kInvalidParam;
+    if (observer)
+    {
+        result = m_evt_dispatcher.Unregister(observer) ? ResultCode::kSuccess : ResultCode::kNotFound;
+    }
+    return result;
 }
 
 void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExportCallback& cb)
@@ -246,9 +266,4 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
     }
 }
 
-ResultCode AddrMgrImpl::DeleteAllEmails()
-{
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.DeleteAllEmails();
-}
 }  // namespace addrbook

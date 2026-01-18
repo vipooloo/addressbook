@@ -18,8 +18,8 @@ class AddressManager
     static ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
     static ResultCode UpdateGroup(const GroupDto& dto);
     /*---------------------------------------------------*/
-    static void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
-    static void Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+    static ResultCode Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+    static ResultCode Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
 
   private:
     AddressManager() = delete;

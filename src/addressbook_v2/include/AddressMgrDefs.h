@@ -15,7 +15,7 @@ enum class ResultCode : uint8_t
     kSuccess = 0,     // 成功
     kInvalidParam,    // 参数无效
     kNotFound,        // 数据不存在
-    kDuplicate,       // 数据重复
+    kAlreadyExist,    // 数据重复
     kDbError,         // 数据库错误
     kExceedMaxCount,  // 超出最大数量限制（新增）
     kNotable,         // 不可用

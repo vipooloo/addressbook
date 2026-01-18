@@ -8,23 +8,32 @@ EventDispatcher::EventDispatcher()
 {
 }
 
-void EventDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+bool EventDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
+    bool result = false;
     std::lock_guard<std::mutex> lock(m_mutex);
     std::list<std::shared_ptr<IAddressMgrDataObserver>>::const_iterator it = std::find(m_observers.cbegin(), m_observers.cend(), observer);
     if (it == m_observers.end())
     {
         m_observers.emplace_back(observer);
+        result = true;
     }
+    return result;
 }
 
-void EventDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+bool EventDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
+    bool result = false;
     std::lock_guard<std::mutex> lock(m_mutex);
     std::list<std::shared_ptr<IAddressMgrDataObserver>>::iterator it = std::remove_if(m_observers.begin(), m_observers.end(), [&observer](const std::shared_ptr<IAddressMgrDataObserver>& sptr) {
         return sptr == observer;
     });
-    m_observers.erase(it);
+    if (it != m_observers.end())
+    {
+        m_observers.erase(it);
+        result = true;
+    }
+    return result;
 }
 
 void EventDispatcher::Notify(ChangeType type)

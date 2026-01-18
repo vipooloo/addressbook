@@ -13,9 +13,9 @@ class EventDispatcher
     EventDispatcher();
     ~EventDispatcher() = default;
 
-    void Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+    bool Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
 
-    void Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
+    bool Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
 
     void Notify(ChangeType type);
 

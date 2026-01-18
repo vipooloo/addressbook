@@ -53,12 +53,12 @@ ResultCode AddressManager::ExportEmails(const ImportExportCallback& cb)
     return addrbook::AddrMgrImpl::GetInstance().ExportEmails(file_path, cb);
 }
 
-void AddressManager::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+ResultCode AddressManager::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
-    addrbook::AddrMgrImpl::GetInstance().Register(observer);
+    return addrbook::AddrMgrImpl::GetInstance().Register(observer);
 }
 
-void AddressManager::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
+ResultCode AddressManager::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
-    addrbook::AddrMgrImpl::GetInstance().Unregister(observer);
+    return addrbook::AddrMgrImpl::GetInstance().Unregister(observer);
 }
