@@ -130,7 +130,7 @@ bool EmailRepository::IsGroupExist(const std::vector<uint32_t>& group_ids) const
     return result;
 }
 
-bool EmailRepository::IsMailExist(const std::vector<uint32_t>& email_ids) const
+bool EmailRepository::IsEmailExist(const std::vector<uint32_t>& email_ids) const
 {
     bool result = true;
     if (!email_ids.empty())

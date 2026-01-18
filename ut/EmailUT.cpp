@@ -99,18 +99,19 @@ TEST_F(EmailUT, AddEmail_case1)
     uint32_t page_size = 10;
     auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
-    const std::vector<EmailDto>& search_results = result.second.GetRecords();
+    const std::vector<EmailDto>& query_results = result.second.GetRecords();
     EXPECT_EQ(result.second.GetTotalRecords(), add_email_cases.size());
     for (uint32_t i = 0; i < add_email_cases.size(); ++i)
     {
-        EXPECT_EQ(search_results[i].GetRid(), output_email_cases[i].GetRid());
-        EXPECT_EQ(search_results[i].GetName(), output_email_cases[i].GetName());
-        EXPECT_EQ(search_results[i].GetAddress(), output_email_cases[i].GetAddress());
-        EXPECT_EQ(search_results[i].GetName(), add_email_cases[i].GetName());
-        EXPECT_EQ(search_results[i].GetAddress(), add_email_cases[i].GetAddress());
+        EXPECT_EQ(query_results[i].GetRid(), output_email_cases[i].GetRid());
+        EXPECT_EQ(query_results[i].GetName(), output_email_cases[i].GetName());
+        EXPECT_EQ(query_results[i].GetAddress(), output_email_cases[i].GetAddress());
+        EXPECT_EQ(query_results[i].GetName(), add_email_cases[i].GetName());
+        EXPECT_EQ(query_results[i].GetAddress(), add_email_cases[i].GetAddress());
     }
     AddressManager::Unregister(observer);
 }
+
 TEST_F(EmailUT, RemoveEmail_case1)
 {
     std::vector<EmailDto> add_email_cases = {
@@ -131,13 +132,13 @@ TEST_F(EmailUT, RemoveEmail_case1)
     uint32_t page_size = 10;
     auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
-    const std::vector<EmailDto>& search_results = result.second.GetRecords();
+    const std::vector<EmailDto>& query_results = result.second.GetRecords();
     EXPECT_EQ(result.second.GetTotalRecords(), add_email_cases.size());
     std::vector<uint32_t> rids_to_remove;
     for (uint32_t i = 0; i < add_email_cases.size(); ++i)
     {
-        EXPECT_EQ(search_results[i].GetRid(), output_email_cases[i].GetRid());
-        rids_to_remove.emplace_back(search_results[i].GetRid());
+        EXPECT_EQ(query_results[i].GetRid(), output_email_cases[i].GetRid());
+        rids_to_remove.emplace_back(query_results[i].GetRid());
     }
 
     std::function<bool(ChangeType)> callback = [](ChangeType type) {
@@ -151,6 +152,50 @@ TEST_F(EmailUT, RemoveEmail_case1)
     result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     EXPECT_EQ(result.second.GetTotalRecords(), 0u);
+
+    AddressManager::Unregister(observer);
+}
+
+TEST_F(EmailUT, UpdateEmail_case1)
+{
+    {
+        ResultCode result = AddressManager::UpdateEmail(EmailDto());
+        EXPECT_EQ(result, ResultCode::kInvalidParam);
+    }
+    {
+        ResultCode result = AddressManager::UpdateEmail(EmailDto{9999, "nonexist", "nonexist"});
+        EXPECT_EQ(result, ResultCode::kNotFound);
+    }
+}
+
+TEST_F(EmailUT, UpdateEmail_case2)
+{
+    AddressManager::CreateEmail(EmailDto("alice@example.com", "Alice"));
+    uint32_t cur_page = 1;
+    uint32_t page_size = 10;
+    auto result = AddressManager::PageQueryEmail(PageQueryParam(cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    const std::vector<EmailDto>& query_results = result.second.GetRecords();
+    EXPECT_EQ(result.second.GetTotalRecords(), 1u);
+    EXPECT_GT(query_results[0].GetRid(), 0u);
+    EXPECT_EQ(query_results[0].GetName(), "Alice");
+    EXPECT_EQ(query_results[0].GetAddress(), "alice@example.com");
+
+    std::function<bool(ChangeType)> callback = [](ChangeType type) {
+        return type == ChangeType::UpdateEmail;
+    };
+    auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+    AddressManager::Register(observer);
+
+    ResultCode update_result = AddressManager::UpdateEmail(EmailDto(query_results[0].GetRid(), "new_alice@example.com", "new_Alice Updated"));
+    EXPECT_EQ(update_result, ResultCode::kSuccess);
+    result = AddressManager::PageQueryEmail(PageQueryParam(cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    const std::vector<EmailDto>& updated_query_results = result.second.GetRecords();
+    EXPECT_EQ(result.second.GetTotalRecords(), 1u);
+    EXPECT_EQ(updated_query_results[0].GetRid(), query_results[0].GetRid());
+    EXPECT_EQ(updated_query_results[0].GetName(), "new_Alice Updated");
+    EXPECT_EQ(updated_query_results[0].GetAddress(), "new_alice@example.com");
 
     AddressManager::Unregister(observer);
 }

@@ -21,7 +21,7 @@ class EmailRepository
 
     uint32_t CreateEmail(const EmailEntity& entity, const std::vector<uint32_t>& ids);
     bool DeleteAllEmails();
-    bool IsMailExist(const std::vector<uint32_t>& email_ids) const;
+    bool IsEmailExist(const std::vector<uint32_t>& email_ids) const;
     uint32_t GetEmailCount() const;
     bool CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit);
     uint32_t GetOrCreateEmail(const EmailEntity& entity);

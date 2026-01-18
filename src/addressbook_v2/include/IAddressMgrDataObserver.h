@@ -2,7 +2,6 @@
 #define IADDRESSMGRDATAOBSERVER_H
 
 #include <cstdint>
-#include <vector>
 
 enum class ChangeType : uint8_t
 {

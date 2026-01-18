@@ -13,7 +13,6 @@ class AddressManager
     static std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
     static ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ResultCode ExportEmails(const ImportExportCallback& cb);
-    static ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
     /*---------------------------------------------------*/
     static std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
     static ResultCode RemoveGroup(const std::vector<uint32_t>& ids);

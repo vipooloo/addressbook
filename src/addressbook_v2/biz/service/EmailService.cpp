@@ -75,7 +75,7 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         }
         // 检查邮件是否存在
         std::vector<uint32_t> mail_rids = dto.GetMailRids();
-        bool group_exist = m_mail_rep.IsMailExist(mail_rids);
+        bool group_exist = m_mail_rep.IsEmailExist(mail_rids);
         if (!group_exist)
         {
             AB_LOG_E("Some mails do not exist");
@@ -197,6 +197,13 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
     do
     {
         TransactionGuard trans_guard;
+        // 检查是否存在这个邮件
+        if (!m_mail_rep.IsEmailExist({dto.GetRid()}))
+        {
+            AB_LOG_E("Email does not exist");
+            result = ResultCode::kNotFound;
+            break;
+        }
         // 删除旧关系
         if (!m_mail_rep.RemoveGroupByMailRid(dto.GetRid()))
         {
@@ -230,6 +237,7 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
         }
         trans_guard.Commit();
     } while (false);
+    DataChanged(result, ChangeType::UpdateEmail);
     return result;
 }
 

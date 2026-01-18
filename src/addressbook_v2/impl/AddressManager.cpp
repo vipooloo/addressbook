@@ -50,11 +50,6 @@ ResultCode AddressManager::ImportEmails(const std::string& file_path, const Impo
 ResultCode AddressManager::ExportEmails(const ImportExportCallback& cb)
 {
     std::string file_path = AddrMgrUtilities::GenerateTimestampedFileName(EMAIL_EXPORT_PREFIX, EXPORT_FILE_SUFFIX);
-    return AddressManager::ExportEmails(file_path, cb);
-}
-
-ResultCode AddressManager::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
-{
     return addrbook::AddrMgrImpl::GetInstance().ExportEmails(file_path, cb);
 }
 
