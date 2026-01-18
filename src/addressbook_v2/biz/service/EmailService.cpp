@@ -168,6 +168,7 @@ ResultCode EmailService::DeleteEmails(const std::vector<uint32_t>& ids)
         AB_LOG_E("Failed %s", __FUNCTION__);
         result = ResultCode::kDbError;
     }
+    DataChanged(result, ChangeType::kRemoveEmail);
 
     return result;
 }

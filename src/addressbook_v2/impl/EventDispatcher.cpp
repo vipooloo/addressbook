@@ -21,9 +21,10 @@ void EventDispatcher::Register(const std::shared_ptr<IAddressMgrDataObserver>& o
 void EventDispatcher::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    std::remove_if(m_observers.begin(), m_observers.end(), [&observer](const std::shared_ptr<IAddressMgrDataObserver>& sptr) {
+    std::list<std::shared_ptr<IAddressMgrDataObserver>>::iterator it = std::remove_if(m_observers.begin(), m_observers.end(), [&observer](const std::shared_ptr<IAddressMgrDataObserver>& sptr) {
         return sptr == observer;
     });
+    m_observers.erase(it);
 }
 
 void EventDispatcher::Notify(ChangeType type)

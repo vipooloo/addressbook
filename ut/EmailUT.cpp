@@ -3,6 +3,26 @@
 #include "gtest/gtest.h"
 
 namespace {
+
+class ConcreteAddressMgrDataObserver : public IAddressMgrDataObserver
+{
+  public:
+    explicit ConcreteAddressMgrDataObserver(const std::function<bool(ChangeType)>& callback)
+      : m_callback(callback)
+    {}
+    void OnChanged(ChangeType type) override
+    {
+        bool result = m_callback(type);
+        EXPECT_TRUE(result) << "事件为:" << static_cast<int>(type);
+    }
+    void SetCallback(const std::function<bool(ChangeType)>& callback)
+    {
+        m_callback = callback;
+    }
+
+  private:
+    std::function<bool(ChangeType)> m_callback;
+};
 class EmailUT : public ::testing::Test
 {
   protected:
@@ -36,6 +56,12 @@ class EmailUT : public ::testing::Test
 
 TEST_F(EmailUT, AddEmail_case1)
 {
+    std::function<bool(ChangeType)> callback = [](ChangeType type) {
+        return type == ChangeType::kAddEmail;
+    };
+    auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+    AddressManager::Register(observer);
+
     std::vector<EmailDto> add_email_cases = {
         {"alice@example.com", "Alice"},
         {"bob@example.com", "Bob"},
@@ -65,6 +91,7 @@ TEST_F(EmailUT, AddEmail_case1)
         EXPECT_EQ(search_results[i].GetName(), add_email_cases[i].GetName());
         EXPECT_EQ(search_results[i].GetAddress(), add_email_cases[i].GetAddress());
     }
+    AddressManager::Unregister(observer);
 }
 TEST_F(EmailUT, RemoveEmail_case1)
 {
@@ -94,10 +121,19 @@ TEST_F(EmailUT, RemoveEmail_case1)
         EXPECT_EQ(search_results[i].GetRid(), output_email_cases[i].GetRid());
         rids_to_remove.emplace_back(search_results[i].GetRid());
     }
+
+    std::function<bool(ChangeType)> callback = [](ChangeType type) {
+        return type == ChangeType::kRemoveEmail;
+    };
+    auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+    AddressManager::Register(observer);
+
     ResultCode remove_result = AddressManager::DeleteEmails(rids_to_remove);
     EXPECT_EQ(remove_result, ResultCode::kSuccess);
     result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     EXPECT_EQ(result.second.GetTotalRecords(), 0u);
+
+    AddressManager::Unregister(observer);
 }
 }  // namespace

@@ -6,7 +6,7 @@
 
 enum class ChangeType : uint8_t
 {
-    kAddEmail,
+    kAddEmail = 0,
     kRemoveEmail,
     kUpdateEmail,
     kAddGroup,
