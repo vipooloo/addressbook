@@ -105,6 +105,43 @@ ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
     return rsult;
 }
 
+std::pair<ResultCode, EmailPageResult> AddrMgrImpl::PageQueryEmail(const PageQueryParam& query_param)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    return m_email_srv.PageQueryEmail(query_param);
+}
+
+ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
+{
+    ResultCode rsult = ResultCode::kInvalidParam;
+
+    struct stat stat_buf = {};
+    if (stat(file_path.c_str(), &stat_buf) == 0)
+    {
+        if (S_ISREG(stat_buf.st_mode) && stat_buf.st_size > 0)
+        {
+            m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, cb));
+            rsult = ResultCode::kSuccess;
+        }
+        else
+        {
+            AB_LOG_E("file is not regular or empty:%s", file_path.c_str());
+        }
+    }
+    else
+    {
+        AB_LOG_E("file not exist file:%s", file_path.c_str());
+    }
+
+    return rsult;
+}
+
+ResultCode AddrMgrImpl::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
+{
+    m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Export, file_path, cb));
+    return ResultCode::kSuccess;
+}
+
 std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
 {
     if (addrbook::CheckerProvider::GetInstance().Verify(dto))
@@ -128,35 +165,6 @@ ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.UpdateGroup(dto);
-}
-
-std::pair<ResultCode, EmailPageResult> AddrMgrImpl::PageQueryEmail(const PageQueryParam& query_param)
-{
-    std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.PageQueryEmail(query_param);
-}
-
-ResultCode AddrMgrImpl::ImportEmails(const std::string& file_path, const ImportExportCallback& cb)
-{
-    ResultCode rsult = ResultCode::kInvalidParam;
-
-    struct stat stat_buf = {};
-    if (stat(file_path.c_str(), &stat_buf) == 0)
-    {
-        if (S_ISREG(stat_buf.st_mode) && stat_buf.st_size > 0)
-        {
-            m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Import, file_path, cb));
-            rsult = ResultCode::kSuccess;
-        }
-    }
-
-    return rsult;
-}
-
-ResultCode AddrMgrImpl::ExportEmails(const std::string& file_path, const ImportExportCallback& cb)
-{
-    m_evt_loop.PushEvent(std::make_shared<ImportExportEvent>(EventType::EMail_Export, file_path, cb));
-    return ResultCode::kSuccess;
 }
 
 ResultCode AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
@@ -185,10 +193,11 @@ ResultCode AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver
 
 void AddrMgrImpl::ImportEmailsSync(const std::string& file_path, const ImportExportCallback& cb)
 {
-    addrbook::CsvReader csv_reader(file_path, {"邮件名字", "邮件地址", "邮件组名字"});
+    addrbook::CsvReader csv_reader(file_path, {"邮件地址", "邮件名字", "邮件组名字"});
     std::vector<std::string> row;
     addrbook::CsvStatus status = CSV_ERROR_INIT_FAILED;
     bool result = true;
+    std::lock_guard<std::mutex> lock(m_mtx);
     while (result)
     {
         // 逐行读取
@@ -244,12 +253,12 @@ void AddrMgrImpl::ExportEmailsSync(const std::string& file_path, const ImportExp
             std::vector<std::vector<std::string>> items;
             std::transform(records.cbegin(), records.cend(), std::back_inserter(items), [](const EmailDto& dto) {
                 std::vector<std::string> item;
-                item.emplace_back(dto.GetName());
                 item.emplace_back(dto.GetAddress());
+                item.emplace_back(dto.GetName());
                 item.emplace_back(AddrMgrUtilities::Join(dto.GetGroupNames(), ","));
                 return item;
             });
-            addrbook::CsvWriter csv_writer(file_path, {"邮件名字", "邮件地址", "邮件组名字"});
+            addrbook::CsvWriter csv_writer(file_path, {"邮件地址", "邮件名字", "邮件组名字"});
             csv_writer.WriteBatch(items);
             total_pages = export_res.GetTotalPages();
         }

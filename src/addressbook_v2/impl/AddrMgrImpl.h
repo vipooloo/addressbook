@@ -28,7 +28,7 @@ class AddrMgrImpl
     std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
     ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
     ResultCode UpdateGroup(const GroupDto& dto);
-
+    /*---------------------------------------------------*/
     ResultCode Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
     ResultCode Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);
 

@@ -8,8 +8,8 @@ class AddressManager
   public:
     static std::pair<ResultCode, EmailDto> CreateEmail(const EmailDto& dto);
     static ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
-    static ResultCode UpdateEmail(const EmailDto& dto);
     static ResultCode DeleteAllEmails();
+    static ResultCode UpdateEmail(const EmailDto& dto);
     static std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
     static ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     static ResultCode ExportEmails(const ImportExportCallback& cb);
