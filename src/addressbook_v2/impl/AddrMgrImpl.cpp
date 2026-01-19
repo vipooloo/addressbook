@@ -101,6 +101,7 @@ ResultCode AddrMgrImpl::UpdateEmail(const EmailDto& dto)
     }
     else
     {
+        AB_LOG_E("invalid email dto");
     }
     return rsult;
 }
