@@ -7,6 +7,7 @@
 GroupDtoChecker::GroupDtoChecker()
   : m_rules{}
 {
+    InitInternalRules();
 }
 
 bool GroupDtoChecker::Verify(const GroupDto& dto) const

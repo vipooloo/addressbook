@@ -7,6 +7,7 @@
 EmailDtoChecker::EmailDtoChecker()
   : m_rules{}
 {
+    InitInternalRules();
 }
 
 bool EmailDtoChecker::Verify(const EmailDto& dto) const

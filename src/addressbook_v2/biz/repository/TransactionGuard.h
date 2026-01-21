@@ -15,7 +15,7 @@ class TransactionGuard
     TransactionGuard& operator=(TransactionGuard&&) noexcept = delete;
 
   private:
-   static bool Execute(const char* sql);
+    static bool Execute(const char* sql);
 
   private:
     bool m_bCommited;
