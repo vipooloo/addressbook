@@ -35,8 +35,8 @@ class CsvBase
       , m_init_status(CSV_SUCCESS)
     {}
 
-    std::string EscapeCell(const std::string& cell_data);
-    void ParseLine(const std::string& line_str, std::vector<std::string>& row_out);
+    static std::string EscapeCell(const std::string& cell_data);
+    static void ParseLine(const std::string& line_str, std::vector<std::string>& row_out);
 
     const std::string& GetFilename() const
     {

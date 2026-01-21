@@ -19,10 +19,10 @@ bool EmailDtoChecker::Verify(const EmailDto& dto) const
 
 void EmailDtoChecker::InitInternalRules()
 {
-    m_rules.emplace_back(std::bind(&EmailDtoChecker::BasickInfoCheck, this, std::placeholders::_1));
+    m_rules.emplace_back(std::bind(&EmailDtoChecker::BasickInfoCheck, std::placeholders::_1));
 }
 
-bool EmailDtoChecker::BasickInfoCheck(const EmailDto& dto) const
+bool EmailDtoChecker::BasickInfoCheck(const EmailDto& dto)
 {
     bool ret = false;
     do

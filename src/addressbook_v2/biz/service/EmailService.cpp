@@ -62,9 +62,9 @@ std::pair<ResultCode, EmailDto> EmailService::CreateEmail(const EmailDto& dto)
 std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
 {
     std::pair<ResultCode, GroupDto> result = std::make_pair(ResultCode::kSuccess, dto);
-    ResultCode& res_code = result.first;
     do
     {
+        ResultCode& res_code = result.first;
         TransactionGuard trans_guard;
         // 检查邮件组是否超过最大数量限制
         if (m_mail_rep.GetGroupCount() >= kMaxGroupCount)

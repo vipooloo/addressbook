@@ -138,7 +138,7 @@ std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std
     return records;
 }
 
-void AbstractDao::BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const
+void AbstractDao::BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx)
 {
     for (const std::string& arg : args)
     {
@@ -181,7 +181,7 @@ bool AbstractDao::OnExecuteSql(const std::string& sql) const
     return OnExecuteSql(sql, std::move(stmt_params));
 }
 
-bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const
+bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params)
 {
     SQLite::Statement stmt(GetDb(), sql);
     bool ret = BindStmtParams(stmt, stmt_params);
@@ -197,7 +197,7 @@ bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<StmtPar
     return ret;
 }
 
-bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const
+bool AbstractDao::OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec)
 {
     bool ret = true;
     SQLite::Statement stmt(GetDb(), sql);

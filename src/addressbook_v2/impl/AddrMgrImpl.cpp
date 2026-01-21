@@ -170,16 +170,14 @@ ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
 
 ResultCode AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
-    ResultCode result = ResultCode::kInvalidParam;
     if (observer)
     {
-        result = m_evt_dispatcher.Register(observer) ? ResultCode::kSuccess : ResultCode::kAlreadyExist;
+        return m_evt_dispatcher.Register(observer) ? ResultCode::kSuccess : ResultCode::kAlreadyExist;
     }
     else
     {
-        result = ResultCode::kInvalidParam;
+        return ResultCode::kInvalidParam;
     }
-    return result;
 }
 
 ResultCode AddrMgrImpl::Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer)

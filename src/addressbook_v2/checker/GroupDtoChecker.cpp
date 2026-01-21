@@ -19,10 +19,10 @@ bool GroupDtoChecker::Verify(const GroupDto& dto) const
 
 void GroupDtoChecker::InitInternalRules()
 {
-    m_rules.emplace_back(std::bind(&GroupDtoChecker::BasickInfoCheck, this, std::placeholders::_1));
+    m_rules.emplace_back(std::bind(&GroupDtoChecker::BasickInfoCheck, std::placeholders::_1));
 }
 
-bool GroupDtoChecker::BasickInfoCheck(const GroupDto& dto) const
+bool GroupDtoChecker::BasickInfoCheck(const GroupDto& dto)
 {
     bool ret = false;
     do

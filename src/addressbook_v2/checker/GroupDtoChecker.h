@@ -15,7 +15,7 @@ class GroupDtoChecker
 
   private:
     void InitInternalRules();
-    bool BasickInfoCheck(const GroupDto& dto) const;
+    static bool BasickInfoCheck(const GroupDto& dto);
 
   private:
     std::vector<GroupDtoRule> m_rules;

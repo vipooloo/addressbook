@@ -36,14 +36,14 @@ class AbstractDao
 
   protected:
     bool OnExecuteSql(const std::string& sql) const;
-    bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params) const;
-    bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec) const;
+    static bool OnExecuteSql(const std::string& sql, const std::vector<StmtParam>& stmt_params);
+    static bool OnExecuteSql(const std::string& sql, const std::vector<std::vector<StmtParam>>& stmt_params_vec);
 
-    uint32_t CalcPageOffset(const PageQueryParam& params) const
+    static uint32_t CalcPageOffset(const PageQueryParam& params)
     {
         return (params.GetCurPage() - 1) * params.GetPageSize();
     }
-    void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx) const;
+    static void BindWhereParams(SQLite::Statement& stmt, const std::vector<std::string>& args, uint32_t start_idx);
     PageResult DoFindByPage(const PageQueryParam& params, const CustomWhere& conditions);
     virtual std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt)
     {

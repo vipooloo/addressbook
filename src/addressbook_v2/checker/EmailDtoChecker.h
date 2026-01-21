@@ -15,7 +15,7 @@ class EmailDtoChecker
 
   private:
     void InitInternalRules();
-    bool BasickInfoCheck(const EmailDto& dto) const;
+    static bool BasickInfoCheck(const EmailDto& dto);
 
   private:
     std::vector<EmailDtoRule> m_rules;
