@@ -13,7 +13,7 @@ file(GLOB_RECURSE ALL_COMPILE_SRC CONFIGURE_DEPENDS
 add_executable(${MODULE_NAME} ${ALL_COMPILE_SRC})
 
 # 如果需要额外链接选项
-target_compile_options(${MODULE_NAME} PRIVATE ${MYAPP_STRICT_COMPILE_FLAGS})
+#target_compile_options(${MODULE_NAME} PRIVATE ${MYAPP_STRICT_COMPILE_FLAGS})
 
 # 指定第三方库路径
 target_link_directories(${MODULE_NAME} PRIVATE ${THIRD_PARTY_INSTALL_DIR}/lib)

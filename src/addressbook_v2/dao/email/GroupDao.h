@@ -13,6 +13,7 @@ class GroupDao : public AbstractDao
     bool Create() override;
     std::pair<bool, GroupEntity> Insert(const GroupEntity& entity);
     uint32_t GetGroupRid(const GroupEntity& entity);
+    bool Update(const GroupEntity& entity);
 };
 }  // namespace addrbook
 

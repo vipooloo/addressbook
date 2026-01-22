@@ -4,8 +4,8 @@
 
 void Add()
 {
-    AddressManager::AddGroup(GroupDto{"group1", {}});
-    AddressManager::AddGroup(GroupDto{"group2", {}});
+    AddressManager::CreateGroup(GroupDto{"group1", {}});
+    AddressManager::CreateGroup(GroupDto{"group2", {}});
     AddressManager::CreateEmail(EmailDto{"email1", "email1"});
     AddressManager::CreateEmail(EmailDto{"email2", "email12", {1, 2}});
     AddressManager::UpdateEmail(EmailDto{1, "XXXXX", "YYY", {3, 4}});

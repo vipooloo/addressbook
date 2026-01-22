@@ -7,24 +7,9 @@ std::pair<ResultCode, EmailDto> AddressManager::CreateEmail(const EmailDto& dto)
     return addrbook::AddrMgrImpl::GetInstance().CreateEmail(dto);
 }
 
-std::pair<ResultCode, GroupDto> AddressManager::AddGroup(const GroupDto& dto)
-{
-    return addrbook::AddrMgrImpl::GetInstance().AddGroup(dto);
-}
-
 ResultCode AddressManager::DeleteEmails(const std::vector<uint32_t>& ids)
 {
     return addrbook::AddrMgrImpl::GetInstance().DeleteEmails(ids);
-}
-
-ResultCode AddressManager::RemoveGroup(const std::vector<uint32_t>& ids)
-{
-    return addrbook::AddrMgrImpl::GetInstance().RemoveGroup(ids);
-}
-
-ResultCode AddressManager::UpdateEmail(const EmailDto& dto)
-{
-    return addrbook::AddrMgrImpl::GetInstance().UpdateEmail(dto);
 }
 
 ResultCode AddressManager::DeleteAllEmails()
@@ -32,9 +17,9 @@ ResultCode AddressManager::DeleteAllEmails()
     return addrbook::AddrMgrImpl::GetInstance().DeleteAllEmails();
 }
 
-ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
+ResultCode AddressManager::UpdateEmail(const EmailDto& dto)
 {
-    return addrbook::AddrMgrImpl::GetInstance().UpdateGroup(dto);
+    return addrbook::AddrMgrImpl::GetInstance().UpdateEmail(dto);
 }
 
 std::pair<ResultCode, EmailPageResult> AddressManager::PageQueryEmail(const PageQueryParam& query_param)
@@ -53,6 +38,37 @@ ResultCode AddressManager::ExportEmails(const ImportExportCallback& cb)
     return addrbook::AddrMgrImpl::GetInstance().ExportEmails(file_path, cb);
 }
 
+/*---------------------------------------------------*/
+std::pair<ResultCode, GroupDto> AddressManager::CreateGroup(const GroupDto& dto)
+{
+    return addrbook::AddrMgrImpl::GetInstance().CreateGroup(dto);
+}
+
+ResultCode AddressManager::DeleteGroups(const std::vector<uint32_t>& ids)
+{
+    return addrbook::AddrMgrImpl::GetInstance().DeleteGroups(ids);
+}
+
+ResultCode AddressManager::DeleteAllGroups()
+{
+    return addrbook::AddrMgrImpl::GetInstance().DeleteAllGroups();
+}
+
+ResultCode AddressManager::RemoveGroup(const std::vector<uint32_t>& ids)
+{
+    return addrbook::AddrMgrImpl::GetInstance().DeleteGroups(ids);
+}
+
+ResultCode AddressManager::UpdateGroup(const GroupDto& dto)
+{
+    return addrbook::AddrMgrImpl::GetInstance().UpdateGroup(dto);
+}
+
+std::pair<ResultCode, GroupPageResult> AddressManager::PageQueryGroup(const PageQueryParam& query_param)
+{
+    return addrbook::AddrMgrImpl::GetInstance().PageQueryGroup(query_param);
+}
+/*---------------------------------------------------*/
 ResultCode AddressManager::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)
 {
     return addrbook::AddrMgrImpl::GetInstance().Register(observer);

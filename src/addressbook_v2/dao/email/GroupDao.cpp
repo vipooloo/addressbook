@@ -61,4 +61,13 @@ uint32_t GroupDao::GetGroupRid(const GroupEntity& entity)
     return rid;
 }
 
+bool GroupDao::Update(const GroupEntity& entity)
+{
+    std::vector<StmtParam> stmt_params;
+    stmt_params.emplace_back(entity.GetGroupName());
+    stmt_params.emplace_back(entity.GetRid());
+
+    return OnExecuteSql(SQL_GROUP_UPDATE, stmt_params);
+}
+
 }  // namespace addrbook

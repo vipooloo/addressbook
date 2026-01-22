@@ -49,7 +49,7 @@ uint32_t EmailRepository::GetOrCreateEmail(const EmailEntity& entity)
     return rid;
 }
 
-uint32_t EmailRepository::AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& ids)
+uint32_t EmailRepository::CreateGroup(const GroupEntity& entity, const std::vector<uint32_t>& ids)
 {
     uint32_t rid = 0;
 
@@ -83,7 +83,7 @@ uint32_t EmailRepository::GetOrCreateGroup(const GroupEntity& entity, uint32_t e
         rid = m_group_dao.GetGroupRid(entity);
         if (0 == rid)
         {
-            rid = AddGroup(entity, {email_rid});
+            rid = CreateGroup(entity, {email_rid});
         }
         if (0 == rid)
         {
@@ -188,10 +188,32 @@ bool EmailRepository::UpdateEmail(const EmailEntity& entity, const std::vector<u
     return result;
 }
 
-bool EmailRepository::UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr)
+bool EmailRepository::UpdateGroup(const GroupEntity& entity, const std::vector<uint32_t>& new_mail_rids)
 {
-    static_cast<void>(entity_sptr);
-    return false;
+    bool result = true;
+
+    // 更新邮件表信息
+    result = m_group_dao.Update(entity);
+    // 更新关联邮件组信息
+    if (result && !new_mail_rids.empty())
+    {
+        uint32_t group_rid = entity.GetRid();
+        std::vector<EmailGroupEntity> relations;
+        relations.reserve(new_mail_rids.size());
+        std::transform(
+            new_mail_rids.cbegin(),
+            new_mail_rids.cend(),
+            std::back_inserter(relations),
+            [group_rid](uint32_t mail_rid) {
+                return EmailGroupEntity(mail_rid, group_rid);
+            });
+        if (!m_mail_group_dao.InsertBatch(relations))
+        {
+            result = false;
+        }
+    }
+
+    return result;
 }
 
 bool EmailRepository::RemoveGroupByMailRid(uint32_t email_rid)
@@ -218,5 +240,10 @@ PageResult EmailRepository::GetEmailsByKeyword(const PageQueryParam& query_param
 bool EmailRepository::DeleteAllEmails()
 {
     return m_mail_dao.RemoveAll();
+}
+
+bool EmailRepository::DeleteAllGroups()
+{
+    return m_group_dao.RemoveAll();
 }
 }  // namespace addrbook

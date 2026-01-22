@@ -2,6 +2,7 @@
 #define ADDRMGRIMPL_H
 
 #include "AddressMgrDefs.h"
+#include "AddressMgrInc.h"
 #include "EmailService.h"
 #include "EventDispatcher.h"
 #include "EventLoop.h"
@@ -25,9 +26,11 @@ class AddrMgrImpl
     ResultCode ImportEmails(const std::string& file_path, const ImportExportCallback& cb);
     ResultCode ExportEmails(const std::string& file_path, const ImportExportCallback& cb);
     /*---------------------------------------------------*/
-    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
-    ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
+    std::pair<ResultCode, GroupDto> CreateGroup(const GroupDto& dto);
+    ResultCode DeleteGroups(const std::vector<uint32_t>& ids);
+    ResultCode DeleteAllGroups();
     ResultCode UpdateGroup(const GroupDto& dto);
+    std::pair<ResultCode, GroupPageResult> PageQueryGroup(const PageQueryParam& query_param);
     /*---------------------------------------------------*/
     ResultCode Register(const std::shared_ptr<IAddressMgrDataObserver>& observer);
     ResultCode Unregister(const std::shared_ptr<IAddressMgrDataObserver>& observer);

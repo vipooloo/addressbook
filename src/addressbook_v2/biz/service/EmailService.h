@@ -7,6 +7,7 @@
 #include "EmailRepository.h"
 #include "EventDispatcher.h"
 #include "GroupDto.h"
+#include "GroupPageResult.h"
 #include <memory>
 #include <vector>
 
@@ -21,7 +22,9 @@ class EmailService
     std::pair<ResultCode, EmailDto> CreateEmail(const EmailDto& dto);
     ResultCode DeleteAllEmails();
 
-    std::pair<ResultCode, GroupDto> AddGroup(const GroupDto& dto);
+    std::pair<ResultCode, GroupDto> CreateGroup(const GroupDto& dto);
+    ResultCode DeleteAllGroups();
+
     ResultCode AddEmailAndGroup(const EmailDto& dto);
 
     ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
@@ -31,6 +34,7 @@ class EmailService
     ResultCode UpdateGroup(const GroupDto& dto);
 
     std::pair<ResultCode, EmailPageResult> PageQueryEmail(const PageQueryParam& query_param);
+    std::pair<ResultCode, GroupPageResult> PageQueryGroup(const PageQueryParam& query_param);
 
   private:
     void DataChanged(ResultCode res, ChangeType type);

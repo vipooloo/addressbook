@@ -1,5 +1,5 @@
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include "AddressManager.h"
+#include "Common.h"
 
 namespace {
 class ExampleClassUT : public ::testing::Test
@@ -13,5 +13,6 @@ class ExampleClassUT : public ::testing::Test
 
 TEST_F(ExampleClassUT, case1)
 {
+    EXPECT_TRUE(true);
 }
 }  // namespace

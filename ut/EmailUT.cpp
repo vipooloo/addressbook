@@ -1,11 +1,5 @@
 #include "AddressManager.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include <condition_variable>
-#include <functional>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include "Common.h"
 
 namespace {
 std::mutex mtx;

@@ -5,11 +5,13 @@
 
 enum class ChangeType : uint8_t
 {
-    CreateEmail = 0,
+    CreateEmail = 0x00,
     DeleteEmails,
     DeleteAllEmails,
     UpdateEmail,
     ImportEmails,
+    CreateGroup = 0x10,
+    DeleteAllGroups,
 };
 
 class IAddressMgrDataObserver

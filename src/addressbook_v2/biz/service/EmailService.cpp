@@ -59,7 +59,7 @@ std::pair<ResultCode, EmailDto> EmailService::CreateEmail(const EmailDto& dto)
     return result;
 }
 
-std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
+std::pair<ResultCode, GroupDto> EmailService::CreateGroup(const GroupDto& dto)
 {
     std::pair<ResultCode, GroupDto> result = std::make_pair(ResultCode::kSuccess, dto);
     do
@@ -91,7 +91,7 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         }
         // 添加邮件组
         GroupEntity entity(dto.GetGroupName());
-        uint32_t group_rid = m_mail_rep.AddGroup(entity, mail_rids);
+        uint32_t group_rid = m_mail_rep.CreateGroup(entity, mail_rids);
         if (0 == group_rid)
         {
             AB_LOG_E("Failed to add email to database");
@@ -101,6 +101,7 @@ std::pair<ResultCode, GroupDto> EmailService::AddGroup(const GroupDto& dto)
         result.second.SetRid(group_rid);
         trans_guard.Commit();
     } while (false);
+    DataChanged(result.first, ChangeType::CreateGroup);
     return result;
 }
 
@@ -228,7 +229,7 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
             break;
         }
         // 更新邮件
-        EmailEntity entity = EmailEntity(dto.GetRid(), dto.GetName(), dto.GetAddress());
+        EmailEntity entity(dto.GetRid(), dto.GetName(), dto.GetAddress());
         if (!m_mail_rep.UpdateEmail(entity, new_group_rids))
         {
             AB_LOG_E("Failed to update email to database");
@@ -243,8 +244,52 @@ ResultCode EmailService::UpdateEmail(const EmailDto& dto)
 
 ResultCode EmailService::UpdateGroup(const GroupDto& dto)
 {
-    static_cast<void>(&dto);
-    return {};
+    ResultCode result = ResultCode::kSuccess;
+    do
+    {
+        TransactionGuard trans_guard;
+        // 检查是否存在这个邮件组
+        if (!m_mail_rep.IsGroupExist({dto.GetRid()}))
+        {
+            AB_LOG_E("Group does not exist");
+            result = ResultCode::kNotFound;
+            break;
+        }
+        // 删除旧关系
+        if (!m_mail_rep.RemoveGroupByMailRid(dto.GetRid()))
+        {
+            AB_LOG_E("Failed to remove group by mail rid");
+            result = ResultCode::kDbError;
+            break;
+        }
+        // 检查邮件是否存在
+        std::vector<uint32_t> rids = dto.GetMailRids();
+        bool group_exist = m_mail_rep.IsEmailExist(rids);
+        if (!group_exist)
+        {
+            AB_LOG_E("Some groups do not exist");
+            result = ResultCode::kInvalidParam;
+            break;
+        }
+        // 检查邮件组中是否还能关联邮件
+        if (!m_mail_rep.CanAddEmail(rids, kMaxGroupsPerEmail))
+        {
+            AB_LOG_E("Some groups exceed max email count");
+            result = ResultCode::kExceedMaxCount;
+            break;
+        }
+        // 更新邮件
+        GroupEntity entity(dto.GetGroupName());
+        if (!m_mail_rep.UpdateGroup(entity, rids))
+        {
+            AB_LOG_E("Failed to update email to database");
+            result = ResultCode::kDbError;
+            break;
+        }
+        trans_guard.Commit();
+    } while (false);
+    DataChanged(result, ChangeType::UpdateEmail);
+    return result;
 }
 
 std::pair<ResultCode, EmailPageResult> EmailService::PageQueryEmail(const PageQueryParam& query_param)
@@ -276,6 +321,34 @@ std::pair<ResultCode, EmailPageResult> EmailService::PageQueryEmail(const PageQu
     return result;
 }
 
+std::pair<ResultCode, GroupPageResult> EmailService::PageQueryGroup(const PageQueryParam& query_param)
+{
+    std::pair<ResultCode, GroupPageResult> result = std::make_pair(ResultCode::kSuccess, GroupPageResult(query_param.GetCurPage(), query_param.GetPageSize()));
+
+    // TransactionGuard trans_guard;
+    // PageResult page_result = m_mail_rep.GetGroupsByKeyword(query_param);
+    // std::vector<GroupDto> dtos;
+    // const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
+    // std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {
+    //     std::shared_ptr<GroupEntity> entity_sptr = std::static_pointer_cast<GroupEntity>(item);
+    //     if (entity_sptr)
+    //     {
+    //         uint32_t rid = entity_sptr->GetRid();
+    //         const std::string& group_name = entity_sptr->GetGroupName();
+    //         const std::string& mail_rids = entity_sptr->GetGroupRids();
+    //         std::vector<uint32_t> ids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(group_rids, ","));
+    //         std::vector<std::string> group_names = AddrMgrUtilities::Split(entity_sptr->GetGroupNames(), "|##|");
+    //         return GroupDto(rid, group_name, email_name, ids, group_names);
+    //     }
+    //     return GroupDto();
+    // });
+    // trans_guard.Commit();
+    // result.second.SetTotalRecords(page_result.GetTotalRecords());
+    // result.second.SetRecords(dtos);
+
+    return result;
+}
+
 void EmailService::DataChanged(ResultCode res, ChangeType type)
 {
     if (ResultCode::kSuccess == res)
@@ -292,8 +365,21 @@ ResultCode EmailService::DeleteAllEmails()
     {
         trans_guard.Commit();
         result = ResultCode::kSuccess;
+        DataChanged(result, ChangeType::DeleteAllEmails);
     }
-    DataChanged(result, ChangeType::DeleteAllEmails);
+    return result;
+}
+
+ResultCode EmailService::DeleteAllGroups()
+{
+    ResultCode result = ResultCode::kNotable;
+    TransactionGuard trans_guard;
+    if (m_mail_rep.DeleteAllGroups())
+    {
+        trans_guard.Commit();
+        result = ResultCode::kSuccess;
+        DataChanged(result, ChangeType::DeleteAllGroups);
+    }
     return result;
 }
 }  // namespace addrbook

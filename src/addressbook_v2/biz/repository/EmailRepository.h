@@ -26,7 +26,8 @@ class EmailRepository
     bool CanAddGroup(const std::vector<uint32_t>& group_ids, uint32_t count_limit);
     uint32_t GetOrCreateEmail(const EmailEntity& entity);
 
-    uint32_t AddGroup(const GroupEntity& entity, const std::vector<uint32_t>& ids);
+    uint32_t CreateGroup(const GroupEntity& entity, const std::vector<uint32_t>& ids);
+    bool DeleteAllGroups();
     bool IsGroupExist(const std::vector<uint32_t>& group_ids) const;
     size_t GetGroupCount() const;
     bool CanAddEmail(const std::vector<uint32_t>& email_ids, uint32_t count_limit);
@@ -36,7 +37,7 @@ class EmailRepository
     bool RemoveGroupByMailRid(uint32_t email_rid);
 
     bool UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids);
-    bool UpdateGroup(const std::shared_ptr<GroupEntity>& entity_sptr);
+    bool UpdateGroup(const GroupEntity& entity, const std::vector<uint32_t>& new_mail_rids);
 
     PageResult GetEmailsByKeyword(const PageQueryParam& query_param);
 

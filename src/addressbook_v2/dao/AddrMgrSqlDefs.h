@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS mail_group (
 static constexpr const char* SQL_GROUP_INSERT = "INSERT INTO mail_group (group_name) VALUES (?);";
 
 static constexpr const char* SQL_SELECT_GROUP_BY_NAME = "SELECT rid FROM mail_group WHERE group_name = ?;";
+static constexpr const char* SQL_GROUP_UPDATE = "UPDATE mail_group SET group_name = ? WHERE rid = ?;";
 //###########################################################################################################################################
 /// @brief 邮件与群组关联映射表的表名
 static constexpr const char* SQL_EMAILGROUP_TABLE_NAME = "GROUPMAPPING";

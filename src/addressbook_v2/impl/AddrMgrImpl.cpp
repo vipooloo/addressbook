@@ -143,12 +143,12 @@ ResultCode AddrMgrImpl::ExportEmails(const std::string& file_path, const ImportE
     return ResultCode::kSuccess;
 }
 
-std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
+std::pair<ResultCode, GroupDto> AddrMgrImpl::CreateGroup(const GroupDto& dto)
 {
     if (addrbook::CheckerProvider::GetInstance().Verify(dto))
     {
         std::lock_guard<std::mutex> lock(m_mtx);
-        return m_email_srv.AddGroup(dto);
+        return m_email_srv.CreateGroup(dto);
     }
     else
     {
@@ -156,16 +156,41 @@ std::pair<ResultCode, GroupDto> AddrMgrImpl::AddGroup(const GroupDto& dto)
     }
 }
 
-ResultCode AddrMgrImpl::RemoveGroup(const std::vector<uint32_t>& ids)
+ResultCode AddrMgrImpl::DeleteGroups(const std::vector<uint32_t>& ids)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     return m_email_srv.RemoveGroup(ids);
 }
 
-ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
+ResultCode AddrMgrImpl::DeleteAllGroups()
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.UpdateGroup(dto);
+    return m_email_srv.DeleteAllGroups();
+}
+
+ResultCode AddrMgrImpl::UpdateGroup(const GroupDto& dto)
+{
+    ResultCode rsult = ResultCode::kInvalidParam;
+    if (dto.GetRid() == 0)
+    {
+        AB_LOG_E("invalid rid");
+    }
+    else if (addrbook::CheckerProvider::GetInstance().Verify(dto))
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        rsult = m_email_srv.UpdateGroup(dto);
+    }
+    else
+    {
+        AB_LOG_E("invalid group dto");
+    }
+    return rsult;
+}
+
+std::pair<ResultCode, GroupPageResult> AddrMgrImpl::PageQueryGroup(const PageQueryParam& query_param)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    return m_email_srv.PageQueryGroup(query_param);
 }
 
 ResultCode AddrMgrImpl::Register(const std::shared_ptr<IAddressMgrDataObserver>& observer)

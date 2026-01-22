@@ -5,6 +5,7 @@
 #include "EmailDto.h"
 #include "EmailPageResult.h"
 #include "GroupDto.h"
+#include "GroupPageResult.h"
 #include "IAddressMgrDataObserver.h"
 #include "PageQueryParam.h"
 #include <memory>
