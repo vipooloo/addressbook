@@ -159,7 +159,7 @@ std::pair<ResultCode, GroupDto> AddrMgrImpl::CreateGroup(const GroupDto& dto)
 ResultCode AddrMgrImpl::DeleteGroups(const std::vector<uint32_t>& ids)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-    return m_email_srv.RemoveGroup(ids);
+    return m_email_srv.DeleteGroup(ids);
 }
 
 ResultCode AddrMgrImpl::DeleteAllGroups()

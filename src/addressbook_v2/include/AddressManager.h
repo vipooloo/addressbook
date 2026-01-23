@@ -17,7 +17,7 @@ class AddressManager
     static std::pair<ResultCode, GroupDto> CreateGroup(const GroupDto& dto);
     static ResultCode DeleteGroups(const std::vector<uint32_t>& ids);
     static ResultCode DeleteAllGroups();
-    static ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
+    static ResultCode DeleteGroup(const std::vector<uint32_t>& ids);
     static ResultCode UpdateGroup(const GroupDto& dto);
     static std::pair<ResultCode, GroupPageResult> PageQueryGroup(const PageQueryParam& query_param);
     /*---------------------------------------------------*/

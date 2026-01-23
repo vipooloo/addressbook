@@ -150,7 +150,7 @@ bool EmailRepository::DeleteEmails(const std::vector<uint32_t>& email_ids)
     return result;
 }
 
-bool EmailRepository::RemoveGroup(const std::vector<uint32_t>& group_ids)
+bool EmailRepository::DeleteGroup(const std::vector<uint32_t>& group_ids)
 {
     bool result = true;
     if (!group_ids.empty())

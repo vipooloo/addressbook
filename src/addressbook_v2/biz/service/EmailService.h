@@ -28,7 +28,7 @@ class EmailService
     ResultCode AddEmailAndGroup(const EmailDto& dto);
 
     ResultCode DeleteEmails(const std::vector<uint32_t>& ids);
-    ResultCode RemoveGroup(const std::vector<uint32_t>& ids);
+    ResultCode DeleteGroup(const std::vector<uint32_t>& ids);
 
     ResultCode UpdateEmail(const EmailDto& dto);
     ResultCode UpdateGroup(const GroupDto& dto);

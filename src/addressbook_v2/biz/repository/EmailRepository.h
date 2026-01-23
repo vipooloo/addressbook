@@ -33,7 +33,7 @@ class EmailRepository
     bool CanAddEmail(const std::vector<uint32_t>& email_ids, uint32_t count_limit);
     uint32_t GetOrCreateGroup(const GroupEntity& entity, uint32_t email_rid);
     bool DeleteEmails(const std::vector<uint32_t>& email_ids);
-    bool RemoveGroup(const std::vector<uint32_t>& group_ids);
+    bool DeleteGroup(const std::vector<uint32_t>& group_ids);
     bool RemoveGroupByMailRid(uint32_t email_rid);
 
     bool UpdateEmail(const EmailEntity& entity, const std::vector<uint32_t>& new_group_rids);

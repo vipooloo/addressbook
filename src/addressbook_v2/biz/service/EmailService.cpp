@@ -174,12 +174,12 @@ ResultCode EmailService::DeleteEmails(const std::vector<uint32_t>& ids)
     return result;
 }
 
-ResultCode EmailService::RemoveGroup(const std::vector<uint32_t>& ids)
+ResultCode EmailService::DeleteGroup(const std::vector<uint32_t>& ids)
 {
     ResultCode result = ResultCode::kSuccess;
 
     TransactionGuard trans_guard;
-    if (m_mail_rep.RemoveGroup(ids))
+    if (m_mail_rep.DeleteGroup(ids))
     {
         trans_guard.Commit();
     }

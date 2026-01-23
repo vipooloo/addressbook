@@ -54,7 +54,7 @@ ResultCode AddressManager::DeleteAllGroups()
     return addrbook::AddrMgrImpl::GetInstance().DeleteAllGroups();
 }
 
-ResultCode AddressManager::RemoveGroup(const std::vector<uint32_t>& ids)
+ResultCode AddressManager::DeleteGroup(const std::vector<uint32_t>& ids)
 {
     return addrbook::AddrMgrImpl::GetInstance().DeleteGroups(ids);
 }
