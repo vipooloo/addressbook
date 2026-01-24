@@ -40,6 +40,7 @@ class EmailRepository
     bool UpdateGroup(const GroupEntity& entity, const std::vector<uint32_t>& new_mail_rids);
 
     PageResult GetEmailsByKeyword(const PageQueryParam& query_param);
+    PageResult GetGroupsByKeyword(const PageQueryParam& query_param);
 
   private:
     EmailDao m_mail_dao;

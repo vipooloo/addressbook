@@ -35,9 +35,27 @@ class GroupEntity : public AbstractEntity
     {
         m_group_name = group_name;
     }
+    void SetEmailRids(const std::string& email_rids)
+    {
+        m_email_rids = email_rids;
+    }
+    const std::string& GetEmailRids() const
+    {
+        return m_email_rids;
+    }
+    void SetEmailNames(const std::string& email_names)
+    {
+        m_email_names = email_names;
+    }
+    const std::string& GetEmailNames() const
+    {
+        return m_email_names;
+    }
 
   private:
     std::string m_group_name;
+    std::string m_email_rids;
+    std::string m_email_names;
 };
 
 #endif  // GROUPENTITY_H

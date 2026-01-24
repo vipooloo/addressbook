@@ -237,6 +237,22 @@ PageResult EmailRepository::GetEmailsByKeyword(const PageQueryParam& query_param
     return result;
 }
 
+PageResult EmailRepository::GetGroupsByKeyword(const PageQueryParam& query_param)
+{
+    PageResult result(query_param.GetCurPage(), query_param.GetPageSize());
+
+    if (query_param.GetKeyword().empty())
+    {
+        result = m_group_dao.FindAll(query_param);
+    }
+    else
+    {
+        result = m_group_dao.FindByPage(query_param);
+    }
+
+    return result;
+}
+
 bool EmailRepository::DeleteAllEmails()
 {
     return m_mail_dao.RemoveAll();

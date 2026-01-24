@@ -70,4 +70,18 @@ bool GroupDao::Update(const GroupEntity& entity)
     return OnExecuteSql(SQL_GROUP_UPDATE, stmt_params);
 }
 
+PageResult GroupDao::FindByPage(const PageQueryParam& query_param)
+{
+    CustomWhere conditions(SQL_GROUP_SELECT_WITH_EMAIL_BY_PAGE, SQL_GROUP_WHERE_SEARCH_KEYWORD);
+    conditions.AddWhereArg("%" + query_param.GetKeyword() + "%");
+
+    return AbstractDao::DoFindByPage(query_param, conditions);
+}
+
+PageResult GroupDao::FindAll(const PageQueryParam& query_param)
+{
+    CustomWhere conditions(SQL_GROUP_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER);
+
+    return AbstractDao::DoFindByPage(query_param, conditions);
+}
 }  // namespace addrbook

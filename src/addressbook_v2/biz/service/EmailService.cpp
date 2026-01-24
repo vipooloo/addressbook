@@ -325,26 +325,26 @@ std::pair<ResultCode, GroupPageResult> EmailService::PageQueryGroup(const PageQu
 {
     std::pair<ResultCode, GroupPageResult> result = std::make_pair(ResultCode::kSuccess, GroupPageResult(query_param.GetCurPage(), query_param.GetPageSize()));
 
-    // TransactionGuard trans_guard;
-    // PageResult page_result = m_mail_rep.GetGroupsByKeyword(query_param);
-    // std::vector<GroupDto> dtos;
-    // const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
-    // std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {
-    //     std::shared_ptr<GroupEntity> entity_sptr = std::static_pointer_cast<GroupEntity>(item);
-    //     if (entity_sptr)
-    //     {
-    //         uint32_t rid = entity_sptr->GetRid();
-    //         const std::string& group_name = entity_sptr->GetGroupName();
-    //         const std::string& mail_rids = entity_sptr->GetGroupRids();
-    //         std::vector<uint32_t> ids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(group_rids, ","));
-    //         std::vector<std::string> group_names = AddrMgrUtilities::Split(entity_sptr->GetGroupNames(), "|##|");
-    //         return GroupDto(rid, group_name, email_name, ids, group_names);
-    //     }
-    //     return GroupDto();
-    // });
-    // trans_guard.Commit();
-    // result.second.SetTotalRecords(page_result.GetTotalRecords());
-    // result.second.SetRecords(dtos);
+    TransactionGuard trans_guard;
+    PageResult page_result = m_mail_rep.GetGroupsByKeyword(query_param);
+    std::vector<GroupDto> dtos;
+    const std::vector<std::shared_ptr<AbstractEntity>>& items = page_result.GetRecords();
+    std::transform(items.begin(), items.end(), std::back_inserter(dtos), [](const std::shared_ptr<AbstractEntity>& item) {
+        std::shared_ptr<GroupEntity> entity_sptr = std::static_pointer_cast<GroupEntity>(item);
+        if (entity_sptr)
+        {
+            uint32_t rid = entity_sptr->GetRid();
+            const std::string& group_name = entity_sptr->GetGroupName();
+            const std::string& mail_rids = entity_sptr->GetEmailRids();
+            std::vector<uint32_t> ids = AddrMgrUtilities::ConvertToNumbers(AddrMgrUtilities::Split(mail_rids, ","));
+            std::vector<std::string> email_names = AddrMgrUtilities::Split(entity_sptr->GetEmailNames(), "|##|");
+            return GroupDto(rid, group_name, ids, email_names);
+        }
+        return GroupDto();
+    });
+    trans_guard.Commit();
+    result.second.SetTotalRecords(page_result.GetTotalRecords());
+    result.second.SetRecords(dtos);
 
     return result;
 }

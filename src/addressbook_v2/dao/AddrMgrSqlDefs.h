@@ -100,6 +100,40 @@ static constexpr const char* SQL_GROUP_INSERT = "INSERT INTO mail_group (group_n
 
 static constexpr const char* SQL_SELECT_GROUP_BY_NAME = "SELECT rid FROM mail_group WHERE group_name = ?;";
 static constexpr const char* SQL_GROUP_UPDATE = "UPDATE mail_group SET group_name = ? WHERE rid = ?;";
+static constexpr const char* SQL_GROUP_SELECT_WITH_EMAIL_BY_PAGE = R"(
+    SELECT  g.rid
+        ,g.group_name
+        ,GROUP_CONCAT(m.rid, ',')           AS mail_rids
+        ,GROUP_CONCAT(m.email_address, '|##|') AS email_addresses
+        ,GROUP_CONCAT(m.email_name, '|##|') AS email_names
+    FROM mail_group g
+    LEFT JOIN GROUPMAPPING r
+        ON g.rid = r.g_rid
+    LEFT JOIN %s m
+        ON r.m_rid = m.rid
+    WHERE %s
+    GROUP BY g.rid
+    ORDER BY g.rid %s
+    LIMIT ? OFFSET ?;
+)";
+static constexpr const char* SQL_GROUP_WHERE_SEARCH_KEYWORD = "group_name LIKE ?";
+static constexpr const char* SQL_GROUP_SELECT_WITH_GROUPS_BY_PAGE = R"(
+    SELECT  g.rid
+        ,g.group_name
+        ,GROUP_CONCAT(m.rid, ',')              AS mail_rids
+        ,GROUP_CONCAT(m.email_address,'|##|')  AS email_addresses
+        ,GROUP_CONCAT(m.email_name,'|##|')     AS email_names
+    FROM mail_group g
+    LEFT JOIN GROUPMAPPING r
+        ON g.rid = r.g_rid
+    LEFT JOIN %s m
+        ON r.m_rid = m.rid
+    WHERE %s
+    GROUP BY g.rid
+    ORDER BY g.rid %s
+    LIMIT ? OFFSET ?;
+)";
+
 //###########################################################################################################################################
 /// @brief 邮件与群组关联映射表的表名
 static constexpr const char* SQL_EMAILGROUP_TABLE_NAME = "GROUPMAPPING";

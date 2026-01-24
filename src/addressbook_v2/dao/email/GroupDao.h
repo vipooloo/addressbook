@@ -14,6 +14,8 @@ class GroupDao : public AbstractDao
     std::pair<bool, GroupEntity> Insert(const GroupEntity& entity);
     uint32_t GetGroupRid(const GroupEntity& entity);
     bool Update(const GroupEntity& entity);
+    PageResult FindAll(const PageQueryParam& query_param);
+    PageResult FindByPage(const PageQueryParam& query_param);
 };
 }  // namespace addrbook
 
