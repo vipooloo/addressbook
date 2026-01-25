@@ -20,9 +20,17 @@ class GroupEntity : public AbstractEntity
       : GroupEntity(0, group_name)
     {}
 
-    explicit GroupEntity(uint32_t rid, const std::string& group_name)
+    GroupEntity(uint32_t rid, const std::string& group_name)
+      : GroupEntity(rid, group_name, {}, {}, {})
+    {
+    }
+
+    GroupEntity(uint32_t rid, const std::string& group_name, const std::string& email_rids, const std::string& email_names, const std::string& email_addresses = {})
       : AbstractEntity(rid)
       , m_group_name{group_name}
+      , m_email_rids{email_rids}
+      , m_email_names{email_names}
+      , m_email_addresses{email_addresses}
     {
     }
 
@@ -56,6 +64,7 @@ class GroupEntity : public AbstractEntity
     std::string m_group_name;
     std::string m_email_rids;
     std::string m_email_names;
+    std::string m_email_addresses;
 };
 
 #endif  // GROUPENTITY_H

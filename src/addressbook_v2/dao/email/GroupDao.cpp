@@ -84,4 +84,16 @@ PageResult GroupDao::FindAll(const PageQueryParam& query_param)
 
     return AbstractDao::DoFindByPage(query_param, conditions);
 }
+
+std::shared_ptr<AbstractEntity> GroupDao::OnCreateEntity(const SQLite::Statement& stmt)
+{
+    uint32_t rid = static_cast<uint32_t>(stmt.getColumn(0).getUInt());  // rid
+    std::string group_name = stmt.getColumn(1).getString();             // group_name
+    std::string mail_rids = stmt.getColumn(2).getString();              // mail_rids
+    std::string email_names = stmt.getColumn(3).getString();            // email_names
+    std::string email_addresses = stmt.getColumn(4).getString();        // email_addresses
+
+    return std::make_shared<GroupEntity>(rid, group_name, mail_rids, email_names, email_addresses);
+}
+
 }  // namespace addrbook

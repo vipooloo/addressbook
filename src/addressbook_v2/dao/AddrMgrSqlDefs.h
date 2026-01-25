@@ -104,8 +104,8 @@ static constexpr const char* SQL_GROUP_SELECT_WITH_EMAIL_BY_PAGE = R"(
     SELECT  g.rid
         ,g.group_name
         ,GROUP_CONCAT(m.rid, ',')           AS mail_rids
-        ,GROUP_CONCAT(m.email_address, '|##|') AS email_addresses
         ,GROUP_CONCAT(m.email_name, '|##|') AS email_names
+        ,GROUP_CONCAT(m.email_address, '|##|') AS email_addresses
     FROM mail_group g
     LEFT JOIN GROUPMAPPING r
         ON g.rid = r.g_rid
@@ -121,8 +121,8 @@ static constexpr const char* SQL_GROUP_SELECT_WITH_GROUPS_BY_PAGE = R"(
     SELECT  g.rid
         ,g.group_name
         ,GROUP_CONCAT(m.rid, ',')              AS mail_rids
-        ,GROUP_CONCAT(m.email_address,'|##|')  AS email_addresses
         ,GROUP_CONCAT(m.email_name,'|##|')     AS email_names
+        ,GROUP_CONCAT(m.email_address,'|##|')  AS email_addresses
     FROM mail_group g
     LEFT JOIN GROUPMAPPING r
         ON g.rid = r.g_rid

@@ -16,6 +16,8 @@ class GroupDao : public AbstractDao
     bool Update(const GroupEntity& entity);
     PageResult FindAll(const PageQueryParam& query_param);
     PageResult FindByPage(const PageQueryParam& query_param);
+  protected:
+    std::shared_ptr<AbstractEntity> OnCreateEntity(const SQLite::Statement& stmt) override;
 };
 }  // namespace addrbook
 
