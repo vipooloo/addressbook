@@ -80,9 +80,7 @@ PageResult GroupDao::FindByPage(const PageQueryParam& query_param)
 
 PageResult GroupDao::FindAll(const PageQueryParam& query_param)
 {
-    CustomWhere conditions(SQL_GROUP_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER);
-
-    return AbstractDao::DoFindByPage(query_param, conditions);
+    return AbstractDao::DoFindByPage(query_param, CustomWhere(SQL_GROUP_SELECT_WITH_GROUPS_BY_PAGE, SQL_EMAIL_WHERE_NO_FILTER));
 }
 
 std::shared_ptr<AbstractEntity> GroupDao::OnCreateEntity(const SQLite::Statement& stmt)

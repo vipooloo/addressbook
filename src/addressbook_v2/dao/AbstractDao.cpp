@@ -5,7 +5,6 @@
 #include "SQLiteConn.h"
 #include <algorithm>
 #include <sqlite3.h>
-
 namespace addrbook {
 
 SQLite::Database& AbstractDao::GetDb()
@@ -94,7 +93,11 @@ size_t AbstractDao::QueryCount(const std::string& where_sql, const CustomWhere& 
     sql = AddrMgrUtilities::ReplaceFirst(sql, where_sql);
 
     SQLite::Statement stmt(AbstractDao::GetDb(), sql);
-    BindWhereParams(stmt, conditions.GetWhereSqlArgs(), 1);
+    const std::vector<std::string>& args = conditions.GetWhereSqlArgs();
+    if (!args.empty())
+    {
+        BindWhereParams(stmt, args, 1);
+    }
 
     size_t total = 0;
     int32_t code = stmt.tryExecuteStep();
@@ -115,11 +118,14 @@ std::vector<std::shared_ptr<AbstractEntity>> AbstractDao::QueryRecords(const std
     std::string sql_buffer = AddrMgrUtilities::ReplaceFirst(sql, m_table_name);
     sql_buffer = AddrMgrUtilities::ReplaceFirst(sql_buffer, where_sql);
     sql_buffer = AddrMgrUtilities::ReplaceFirst(sql_buffer, OrderType::ASC == params.GetOrderBy() ? "ASC" : "DESC");
-
     SQLite::Statement stmt(AbstractDao::GetDb(), sql_buffer);
     const std::vector<std::string>& args = conditions.GetWhereSqlArgs();
-    BindWhereParams(stmt, args, 1);
     uint32_t limit_idx = args.size();
+    if (limit_idx != 0)
+    {
+        BindWhereParams(stmt, args, 1);
+    }
+
     stmt.bind(++limit_idx, params.GetPageSize());
     stmt.bind(++limit_idx, CalcPageOffset(params));
 
