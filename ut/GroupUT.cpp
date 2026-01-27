@@ -101,14 +101,14 @@ TEST_F(GroupUT, case1)
         GroupDto{"Alice Group"},
         GroupDto{"Bob Group"},
     };
-    std::vector<GroupDto> output_email_cases;
+    std::vector<GroupDto> output_group_vec;
     for (const GroupDto& dto : add_group_set)
     {
         auto result = AddressManager::CreateGroup(dto);
         ASSERT_EQ(result.first, ResultCode::kSuccess);
         ASSERT_GT(result.second.GetRid(), 0u);
         ASSERT_EQ(result.second.GetGroupName(), dto.GetGroupName());
-        output_email_cases.emplace_back(result.second);
+        output_group_vec.emplace_back(result.second);
     }
     uint32_t cur_page = 1;
     uint32_t page_size = 10;
@@ -118,10 +118,52 @@ TEST_F(GroupUT, case1)
     EXPECT_EQ(result.second.GetTotalRecords(), add_group_set.size());
     for (uint32_t i = 0; i < add_group_set.size(); ++i)
     {
-        EXPECT_EQ(query_results[i].GetRid(), output_email_cases[i].GetRid());
-        EXPECT_EQ(query_results[i].GetGroupName(), output_email_cases[i].GetGroupName());
+        EXPECT_EQ(query_results[i].GetRid(), output_group_vec[i].GetRid());
+        EXPECT_EQ(query_results[i].GetGroupName(), output_group_vec[i].GetGroupName());
         EXPECT_EQ(query_results[i].GetGroupName(), add_group_set[i].GetGroupName());
     }
+    AddressManager::Unregister(observer);
+}
+TEST_F(GroupUT, RemoveGroup_case1)
+{
+    std::vector<GroupDto> add_group_set = {
+        GroupDto{"Alice Group"},
+        GroupDto{"Bob Group"},
+    };
+    std::vector<GroupDto> output_group_vec;
+    for (const GroupDto& dto : add_group_set)
+    {
+        auto result = AddressManager::CreateGroup(dto);
+        ASSERT_EQ(result.first, ResultCode::kSuccess);
+        ASSERT_GT(result.second.GetRid(), 0u);
+        ASSERT_EQ(result.second.GetGroupName(), dto.GetGroupName());
+        output_group_vec.emplace_back(result.second);
+    }
+    uint32_t cur_page = 1;
+    uint32_t page_size = 10;
+    auto result = AddressManager::PageQueryGroup(PageQueryParam("", cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    const std::vector<GroupDto>& query_results = result.second.GetRecords();
+    EXPECT_EQ(result.second.GetTotalRecords(), add_group_set.size());
+    std::vector<uint32_t> rids_to_remove;
+    for (uint32_t i = 0; i < add_group_set.size(); ++i)
+    {
+        EXPECT_EQ(query_results[i].GetRid(), output_group_vec[i].GetRid());
+        rids_to_remove.emplace_back(query_results[i].GetRid());
+    }
+
+    std::function<bool(ChangeType)> callback = [](ChangeType type) {
+        return type == ChangeType::DeleteGroups;
+    };
+    auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+    AddressManager::Register(observer);
+
+    ResultCode remove_result = AddressManager::DeleteGroups(rids_to_remove);
+    EXPECT_EQ(remove_result, ResultCode::kSuccess);
+    result = AddressManager::PageQueryGroup(PageQueryParam("", cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    EXPECT_EQ(result.second.GetTotalRecords(), 0u);
+
     AddressManager::Unregister(observer);
 }
 }  // namespace

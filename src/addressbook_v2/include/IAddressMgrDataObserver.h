@@ -11,6 +11,7 @@ enum class ChangeType : uint8_t
     UpdateEmail,
     ImportEmails,
     CreateGroup = 0x10,
+    DeleteGroups,
     DeleteAllGroups,
 };
 
