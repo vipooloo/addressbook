@@ -280,7 +280,7 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
             break;
         }
         // 更新邮件
-        GroupEntity entity(dto.GetGroupName());
+        GroupEntity entity(dto.GetRid(), dto.GetGroupName());
         if (!m_mail_rep.UpdateGroup(entity, rids))
         {
             AB_LOG_E("Failed to update email to database");
@@ -289,7 +289,7 @@ ResultCode EmailService::UpdateGroup(const GroupDto& dto)
         }
         trans_guard.Commit();
     } while (false);
-    DataChanged(result, ChangeType::UpdateEmail);
+    DataChanged(result, ChangeType::UpdateGroup);
     return result;
 }
 

@@ -166,4 +166,56 @@ TEST_F(GroupUT, RemoveGroup_case1)
 
     AddressManager::Unregister(observer);
 }
+
+TEST_F(GroupUT, UpdateGroup_case1)
+{
+    {
+        ResultCode result = AddressManager::UpdateGroup(GroupDto());
+        EXPECT_EQ(result, ResultCode::kInvalidParam);
+    }
+    {
+        ResultCode result = AddressManager::UpdateGroup(GroupDto{12322, "nonexist", {}});
+        EXPECT_EQ(result, ResultCode::kNotFound);
+    }
+}
+
+TEST_F(GroupUT, UpdateGroup_case2)
+{
+    AddressManager::CreateGroup(GroupDto("Alice Group"));
+    uint32_t cur_page = 1;
+    uint32_t page_size = 10;
+    auto result = AddressManager::PageQueryGroup(PageQueryParam(cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    const std::vector<GroupDto>& query_results = result.second.GetRecords();
+    EXPECT_EQ(result.second.GetTotalRecords(), 1u);
+    EXPECT_GT(query_results[0].GetRid(), 0u);
+    EXPECT_EQ(query_results[0].GetGroupName(), "Alice Group");
+
+    std::function<bool(ChangeType)> callback = [](ChangeType type) {
+        return type == ChangeType::UpdateGroup;
+    };
+    auto observer = std::make_shared<ConcreteAddressMgrDataObserver>(callback);
+    AddressManager::Register(observer);
+
+    ResultCode update_result = AddressManager::UpdateGroup(GroupDto(query_results[0].GetRid(), "Alice Group Updated", {}));
+    EXPECT_EQ(update_result, ResultCode::kSuccess);
+    result = AddressManager::PageQueryGroup(PageQueryParam(cur_page, page_size));
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    const std::vector<GroupDto>& updated_query_results = result.second.GetRecords();
+    EXPECT_EQ(result.second.GetTotalRecords(), 1u);
+    EXPECT_EQ(updated_query_results[0].GetRid(), query_results[0].GetRid());
+    EXPECT_EQ(updated_query_results[0].GetGroupName(), "Alice Group Updated");
+    AddressManager::Unregister(observer);
+}
+
+TEST_F(GroupUT, QueryEmail_case1)
+{
+    PageQueryParam query_param("nonexist", 1, 10);
+    auto result = AddressManager::PageQueryEmail(query_param);
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    EXPECT_EQ(result.second.GetTotalRecords(), 0u);
+    EXPECT_EQ(result.second.GetTotalPages(), 0u);
+    EXPECT_EQ(result.second.GetCurrentPage(), query_param.GetCurPage());
+    EXPECT_EQ(result.second.GetPageSize(), query_param.GetPageSize());
+}
 }  // namespace
