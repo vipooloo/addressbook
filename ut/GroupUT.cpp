@@ -78,7 +78,7 @@ class GroupUT : public ::testing::Test
         AddressManager::DeleteAllGroups();
         uint32_t cur_page = 1;
         uint32_t page_size = 10;
-        auto result = AddressManager::PageQueryEmail(PageQueryParam("", cur_page, page_size));
+        auto result = AddressManager::PageQueryGroup(PageQueryParam("", cur_page, page_size));
         ASSERT_EQ(result.first, ResultCode::kSuccess);
         ASSERT_EQ(result.second.GetTotalRecords(), 0u);
         ASSERT_EQ(result.second.GetTotalPages(), 0u);
@@ -208,10 +208,21 @@ TEST_F(GroupUT, UpdateGroup_case2)
     AddressManager::Unregister(observer);
 }
 
-TEST_F(GroupUT, QueryEmail_case1)
+TEST_F(GroupUT, QueryGroup_case1)
 {
     PageQueryParam query_param("nonexist", 1, 10);
-    auto result = AddressManager::PageQueryEmail(query_param);
+    auto result = AddressManager::PageQueryGroup(query_param);
+    ASSERT_EQ(result.first, ResultCode::kSuccess);
+    EXPECT_EQ(result.second.GetTotalRecords(), 0u);
+    EXPECT_EQ(result.second.GetTotalPages(), 0u);
+    EXPECT_EQ(result.second.GetCurrentPage(), query_param.GetCurPage());
+    EXPECT_EQ(result.second.GetPageSize(), query_param.GetPageSize());
+}
+
+TEST_F(GroupUT, QueryGroup_case2)
+{
+    PageQueryParam query_param(1, 10);
+    auto result = AddressManager::PageQueryGroup(query_param);
     ASSERT_EQ(result.first, ResultCode::kSuccess);
     EXPECT_EQ(result.second.GetTotalRecords(), 0u);
     EXPECT_EQ(result.second.GetTotalPages(), 0u);
